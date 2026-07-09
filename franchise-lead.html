@@ -1,0 +1,571 @@
+<!doctype html>
+<!-- @dsCard group="Brand" name="Franchise Lead Capture Page" subtitle="V5 minimale — intro + formulaire de contact + modale de confirmation" viewport="1280x1000" -->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>L'Atelier By — Ouvrez votre franchise</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="L'Atelier By — Ouvrez votre boutique. Un modèle clé en main, rentable et entièrement accompagné.">
+<link rel="stylesheet" href="global.css">
+<script>document.documentElement.classList.add('js');</script>
+<style>
+/* ==========================================================================
+   franchise-lead — MINIMAL / V5
+   Même langage que indexV5 : tokens & polices de global.css, type modeste,
+   accent ruby très parcimonieux, beaucoup d'air.
+   ========================================================================== */
+:root {
+  --paper:  #FCFBF8;
+  --ink:    #232220;
+  --muted:  #8A847C;
+  --faint:  #B8B2A8;
+  --hair:   rgba(35,34,32,0.12);
+  --hair-2: rgba(35,34,32,0.06);
+  --accent: var(--color-primary);   /* ruby — utilisé TRÈS parcimonieusement */
+  --font-accent: var(--font-ui);     /* pas de police cursive — emphase par la couleur uniquement */
+  --maxw:   1080px;
+  --wide:   1280px;
+  --gutter: clamp(24px, 6vw, 72px);
+  --ease:   cubic-bezier(0.4, 0, 0.2, 1);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+html, body { background: var(--paper); }
+body {
+  margin: 0; color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 16px; line-height: 1.65; font-weight: 400;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+section { padding: 0; }
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+::selection { background: var(--accent); color: #fff; }
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding-inline: var(--gutter); }
+.wrap--wide { max-width: var(--wide); }
+
+/* ---- type partagé ---- */
+.eyebrow {
+  font-family: var(--font-ui); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.26em; text-transform: uppercase; color: var(--muted); margin: 0;
+}
+.title {
+  font-family: var(--font-ui); font-weight: 400; letter-spacing: -0.01em;
+  line-height: 1.14; margin: 0;
+  font-size: clamp(25px, 3vw, 36px);
+}
+.title .script { font-family: var(--font-accent); color: var(--accent); }
+.lede { font-size: 16.5px; line-height: 1.7; color: var(--muted); margin: 0; }
+.hr { height: 1px; background: var(--hair); border: 0; margin: 0; }
+
+/* gentle reveal */
+html.js .rev { opacity: 0; transform: translateY(14px); transition: opacity 1s var(--ease), transform 1s var(--ease); }
+html.js .rev.is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { html.js .rev { opacity: 1 !important; transform: none !important; } }
+
+/* ==========================================================================
+   HEADER (identique à indexV5)
+   ========================================================================== */
+.head {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--paper) 90%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--hair-2);
+}
+.head__in { display: flex; align-items: center; justify-content: space-between; gap: 24px; height: 78px; }
+.head__logo { height: 23px; width: auto; }
+.head__nav { display: flex; align-items: center; gap: 34px; }
+.head__nav a { font-size: 13px; letter-spacing: 0.04em; color: var(--muted); position: relative; padding: 4px 0; transition: color .25s var(--ease); }
+.head__nav a:hover { color: var(--ink); }
+.head__nav a.is-active { color: var(--accent); }
+.head__order { font-size: 13px; letter-spacing: 0.04em; display: inline-flex; align-items: center; gap: 7px; color: var(--ink); transition: gap .25s var(--ease), color .25s var(--ease); }
+.head__order:hover { color: var(--accent); gap: 11px; }
+.head__lang { display: inline-flex; gap: 2px; border: 1px solid var(--hair); border-radius: var(--radius-pill); padding: 3px; }
+.head__lang button { border: none; background: none; font: inherit; font-size: 11px; letter-spacing: 0.06em; color: var(--muted); padding: 5px 11px; border-radius: var(--radius-pill); cursor: pointer; transition: color .2s var(--ease), background .2s var(--ease); }
+.head__lang button:hover { color: var(--ink); }
+.head__lang button.is-active { background: var(--ink); color: var(--paper); }
+@media (max-width: 760px) { .head__nav { display: none; } }
+section[id] { scroll-margin-top: 92px; }
+
+/* ==========================================================================
+   PAGE FRANCHISE — flux vertical unique, lisible
+   ========================================================================== */
+.fr { max-width: 760px; margin: 0 auto; padding-inline: var(--gutter); }
+.fr-block { padding: clamp(40px, 6vw, 72px) 0; border-top: 1px solid var(--hair); }
+.fr-block:first-of-type { border-top: 0; padding-top: clamp(44px, 6vw, 80px); }
+.fr-eyebrow { margin-bottom: 16px; display: inline-flex; align-items: baseline; gap: 12px; }
+.fr-num { font-family: var(--font-ui); font-size: 11px; font-weight: 500; letter-spacing: 0.18em; color: var(--accent); }
+.script { color: var(--accent); }
+.fr-title { font-family: var(--font-ui); font-weight: 400; letter-spacing: -0.015em; line-height: 1.08; margin: 0 0 18px; font-size: clamp(30px, 4vw, 48px); max-width: 15ch; }
+.fr-h2 { font-family: var(--font-ui); font-weight: 400; letter-spacing: -0.01em; line-height: 1.14; margin: 0 0 16px; font-size: clamp(23px, 2.8vw, 32px); max-width: 24ch; }
+.fr-lede { font-size: 16.5px; line-height: 1.7; color: var(--muted); margin: 0; max-width: 56ch; }
+.fr-intro { font-size: 16px; line-height: 1.6; color: var(--ink); font-weight: 500; margin: 0 0 20px; }
+.fr-note { font-size: 15px; line-height: 1.7; color: var(--muted); margin: 26px 0 0; max-width: 58ch; }
+.fr-note b { color: var(--ink); font-weight: 500; }
+.fr .form { max-width: 600px; }
+
+.trust { list-style: none; margin: 28px 0 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.trust li { display: flex; align-items: flex-start; gap: 12px; font-size: 15px; line-height: 1.55; color: var(--ink); }
+.trust__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex: 0 0 auto; margin-top: 8px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 12px; margin: 0; }
+.chip { display: inline-flex; align-items: center; gap: 9px; background: #fff; border: 1px solid var(--hair); border-radius: var(--radius-pill); padding: 11px 20px; font-size: 14.5px; line-height: 1.3; color: var(--ink); transition: border-color .25s var(--ease), transform .25s var(--ease), box-shadow .25s var(--ease); }
+.chip:hover { transform: translateY(-2px); border-color: var(--faint); box-shadow: 0 12px 26px -20px rgba(35,34,32,.5); }
+
+/* apparition en cascade */
+html.js .revs > * { opacity: 0; transform: translateY(14px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+html.js .revs.is-in > * { opacity: 1; transform: none; }
+html.js .revs.is-in > *:nth-child(2) { transition-delay: .05s; }
+html.js .revs.is-in > *:nth-child(3) { transition-delay: .10s; }
+html.js .revs.is-in > *:nth-child(4) { transition-delay: .15s; }
+html.js .revs.is-in > *:nth-child(5) { transition-delay: .20s; }
+html.js .revs.is-in > *:nth-child(6) { transition-delay: .25s; }
+html.js .revs.is-in > *:nth-child(7) { transition-delay: .30s; }
+html.js .revs.is-in > *:nth-child(8) { transition-delay: .35s; }
+@media (prefers-reduced-motion: reduce) { html.js .revs > * { opacity: 1 !important; transform: none !important; } }
+
+.needs { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 48px); margin-top: 28px; }
+.need__h { font-family: var(--font-ui); font-weight: 500; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 0 0 16px; padding-bottom: 12px; border-bottom: 1px solid var(--hair); }
+.need__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.need__list li { display: grid; grid-template-columns: 20px 1fr; gap: 11px; align-items: start; font-size: 15px; line-height: 1.5; color: var(--ink); }
+.need__ic { width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; margin-top: 1px; }
+.need__ic svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.need--yes .need__ic { color: var(--accent); }
+.need--no .need__ic { color: var(--faint); }
+.need small { display: block; font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+@media (max-width: 600px) { .needs { grid-template-columns: 1fr; gap: 30px; } }
+
+/* ---- formulaire ---- */
+.form { background: #fff; border: 1px solid var(--hair); border-radius: var(--radius-lg); padding: clamp(26px, 4vw, 40px); box-shadow: 0 30px 70px -46px rgba(35,34,32,.4); }
+.form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 460px) { .form__row { grid-template-columns: 1fr; } }
+.field { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
+.field:first-of-type, .form__row .field { margin-top: 0; }
+.form__row { margin-bottom: 18px; }
+.field__label { font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.field input, .field select {
+  font-family: var(--font-ui); font-size: 15px; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--hair); border-radius: var(--radius-md);
+  padding: 13px 15px; width: 100%; appearance: none; -webkit-appearance: none;
+  transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
+}
+.field input::placeholder { color: var(--faint); }
+.field input:focus, .field select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent); }
+.field--select { position: relative; }
+.field__chev { position: absolute; right: 15px; bottom: 15px; pointer-events: none; color: var(--muted); }
+.field__chev svg { display: block; stroke: currentColor; stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.submit {
+  margin-top: 26px; width: 100%;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  background: var(--accent); color: #fff; border: none; cursor: pointer;
+  font-family: var(--font-ui); font-size: 14px; letter-spacing: 0.02em; font-weight: 500;
+  border-radius: var(--radius-pill); padding: 15px 24px;
+  transition: gap .3s var(--ease), filter .25s var(--ease);
+}
+.submit svg { stroke: currentColor; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.submit:hover { gap: 14px; filter: brightness(1.06); }
+.form__note { margin: 16px 0 0; font-size: 12px; line-height: 1.55; color: var(--faint); text-align: center; }
+
+/* ==========================================================================
+   MODALE DE CONFIRMATION
+   ========================================================================== */
+.modal { position: fixed; inset: 0; z-index: 300; display: none; align-items: center; justify-content: center; padding: clamp(0px, 4vw, 40px); }
+.modal.is-open { display: flex; }
+.modal__backdrop { position: absolute; inset: 0; background: rgba(27,26,24,0.5); backdrop-filter: blur(3px); opacity: 0; transition: opacity .3s var(--ease); }
+.modal.is-open .modal__backdrop { opacity: 1; }
+.modal__panel { position: relative; background: var(--paper); width: 100%; max-width: 460px; border-radius: var(--radius-lg); box-shadow: 0 40px 90px -30px rgba(0,0,0,.5); padding: clamp(30px, 5vw, 44px); text-align: center; transform: translateY(16px) scale(.98); opacity: 0; transition: transform .35s var(--ease), opacity .35s var(--ease); }
+.modal.is-open .modal__panel { transform: none; opacity: 1; }
+.modal__close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; color: var(--muted); font-size: 22px; line-height: 1; cursor: pointer; transition: color .2s var(--ease); }
+.modal__close:hover { color: var(--accent); }
+.modal__mark { width: 52px; height: 52px; margin: 0 auto 20px; border-radius: 50%; border: 1px solid var(--accent); display: inline-flex; align-items: center; justify-content: center; color: var(--accent); }
+.modal__mark svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.modal__eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.26em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.modal__title { font-family: var(--font-ui); font-weight: 400; font-size: clamp(22px, 3vw, 27px); letter-spacing: -0.01em; line-height: 1.2; margin: 0 auto; max-width: 20ch; }
+.modal__body { font-size: 14.5px; line-height: 1.65; color: var(--muted); margin: 14px auto 0; max-width: 34ch; }
+.modal__actions { margin-top: 28px; }
+.btn-min {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-size: 13px; letter-spacing: 0.04em; color: var(--ink);
+  background: transparent; border: 1px solid var(--hair); border-radius: var(--radius-pill);
+  padding: 12px 24px; cursor: pointer;
+  transition: border-color .3s var(--ease), color .3s var(--ease), gap .3s var(--ease);
+}
+.btn-min .ar { transition: transform .3s var(--ease); }
+.btn-min:hover { border-color: var(--ink); color: var(--accent); gap: 13px; }
+.btn-min:hover .ar { transform: translateX(4px); }
+
+/* ==========================================================================
+   FOOTER (identique à indexV5)
+   ========================================================================== */
+.foot { border-top: 1px solid var(--hair); padding: clamp(56px, 8vw, 90px) 0 36px; }
+.foot__top { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 40px; }
+.foot__logo { height: 22px; width: auto; }
+.foot__tag { font-size: 13px; line-height: 1.6; color: var(--muted); margin: 16px 0 0; max-width: 30ch; }
+.foot__col h4 { font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink); margin: 0 0 14px; }
+.foot__col a { display: block; font-size: 13.5px; color: var(--muted); padding: 5px 0; transition: color .2s var(--ease); }
+.foot__col a:hover { color: var(--accent); }
+.foot__bottom { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: clamp(48px, 7vw, 80px); padding-top: 24px; border-top: 1px solid var(--hair-2); font-size: 12px; color: var(--faint); flex-wrap: wrap; }
+.foot__bottom button { background: none; border: none; cursor: pointer; color: var(--faint); font: inherit; transition: color .2s var(--ease); }
+.foot__bottom button:hover { color: var(--ink); }
+@media (max-width: 720px) { .foot__top { grid-template-columns: 1fr 1fr; gap: 32px; } .foot__brand { grid-column: 1 / -1; } }
+</style>
+</head>
+<body>
+
+<!-- ===================== HEADER ===================== -->
+<header class="head">
+  <div class="wrap wrap--wide head__in">
+    <a href="index.html" aria-label="L'Atelier By"><img class="head__logo" src="img/brand/logo.png" alt="L'Atelier By"></a>
+    <nav class="head__nav">
+      <a href="#ouvrir" data-i18n="nav.model">Le modèle</a>
+      <a href="#profil" data-i18n="nav.profil">Profil</a>
+      <a href="#prerequis" data-i18n="nav.prereq">Prérequis</a>
+      <a href="#contact" data-i18n="nav.contact">Contact</a>
+    </nav>
+    <div class="head__lang" data-lang-switch>
+      <button type="button" data-lang="fr">FR</button>
+      <button type="button" data-lang="nl">NL</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- OUVREZ -->
+  <section class="fr-block" id="ouvrir">
+    <div class="fr rev is-in">
+      <p class="eyebrow fr-eyebrow"><span class="fr-num">01</span><span data-i18n="hero.eyebrow">Franchise</span></p>
+      <h1 class="fr-title" data-i18n-html="hero.title">Ouvrez votre <span class="script">boutique.</span></h1>
+      <p class="fr-lede" data-i18n="hero.lede">Un modèle clé en main, rentable et entièrement accompagné — même sans expérience en boulangerie.</p>
+      <ul class="trust revs">
+        <li><span class="trust__dot"></span><span data-i18n="hero.b1">Production centralisée : vous vendez, nous produisons.</span></li>
+        <li><span class="trust__dot"></span><span data-i18n="hero.b2">Accompagnement de l'emplacement à l'ouverture.</span></li>
+        <li><span class="trust__dot"></span><span data-i18n="hero.b3">Rentabilité estimée dès la deuxième année.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CE QUE NOUS RECHERCHONS -->
+  <section class="fr-block" id="profil">
+    <div class="fr rev">
+      <p class="eyebrow fr-eyebrow"><span class="fr-num">02</span><span data-i18n="profil.eyebrow">Profil recherché</span></p>
+      <h2 class="fr-h2" data-i18n="profil.h2">Ce que nous recherchons</h2>
+      <p class="fr-intro" data-i18n="profil.intro">Chez L'Atelier By, nous recherchons des entrepreneurs :</p>
+      <div class="chips revs">
+        <span class="chip" data-i18n="profil.c1">motivés et rayonnants</span>
+        <span class="chip" data-i18n="profil.c2">autonomes</span>
+        <span class="chip" data-i18n="profil.c3">investis dans un projet stimulant</span>
+        <span class="chip" data-i18n="profil.c4">courageux</span>
+        <span class="chip" data-i18n="profil.c5">sensibles au détail et aux normes d'hygiène</span>
+        <span class="chip" data-i18n="profil.c6">capables de gérer une petite équipe</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- BESOIN / PAS BESOIN -->
+  <section class="fr-block" id="prerequis">
+    <div class="fr rev">
+      <p class="eyebrow fr-eyebrow"><span class="fr-num">03</span><span data-i18n="prereq.eyebrow">Prérequis</span></p>
+      <h2 class="fr-h2" data-i18n="prereq.h2">Ce dont vous avez besoin — et ce dont vous n'avez pas besoin</h2>
+      <div class="needs">
+        <div class="need need--yes">
+          <p class="need__h" data-i18n="prereq.yes">Nécessaire</p>
+          <ul class="need__list revs">
+            <li><span class="need__ic"><svg viewBox="0 0 24 24"><path d="M5 13l4 4 10-11"/></svg></span><span data-i18n="prereq.y1">Un certificat de gestion</span></li>
+            <li><span class="need__ic"><svg viewBox="0 0 24 24"><path d="M5 13l4 4 10-11"/></svg></span><span data-i18n="prereq.y2">L'envie d'entreprendre et de gérer une équipe</span></li>
+            <li><span class="need__ic"><svg viewBox="0 0 24 24"><path d="M5 13l4 4 10-11"/></svg></span><span data-i18n-html="prereq.y3">Une expérience commerciale<small>Un atout, pas une obligation</small></span></li>
+          </ul>
+        </div>
+        <div class="need need--no">
+          <p class="need__h" data-i18n="prereq.no">Pas nécessaire</p>
+          <ul class="need__list revs">
+            <li><span class="need__ic"><svg viewBox="0 0 24 24"><path d="M6 12h12"/></svg></span><span data-i18n="prereq.n1">Aucune formation en boulangerie</span></li>
+            <li><span class="need__ic"><svg viewBox="0 0 24 24"><path d="M6 12h12"/></svg></span><span data-i18n-html="prereq.n2">Aucune expérience du métier<small>Nous vous formons sur le terrain</small></span></li>
+          </ul>
+        </div>
+      </div>
+      <p class="fr-note" data-i18n-html="prereq.note"><b>Ne pas être boulanger est même un avantage.</b> Vous vous concentrez sur le commerce et vos clients ; nous produisons.</p>
+    </div>
+  </section>
+
+  <!-- FORMULAIRE (dernier) -->
+  <section class="fr-block" id="contact">
+    <div class="fr rev">
+      <p class="eyebrow fr-eyebrow"><span class="fr-num">04</span><span data-i18n="contact.eyebrow">Contact</span></p>
+      <h2 class="fr-h2" data-i18n="contact.h2">Recevez le dossier complet</h2>
+      <p class="fr-lede" style="margin-bottom: 28px;" data-i18n="contact.lede">Laissez-nous vos coordonnées : nous vous envoyons le dossier de franchise et un membre de l'équipe vous recontacte.</p>
+      <form class="form" id="leadForm" novalidate>
+        <div class="form__row">
+          <label class="field">
+            <span class="field__label" data-i18n="form.firstname">Prénom</span>
+            <input type="text" name="first_name" required autocomplete="given-name">
+          </label>
+          <label class="field">
+            <span class="field__label" data-i18n="form.lastname">Nom</span>
+            <input type="text" name="last_name" required autocomplete="family-name">
+          </label>
+        </div>
+        <label class="field">
+          <span class="field__label" data-i18n="form.email">E-mail</span>
+          <input type="email" name="email" required autocomplete="email" placeholder="vous@exemple.be" data-i18n-ph="form.emailPh">
+        </label>
+        <label class="field">
+          <span class="field__label" data-i18n="form.phone">Téléphone</span>
+          <input type="tel" name="phone" autocomplete="tel" placeholder="+32 …">
+        </label>
+        <label class="field field--select">
+          <span class="field__label" data-i18n="form.zone">Zone géographique souhaitée</span>
+          <select name="area" id="leadZone" required>
+            <option value="">Choisir une zone…</option>
+            <optgroup label="Région de Bruxelles-Capitale">
+              <option value="bruxelles-capitale">Bruxelles-Capitale</option>
+            </optgroup>
+            <optgroup label="Brabant wallon">
+              <option value="nivelles">Nivelles</option>
+            </optgroup>
+            <optgroup label="Hainaut">
+              <option value="ath">Ath</option>
+              <option value="charleroi">Charleroi</option>
+              <option value="la-louviere">La Louvière</option>
+              <option value="mons">Mons</option>
+              <option value="mouscron">Mouscron</option>
+              <option value="soignies">Soignies</option>
+              <option value="thuin">Thuin</option>
+              <option value="tournai">Tournai</option>
+            </optgroup>
+            <optgroup label="Liège">
+              <option value="huy">Huy</option>
+              <option value="liege">Liège</option>
+              <option value="verviers">Verviers</option>
+              <option value="waremme">Waremme</option>
+            </optgroup>
+            <optgroup label="Luxembourg">
+              <option value="arlon">Arlon</option>
+              <option value="bastogne">Bastogne</option>
+              <option value="marche-en-famenne">Marche-en-Famenne</option>
+              <option value="neufchateau">Neufchâteau</option>
+              <option value="virton">Virton</option>
+            </optgroup>
+            <optgroup label="Namur">
+              <option value="dinant">Dinant</option>
+              <option value="namur">Namur</option>
+              <option value="philippeville">Philippeville</option>
+            </optgroup>
+          </select>
+          <span class="field__chev" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </span>
+        </label>
+        <button type="submit" class="submit">
+          <span data-i18n="form.submit">Demande de contact</span>
+          <svg width="14" height="14" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+        <p class="form__note" data-i18n="form.note">Sans engagement. Vos données restent confidentielles et ne sont jamais partagées.</p>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="foot">
+  <div class="wrap wrap--wide">
+    <div class="foot__top">
+      <div class="foot__brand">
+        <img class="foot__logo" src="img/brand/logo.png" alt="L'Atelier By">
+        <p class="foot__tag" data-i18n="footer.tag">Maison de pains et viennoiseries — Belgique, depuis 2019.</p>
+      </div>
+      <div class="foot__col">
+        <h4 data-i18n="footer.explore">Explorer</h4>
+        <a href="index.html#boutiques" data-i18n="footer.shops">Nos boutiques</a>
+        <a href="index.html#produits" data-i18n="footer.products">Produits</a>
+        <a href="index.html#experiences" data-i18n="footer.experiences">Expériences</a>
+      </div>
+      <div class="foot__col">
+        <h4 data-i18n="footer.services">Services</h4>
+        <a href="index.html#experiences" data-i18n="footer.collect">Click &amp; Collect</a>
+        <a href="index.html#experiences" data-i18n="footer.office">Livraison bureau</a>
+        <a href="index.html#produits" data-i18n="footer.online">Magasin en ligne</a>
+      </div>
+      <div class="foot__col">
+        <h4 data-i18n="footer.house">La Maison</h4>
+        <a href="franchise-lead.html" data-i18n="footer.franchise">Franchise</a>
+        <a href="galette-des-rois.html" data-i18n="footer.galette">Galette des rois</a>
+      </div>
+    </div>
+    <div class="foot__bottom">
+      <span data-i18n="footer.copyright">© 2026 L'Atelier By — Tous droits réservés.</span>
+      <span data-i18n="footer.legal">Mentions légales · Confidentialité · Conditions</span>
+      <button type="button" data-totop data-i18n="footer.totop">Haut de page ↑</button>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== MODALE CONFIRMATION ===================== -->
+<div class="modal" id="leadModal" role="dialog" aria-modal="true" aria-labelledby="leadModalTitle" aria-hidden="true">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__panel">
+    <button class="modal__close" type="button" data-close aria-label="Fermer">×</button>
+    <span class="modal__mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 13l4 4 10-11"/></svg></span>
+    <p class="modal__eyebrow" data-i18n="modal.eyebrow">Merci</p>
+    <h2 class="modal__title" id="leadModalTitle" data-i18n="modal.title">Votre demande est bien reçue.</h2>
+    <p class="modal__body" data-i18n="modal.body">Nous vous envoyons le dossier de franchise par e-mail sous 48 h, et un membre de l'équipe vous recontacte pour en parler.</p>
+    <div class="modal__actions">
+      <a class="btn-min" href="index.html#franchise" data-i18n-html="modal.back">Retour à l'accueil <span class="ar">→</span></a>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // gentle reveal for anything below the fold
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+  document.querySelectorAll('.rev, .revs').forEach(function (el) { io.observe(el); });
+
+  var totop = document.querySelector('[data-totop]');
+  if (totop) totop.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+  // scrollspy : surligne la section active dans la nav (position-based)
+  (function () {
+    var links = {};
+    document.querySelectorAll('.head__nav a[href^="#"]').forEach(function (a) {
+      var id = a.getAttribute('href').slice(1); if (id) links[id] = a;
+    });
+    var ids = Object.keys(links); if (!ids.length) return;
+    var sections = ids.map(function (id) { return document.getElementById(id); }).filter(Boolean);
+    var raf = null;
+    function update() {
+      raf = null;
+      var offset = 100, current = sections[0];
+      sections.forEach(function (s) { if (s.getBoundingClientRect().top <= offset) current = s; });
+      ids.forEach(function (k) { links[k].classList.remove('is-active'); });
+      if (current && links[current.id]) links[current.id].classList.add('is-active');
+    }
+    function onScroll() { if (!raf) raf = requestAnimationFrame(update); }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    update();
+  })();
+
+  // form → confirmation modal
+  var form = document.getElementById('leadForm');
+  var modal = document.getElementById('leadModal');
+  function openModal() {
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    modal.querySelector('.modal__close').focus();
+  }
+  function closeModal() {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    openModal();
+  });
+  modal.querySelectorAll('[data-close]').forEach(function (el) { el.addEventListener('click', closeModal); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal(); });
+
+  // --- i18n FR / NL — langue par défaut forcée par le magasin choisi (Halle → NL) ---
+  (function () {
+    var T = {
+      fr: {
+        'nav.model':'Le modèle','nav.profil':'Profil','nav.prereq':'Prérequis','nav.contact':'Contact',
+        'hero.eyebrow':'Franchise','hero.title':'Ouvrez votre <span class="script">boutique.</span>',
+        'hero.lede':'Un modèle clé en main, rentable et entièrement accompagné — même sans expérience en boulangerie.',
+        'hero.b1':'Production centralisée : vous vendez, nous produisons.','hero.b2':"Accompagnement de l'emplacement à l'ouverture.",'hero.b3':'Rentabilité estimée dès la deuxième année.',
+        'profil.eyebrow':'Profil recherché','profil.h2':'Ce que nous recherchons','profil.intro':"Chez L'Atelier By, nous recherchons des entrepreneurs :",
+        'profil.c1':'motivés et rayonnants','profil.c2':'autonomes','profil.c3':'investis dans un projet stimulant','profil.c4':'courageux','profil.c5':"sensibles au détail et aux normes d'hygiène",'profil.c6':'capables de gérer une petite équipe',
+        'prereq.eyebrow':'Prérequis','prereq.h2':"Ce dont vous avez besoin — et ce dont vous n'avez pas besoin",'prereq.yes':'Nécessaire',
+        'prereq.y1':'Un certificat de gestion','prereq.y2':"L'envie d'entreprendre et de gérer une équipe",'prereq.y3':'Une expérience commerciale<small>Un atout, pas une obligation</small>',
+        'prereq.no':'Pas nécessaire','prereq.n1':'Aucune formation en boulangerie','prereq.n2':'Aucune expérience du métier<small>Nous vous formons sur le terrain</small>',
+        'prereq.note':"<b>Ne pas être boulanger est même un avantage.</b> Vous vous concentrez sur le commerce et vos clients ; nous produisons.",
+        'contact.eyebrow':'Contact','contact.h2':'Recevez le dossier complet','contact.lede':"Laissez-nous vos coordonnées : nous vous envoyons le dossier de franchise et un membre de l'équipe vous recontacte.",
+        'form.firstname':'Prénom','form.lastname':'Nom','form.email':'E-mail','form.emailPh':'vous@exemple.be','form.phone':'Téléphone','form.zone':'Zone géographique souhaitée','form.zonePlaceholder':'Choisir une zone…','form.submit':'Demande de contact','form.note':'Sans engagement. Vos données restent confidentielles et ne sont jamais partagées.',
+        'modal.eyebrow':'Merci','modal.title':'Votre demande est bien reçue.','modal.body':"Nous vous envoyons le dossier de franchise par e-mail sous 48 h, et un membre de l'équipe vous recontacte pour en parler.",'modal.back':'Retour à l\'accueil <span class="ar">→</span>',
+        'footer.tag':'Maison de pains et viennoiseries — Belgique, depuis 2019.','footer.explore':'Explorer','footer.shops':'Nos boutiques','footer.products':'Produits','footer.experiences':'Expériences','footer.services':'Services','footer.collect':'Click & Collect','footer.office':'Livraison bureau','footer.online':'Magasin en ligne','footer.house':'La Maison','footer.franchise':'Franchise','footer.galette':'Galette des rois','footer.copyright':'© 2026 L\'Atelier By — Tous droits réservés.','footer.legal':'Mentions légales · Confidentialité · Conditions','footer.totop':'Haut de page ↑',
+        'doc.title':"L'Atelier By — Ouvrez votre franchise"
+      },
+      nl: {
+        'nav.model':'Het model','nav.profil':'Profiel','nav.prereq':'Vereisten','nav.contact':'Contact',
+        'hero.eyebrow':'Franchise','hero.title':'Open uw eigen <span class="script">zaak.</span>',
+        'hero.lede':'Een kant-en-klaar model, rendabel en volledig begeleid — zelfs zonder ervaring in de bakkerij.',
+        'hero.b1':'Gecentraliseerde productie: u verkoopt, wij produceren.','hero.b2':'Begeleiding van locatie tot opening.','hero.b3':'Rendabiliteit verwacht vanaf het tweede jaar.',
+        'profil.eyebrow':'Gezocht profiel','profil.h2':'Wat wij zoeken','profil.intro':"Bij L'Atelier By zoeken we ondernemers die:",
+        'profil.c1':'gemotiveerd en stralend zijn','profil.c2':'zelfstandig zijn','profil.c3':'zich inzetten voor een boeiend project','profil.c4':'moedig zijn','profil.c5':'oog hebben voor detail en hygiëne','profil.c6':'een klein team kunnen leiden',
+        'prereq.eyebrow':'Vereisten','prereq.h2':'Wat u nodig hebt — en wat niet','prereq.yes':'Vereist',
+        'prereq.y1':'Een getuigschrift bedrijfsbeheer','prereq.y2':'Zin om te ondernemen en een team te leiden','prereq.y3':'Commerciële ervaring<small>Een troef, geen verplichting</small>',
+        'prereq.no':'Niet nodig','prereq.n1':'Geen bakkersopleiding','prereq.n2':'Geen ervaring in het vak<small>Wij leiden u op in de praktijk</small>',
+        'prereq.note':'<b>Geen bakker zijn is zelfs een voordeel.</b> U richt zich op de winkel en uw klanten; wij produceren.',
+        'contact.eyebrow':'Contact','contact.h2':'Ontvang het volledige dossier','contact.lede':'Laat uw gegevens achter: we sturen u het franchisedossier en een teamlid neemt contact met u op.',
+        'form.firstname':'Voornaam','form.lastname':'Naam','form.email':'E-mail','form.emailPh':'u@voorbeeld.be','form.phone':'Telefoon','form.zone':'Gewenste regio','form.zonePlaceholder':'Kies een regio…','form.submit':'Contactaanvraag','form.note':'Vrijblijvend. Uw gegevens blijven vertrouwelijk en worden nooit gedeeld.',
+        'modal.eyebrow':'Bedankt','modal.title':'Uw aanvraag is goed ontvangen.','modal.body':'We sturen u het franchisedossier binnen 48 u per e-mail, en een teamlid neemt contact op om het te bespreken.','modal.back':'Terug naar home <span class="ar">→</span>',
+        'footer.tag':'Huis van brood en viennoiserie — België, sinds 2019.','footer.explore':'Ontdekken','footer.shops':'Onze winkels','footer.products':'Producten','footer.experiences':'Ervaringen','footer.services':'Diensten','footer.collect':'Click & Collect','footer.office':'Levering op kantoor','footer.online':'Webshop','footer.house':'Het huis','footer.franchise':'Franchise','footer.galette':'Driekoningentaart','footer.copyright':'© 2026 L\'Atelier By — Alle rechten voorbehouden.','footer.legal':'Wettelijke vermeldingen · Privacy · Voorwaarden','footer.totop':'Naar boven ↑',
+        'doc.title':"L'Atelier By — Open uw franchise"
+      }
+    };
+    var Z = {
+      fr: [
+        ['Région de Bruxelles-Capitale', [['bruxelles-capitale','Bruxelles-Capitale']]],
+        ['Brabant wallon', [['nivelles','Nivelles']]],
+        ['Hainaut', [['ath','Ath'],['charleroi','Charleroi'],['la-louviere','La Louvière'],['mons','Mons'],['mouscron','Mouscron'],['soignies','Soignies'],['thuin','Thuin'],['tournai','Tournai']]],
+        ['Liège', [['huy','Huy'],['liege','Liège'],['verviers','Verviers'],['waremme','Waremme']]],
+        ['Luxembourg', [['arlon','Arlon'],['bastogne','Bastogne'],['marche-en-famenne','Marche-en-Famenne'],['neufchateau','Neufchâteau'],['virton','Virton']]],
+        ['Namur', [['dinant','Dinant'],['namur','Namur'],['philippeville','Philippeville']]]
+      ],
+      nl: [
+        ['Brussels Hoofdstedelijk Gewest', [['brussel','Brussel']]],
+        ['Vlaams-Brabant', [['halle-vilvoorde','Halle-Vilvoorde'],['leuven','Leuven']]],
+        ['Antwerpen', [['antwerpen','Antwerpen'],['mechelen','Mechelen'],['turnhout','Turnhout']]],
+        ['Limburg', [['hasselt','Hasselt'],['maaseik','Maaseik'],['tongeren','Tongeren']]],
+        ['West-Vlaanderen', [['brugge','Brugge'],['kortrijk','Kortrijk'],['diksmuide','Diksmuide'],['veurne','Veurne'],['oostende','Oostende'],['roeselare','Roeselare'],['tielt','Tielt'],['ieper','Ieper']]],
+        ['Oost-Vlaanderen', [['aalst','Aalst'],['oudenaarde','Oudenaarde'],['eeklo','Eeklo'],['gent','Gent'],['sint-niklaas','Sint-Niklaas'],['dendermonde','Dendermonde']]]
+      ]
+    };
+    function t(k) { return (T[lang] && T[lang][k]) || T.fr[k] || ''; }
+    function buildZones() {
+      var sel = document.getElementById('leadZone'); if (!sel) return;
+      var html = '<option value="">' + t('form.zonePlaceholder') + '</option>';
+      (Z[lang] || Z.fr).forEach(function (g) {
+        html += '<optgroup label="' + g[0] + '">';
+        g[1].forEach(function (o) { html += '<option value="' + o[0] + '">' + o[1] + '</option>'; });
+        html += '</optgroup>';
+      });
+      sel.innerHTML = html;
+    }
+    function apply() {
+      document.documentElement.lang = lang;
+      document.title = t('doc.title');
+      document.querySelectorAll('[data-i18n]').forEach(function (el) { el.textContent = t(el.getAttribute('data-i18n')); });
+      document.querySelectorAll('[data-i18n-html]').forEach(function (el) { el.innerHTML = t(el.getAttribute('data-i18n-html')); });
+      document.querySelectorAll('[data-i18n-ph]').forEach(function (el) { el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph'))); });
+      buildZones();
+      var sw = document.querySelector('[data-lang-switch]');
+      if (sw) sw.querySelectorAll('button').forEach(function (b) { b.classList.toggle('is-active', b.dataset.lang === lang); });
+    }
+    function shopLang() { try { return localStorage.getItem('la_boutique') === 'halle' ? 'nl' : 'fr'; } catch (e) { return 'fr'; } }
+    var lang; try { lang = localStorage.getItem('la_lang'); } catch (e) {}
+    if (lang !== 'fr' && lang !== 'nl') lang = shopLang();
+    var sw = document.querySelector('[data-lang-switch]');
+    if (sw) sw.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        lang = b.dataset.lang;
+        try { localStorage.setItem('la_lang', lang); } catch (e) {}
+        apply();
+      });
+    });
+    apply();
+  })();
+})();
+</script>
+</body>
+</html>
