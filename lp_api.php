@@ -61,6 +61,7 @@ $handlers = [
     'shops'    => 'lp_get_shops',
     'pickers'  => 'lp_get_pickers',
     'families' => 'lp_get_families',
+    'services' => 'lp_get_services',
     'sections' => 'lp_get_sections',
     'all'      => 'lp_get_all',
 ];
@@ -197,6 +198,15 @@ function lp_get_families(PDO $pdo): array {
     )->fetchAll();
 }
 
+function lp_get_services(PDO $pdo): array {
+    return $pdo->query(
+        'SELECT position, name_fr, name_nl, desc_fr, desc_nl, icon_svg
+         FROM lp_services
+         WHERE is_active = 1
+         ORDER BY position ASC'
+    )->fetchAll();
+}
+
 function lp_get_sections(PDO $pdo): array {
     $rows = $pdo->query(
         'SELECT section_key, eyebrow_fr, eyebrow_nl, title_fr, title_nl, lede_fr, lede_nl
@@ -218,6 +228,7 @@ function lp_get_all(PDO $pdo): array {
         'shops'    => lp_get_shops($pdo),
         'pickers'  => lp_get_pickers($pdo),
         'families' => lp_get_families($pdo),
+        'services' => lp_get_services($pdo),
         'sections' => lp_get_sections($pdo),
     ];
 }

@@ -1499,6 +1499,22 @@ section[id] { scroll-margin-top: 92px; }
     });
   }
 
+  function patchServices(services) {
+    var wrap = document.querySelector('#experiences .xp');
+    if (!wrap) return;
+    var nl = lang === 'nl';
+    wrap.innerHTML = '';
+    services.forEach(function (s) {
+      var div = document.createElement('div');
+      div.className = 'xpi';
+      div.innerHTML =
+        '<span class="xpi__ic"><svg viewBox="0 0 24 24">' + s.icon_svg + '</svg></span>' +
+        '<div><h3 class="xpi__name">' + (nl ? s.name_nl : s.name_fr) + '</h3>' +
+        '<p class="xpi__desc">' + (nl ? s.desc_nl : s.desc_fr) + '</p></div>';
+      wrap.appendChild(div);
+    });
+  }
+
   function patchSections(sections) {
     var nl = lang === 'nl';
     var map = {
@@ -1548,6 +1564,7 @@ section[id] { scroll-margin-top: 92px; }
       if (!data || data.error) return;
       lang = document.documentElement.lang || 'fr';
       if (data.sections)                           patchSections(data.sections);
+      if (data.services  && data.services.length)  patchServices(data.services);
       if (data.hero      && data.hero.length)      patchHero(data.hero);
       if (data.families  && data.families.length)  patchFamilies(data.families);
       if (data.seasonal  && data.seasonal.length)  patchSeasonal(data.seasonal);
