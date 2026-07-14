@@ -1418,6 +1418,20 @@ section[id] { scroll-margin-top: 92px; }
 
   function g(o, k) { return o[k + '_' + lang] || o[k + '_fr'] || ''; }
 
+  function patchFamilies(families) {
+    var els = document.querySelectorAll('.fam');
+    families.forEach(function (f, i) {
+      var el = els[i]; if (!el) return;
+      var img   = el.querySelector('.fam__art img');
+      var name  = el.querySelector('.fam__name');
+      var count = el.querySelector('.fam__count');
+      if (img)   img.src         = f.image_path;
+      if (name)  name.textContent = lang === 'nl' ? f.name_nl  : f.name_fr;
+      if (count) count.textContent = lang === 'nl' ? f.count_nl : f.count_fr;
+      if (f.href) el.href = f.href;
+    });
+  }
+
   function patchHero(slides) {
     document.querySelectorAll('.hslide').forEach(function (el, i) {
       var s = slides[i]; if (!s) return;
@@ -1440,7 +1454,8 @@ section[id] { scroll-margin-top: 92px; }
     .then(function (data) {
       if (!data || data.error) return;
       lang = document.documentElement.lang || 'fr';
-      if (data.hero && data.hero.length) patchHero(data.hero);
+      if (data.hero     && data.hero.length)     patchHero(data.hero);
+      if (data.families && data.families.length) patchFamilies(data.families);
       document.dispatchEvent(new CustomEvent('lp:data', { detail: data }));
     })
     .catch(function () {});

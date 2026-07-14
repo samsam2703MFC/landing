@@ -60,6 +60,7 @@ $handlers = [
     'franchise'=> 'lp_get_franchise',
     'shops'    => 'lp_get_shops',
     'pickers'  => 'lp_get_pickers',
+    'families' => 'lp_get_families',
     'all'      => 'lp_get_all',
 ];
 
@@ -186,6 +187,15 @@ function lp_get_pickers(PDO $pdo): array {
     return $rows;
 }
 
+function lp_get_families(PDO $pdo): array {
+    return $pdo->query(
+        'SELECT position, name_fr, name_nl, count_fr, count_nl, image_path, href
+         FROM lp_product_families
+         WHERE is_active = 1
+         ORDER BY position ASC'
+    )->fetchAll();
+}
+
 function lp_get_all(PDO $pdo): array {
     return [
         'hero'     => lp_get_hero($pdo),
@@ -194,5 +204,6 @@ function lp_get_all(PDO $pdo): array {
         'franchise'=> lp_get_franchise($pdo),
         'shops'    => lp_get_shops($pdo),
         'pickers'  => lp_get_pickers($pdo),
+        'families' => lp_get_families($pdo),
     ];
 }
