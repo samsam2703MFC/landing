@@ -470,7 +470,35 @@ html.js .revs.is-in > *:nth-child(8) { transition-delay: .35s; }
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     if (!form.checkValidity()) { form.reportValidity(); return; }
-    openModal();
+
+    var btn = form.querySelector('.submit');
+    btn.disabled = true;
+
+    var data = {
+      first_name : (form.first_name.value  || '').trim(),
+      last_name  : (form.last_name.value   || '').trim(),
+      email      : (form.email.value       || '').trim(),
+      phone      : (form.phone.value       || '').trim(),
+      area       : (form.area ? form.area.value : ''),
+      message    : (form.message ? form.message.value : ''),
+      lang       : document.documentElement.lang || 'fr',
+    };
+
+    fetch('/lp_lead.php', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify(data),
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (res) {
+      btn.disabled = false;
+      if (res.ok) { openModal(); }
+      else { alert('Une erreur est survenue. Veuillez réessayer.'); }
+    })
+    .catch(function () {
+      btn.disabled = false;
+      alert('Connexion impossible. Veuillez réessayer.');
+    });
   });
   modal.querySelectorAll('[data-close]').forEach(function (el) { el.addEventListener('click', closeModal); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal(); });
