@@ -61,6 +61,7 @@ $handlers = [
     'shops'    => 'lp_get_shops',
     'pickers'  => 'lp_get_pickers',
     'families' => 'lp_get_families',
+    'legal'    => 'lp_get_legal',
     'footer'   => 'lp_get_footer',
     'nav'      => 'lp_get_nav',
     'i18n'     => 'lp_get_i18n',
@@ -201,6 +202,13 @@ function lp_get_families(PDO $pdo): array {
          WHERE is_active = 1
          ORDER BY position ASC'
     )->fetchAll();
+}
+
+function lp_get_legal(PDO $pdo): array {
+    $row = $pdo->query('SELECT * FROM lp_legal ORDER BY id ASC LIMIT 1')->fetch();
+    if (!$row) return [];
+    unset($row['id'], $row['updated_at']);
+    return $row;
 }
 
 function lp_get_footer(PDO $pdo): array {

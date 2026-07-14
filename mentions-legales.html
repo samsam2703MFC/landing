@@ -122,7 +122,7 @@ img { display: block; max-width: 100%; }
       <p class="eyebrow">Informations légales</p>
       <h1 class="title">Mentions légales, confidentialité & conditions</h1>
       <p class="legal__lead">Cette page regroupe les informations légales obligatoires relatives au site et aux services de L'Atelier By.</p>
-      <p class="legal__updated">Dernière mise à jour : <span class="fill">[DATE]</span></p>
+      <p class="legal__updated">Dernière mise à jour : <span class="fill" data-legal="updated_date">[DATE]</span></p>
       <nav class="legal__toc">
         <a href="#mentions">Mentions légales</a>
         <a href="#confidentialite">Confidentialité (RGPD)</a>
@@ -140,21 +140,21 @@ img { display: block; max-width: 100%; }
 
       <h3>Éditeur du site</h3>
       <ul>
-        <li>Dénomination sociale : <span class="fill">[RAISON SOCIALE]</span></li>
-        <li>Forme juridique : <span class="fill">[SA / SRL / indépendant…]</span></li>
-        <li>Siège social : <span class="fill">[ADRESSE COMPLÈTE]</span></li>
-        <li>Numéro d'entreprise (BCE) : <span class="fill">[0XXX.XXX.XXX]</span></li>
-        <li>Numéro de TVA : <span class="fill">[BE 0XXX.XXX.XXX]</span></li>
-        <li>Éditeur responsable : <span class="fill">[NOM PRÉNOM]</span></li>
-        <li>E-mail : <a href="mailto:[EMAIL DE CONTACT]">[EMAIL DE CONTACT]</a></li>
-        <li>Téléphone : <span class="fill">[+32 …]</span></li>
+        <li>Dénomination sociale : <span class="fill" data-legal="company_name">[RAISON SOCIALE]</span></li>
+        <li>Forme juridique : <span class="fill" data-legal="legal_form">[SA / SRL / indépendant…]</span></li>
+        <li>Siège social : <span class="fill" data-legal="address">[ADRESSE COMPLÈTE]</span></li>
+        <li>Numéro d'entreprise (BCE) : <span class="fill" data-legal="bce_number">[0XXX.XXX.XXX]</span></li>
+        <li>Numéro de TVA : <span class="fill" data-legal="vat_number">[BE 0XXX.XXX.XXX]</span></li>
+        <li>Éditeur responsable : <span class="fill" data-legal="editor_name">[NOM PRÉNOM]</span></li>
+        <li>E-mail : <a class="fill" href="mailto:" data-legal-mail="contact_email">[EMAIL DE CONTACT]</a></li>
+        <li>Téléphone : <span class="fill" data-legal="contact_phone">[+32 …]</span></li>
       </ul>
 
       <h3>Hébergeur</h3>
       <ul>
-        <li>Nom de l'hébergeur : <span class="fill">[NOM HÉBERGEUR]</span></li>
-        <li>Adresse : <span class="fill">[ADRESSE HÉBERGEUR]</span></li>
-        <li>Contact : <span class="fill">[EMAIL / TÉL HÉBERGEUR]</span></li>
+        <li>Nom de l'hébergeur : <span class="fill" data-legal="host_name">[NOM HÉBERGEUR]</span></li>
+        <li>Adresse : <span class="fill" data-legal="host_address">[ADRESSE HÉBERGEUR]</span></li>
+        <li>Contact : <span class="fill" data-legal="host_contact">[EMAIL / TÉL HÉBERGEUR]</span></li>
       </ul>
 
       <h3>Propriété intellectuelle</h3>
@@ -170,7 +170,7 @@ img { display: block; max-width: 100%; }
       <p>La présente politique décrit la manière dont L'Atelier By collecte et traite vos données à caractère personnel, conformément au Règlement (UE) 2016/679 (RGPD) et à la loi belge du 30 juillet 2018.</p>
 
       <h3>Responsable du traitement</h3>
-      <p><span class="fill">[RAISON SOCIALE]</span>, <span class="fill">[ADRESSE]</span> — contact : <a href="mailto:[EMAIL DPO/CONTACT]">[EMAIL DPO/CONTACT]</a>.</p>
+      <p><span class="fill" data-legal="company_name">[RAISON SOCIALE]</span>, <span class="fill" data-legal="address">[ADRESSE]</span> — contact : <a class="fill" href="mailto:" data-legal-mail="dpo_email">[EMAIL DPO/CONTACT]</a>.</p>
 
       <h3>Données collectées</h3>
       <ul>
@@ -188,13 +188,13 @@ img { display: block; max-width: 100%; }
       </ul>
 
       <h3>Durée de conservation</h3>
-      <p>Vos données sont conservées le temps nécessaire aux finalités décrites, puis archivées ou supprimées conformément aux délais légaux applicables. Les données de prospection sont conservées au maximum <span class="fill">[X ans/mois]</span> après le dernier contact.</p>
+      <p>Vos données sont conservées le temps nécessaire aux finalités décrites, puis archivées ou supprimées conformément aux délais légaux applicables. Les données de prospection sont conservées au maximum <span class="fill" data-legal="data_retention">[X ans/mois]</span> après le dernier contact.</p>
 
       <h3>Destinataires</h3>
       <p>Vos données ne sont jamais vendues. Elles peuvent être communiquées à nos sous-traitants techniques (hébergement, envoi d'e-mails) agissant sur nos instructions et soumis à des obligations de confidentialité.</p>
 
       <h3>Vos droits</h3>
-      <p>Vous disposez à tout moment des droits suivants : accès, rectification, effacement, limitation, opposition, portabilité, et retrait du consentement. Pour les exercer, contactez-nous à <a href="mailto:[EMAIL DPO/CONTACT]">[EMAIL DPO/CONTACT]</a>.</p>
+      <p>Vous disposez à tout moment des droits suivants : accès, rectification, effacement, limitation, opposition, portabilité, et retrait du consentement. Pour les exercer, contactez-nous à <a class="fill" href="mailto:" data-legal-mail="dpo_email">[EMAIL DPO/CONTACT]</a>.</p>
       <p>Vous avez également le droit d'introduire une réclamation auprès de l'Autorité de protection des données (APD) : Rue de la Presse 35, 1000 Bruxelles — <a href="https://www.autoriteprotectiondonnees.be" target="_blank" rel="noopener">www.autoriteprotectiondonnees.be</a>.</p>
     </section>
 
@@ -210,7 +210,7 @@ img { display: block; max-width: 100%; }
       <p>Les prix sont indiqués en euros, toutes taxes comprises (TVA belge applicable). L'Atelier By se réserve le droit de modifier ses prix à tout moment ; les produits sont facturés sur la base des tarifs en vigueur au moment de la validation de la commande.</p>
 
       <h3>Commande et paiement</h3>
-      <p>La commande est confirmée après validation du paiement selon les moyens proposés (<span class="fill">[MOYENS DE PAIEMENT]</span>). L'Atelier By se réserve le droit de refuser toute commande en cas de litige, de non-paiement ou d'indisponibilité.</p>
+      <p>La commande est confirmée après validation du paiement selon les moyens proposés (<span class="fill" data-legal="payment_methods">[MOYENS DE PAIEMENT]</span>). L'Atelier By se réserve le droit de refuser toute commande en cas de litige, de non-paiement ou d'indisponibilité.</p>
 
       <h3>Retrait et livraison</h3>
       <p>Les modalités de retrait en boutique (Click &amp; Collect) et de livraison sont précisées lors de la commande. Les créneaux et zones de livraison peuvent varier selon la boutique.</p>
@@ -222,7 +222,7 @@ img { display: block; max-width: 100%; }
       <p>L'Atelier By met tout en œuvre pour assurer la qualité de ses produits. Sa responsabilité ne saurait être engagée en cas de mauvaise conservation par le client ou de non-respect des recommandations (allergènes, dates de consommation).</p>
 
       <h3>Droit applicable et litiges</h3>
-      <p>Les présentes conditions sont régies par le droit belge. En cas de litige, une solution amiable sera recherchée en priorité. À défaut, les tribunaux de <span class="fill">[ARRONDISSEMENT JUDICIAIRE]</span> seront seuls compétents. Les consommateurs peuvent également recourir à la plateforme européenne de règlement en ligne des litiges : <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">ec.europa.eu/consumers/odr</a>.</p>
+      <p>Les présentes conditions sont régies par le droit belge. En cas de litige, une solution amiable sera recherchée en priorité. À défaut, les tribunaux de <span class="fill" data-legal="jurisdiction">[ARRONDISSEMENT JUDICIAIRE]</span> seront seuls compétents. Les consommateurs peuvent également recourir à la plateforme européenne de règlement en ligne des litiges : <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">ec.europa.eu/consumers/odr</a>.</p>
     </section>
 
     <!-- ============ COOKIES ============ -->
@@ -232,13 +232,9 @@ img { display: block; max-width: 100%; }
       <ul>
         <li><strong>Cookies essentiels</strong> : nécessaires au fonctionnement du site (ne peuvent être désactivés).</li>
         <li><strong>Cookies de préférence</strong> : mémorisent votre langue et votre boutique.</li>
-        <li><strong>Cookies de mesure d'audience</strong> : <span class="fill">[si applicable — outil utilisé]</span>, soumis à votre consentement.</li>
+        <li><strong>Cookies de mesure d'audience</strong> : <span class="fill" data-legal="audience_tool">[si applicable — outil utilisé]</span>, soumis à votre consentement.</li>
       </ul>
       <p>Vous pouvez à tout moment configurer votre navigateur pour refuser les cookies ou supprimer ceux déjà enregistrés.</p>
-
-      <div class="legal__note">
-        ⚠️ Ce document est un modèle générique fourni à titre informatif. Il doit être complété avec vos données réelles (champs surlignés) et adapté à votre situation. Nous vous recommandons de le faire relire par un conseiller juridique avant publication.
-      </div>
     </section>
 
   </div>
@@ -256,8 +252,23 @@ img { display: block; max-width: 100%; }
 <script>
   (function () {
     var y = document.getElementById('year');
-    // Année dynamique (fallback 2026 si indisponible)
     try { y.textContent = new Date().getFullYear(); } catch (e) {}
+
+    // Remplissage des données légales depuis la DB (lp_legal)
+    fetch('/landing/lp_api.php?r=legal')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d || d.error) return;
+        document.querySelectorAll('[data-legal]').forEach(function (el) {
+          var v = d[el.getAttribute('data-legal')];
+          if (v) { el.textContent = v; el.classList.remove('fill'); }
+        });
+        document.querySelectorAll('[data-legal-mail]').forEach(function (el) {
+          var v = d[el.getAttribute('data-legal-mail')];
+          if (v) { el.textContent = v; el.href = 'mailto:' + v; el.classList.remove('fill'); }
+        });
+      })
+      .catch(function () {});
   })();
 </script>
 </body>
