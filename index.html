@@ -1140,6 +1140,10 @@ section[id] { scroll-margin-top: 92px; }
     }
     buildCards();
     onLang(function () { buildCards(); sync(); });
+    document.addEventListener('lp:data', function (e) {
+      var d = e.detail;
+      if (d.shops && d.shops.length) { SHOPS = d.shops; buildCards(); sync(); }
+    });
     modal.querySelectorAll('[data-mclose]').forEach(function (el) { el.addEventListener('click', close); });
     modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.classList.contains('is-open')) close(); });
@@ -1338,6 +1342,10 @@ section[id] { scroll-margin-top: 92px; }
     });
 
     syncChip();
+    document.addEventListener('lp:data', function (e) {
+      var d = e.detail;
+      if (d.pickers && d.pickers.length) { BOUTIQUES = d.pickers; syncChip(); }
+    });
   })();
 
   // --- tweaks ---
@@ -1383,6 +1391,43 @@ section[id] { scroll-margin-top: 92px; }
   });
   try { window.parent.postMessage({ type: '__edit_mode_available' }, '*'); } catch (e) {}
   applyAll();
+})();
+</script>
+
+<!-- ===================== LP API INTEGRATION ===================== -->
+<script>
+(function () {
+  'use strict';
+  var lang = document.documentElement.lang || 'fr';
+
+  function g(o, k) { return o[k + '_' + lang] || o[k + '_fr'] || ''; }
+
+  function patchHero(slides) {
+    document.querySelectorAll('.hslide').forEach(function (el, i) {
+      var s = slides[i]; if (!s) return;
+      var eyebrow = el.querySelector('.eyebrow');
+      var title   = el.querySelector('.hero__title');
+      var lede    = el.querySelector('.hero__lede');
+      var ctas    = el.querySelectorAll('.hero__cta a');
+      var img     = el.querySelector('.hslide__art img');
+      if (eyebrow) eyebrow.textContent = g(s, 'eyebrow');
+      if (title)   title.innerHTML     = g(s, 'title');
+      if (lede)    lede.textContent    = g(s, 'lede');
+      if (ctas[0]) { ctas[0].textContent = g(s, 'cta1_text'); if (s.cta1_url) ctas[0].href = s.cta1_url; }
+      if (ctas[1]) { ctas[1].textContent = g(s, 'cta2_text'); if (s.cta2_url) ctas[1].href = s.cta2_url; }
+      if (img && s.image_path) img.src = s.image_path;
+    });
+  }
+
+  fetch('/lp_api.php?r=all')
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (!data || data.error) return;
+      lang = document.documentElement.lang || 'fr';
+      if (data.hero && data.hero.length) patchHero(data.hero);
+      document.dispatchEvent(new CustomEvent('lp:data', { detail: data }));
+    })
+    .catch(function () {});
 })();
 </script>
 </body>
