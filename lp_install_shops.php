@@ -29,6 +29,11 @@ try {
             image_path   VARCHAR(255)  NOT NULL DEFAULT '',
             webshop_url  VARCHAR(255)  NOT NULL DEFAULT '',
             is_active    TINYINT(1)    NOT NULL DEFAULT 1,
+            picker_key     VARCHAR(40)  NOT NULL DEFAULT '',
+            zone           VARCHAR(120) NOT NULL DEFAULT '',
+            lat            DECIMAL(9,6) NOT NULL DEFAULT 0,
+            lng            DECIMAL(9,6) NOT NULL DEFAULT 0,
+            show_in_picker TINYINT(1)   NOT NULL DEFAULT 0,
             updated_at   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
@@ -172,7 +177,36 @@ try {
         }
     }
 
-    echo '<p style="font-family:monospace;color:green">✓ Tables lp_shops + lp_shop_hours + lp_shop_services créées et initialisées (8 boutiques). Supprimez ce fichier.</p>';
+    // ── Pickers webshop (lignes lp_shops : show_in_picker=1, is_active=0) ──
+    $pexists = (int)$pdo->query('SELECT COUNT(*) FROM lp_shops WHERE show_in_picker = 1')->fetchColumn();
+    if (!$pexists) {
+        $base = (int)$pdo->query('SELECT COALESCE(MAX(sort_order),0) FROM lp_shops')->fetchColumn();
+        $pstmt = $pdo->prepare(
+            "INSERT INTO lp_shops
+                (sort_order, name, city, postal_code, kind, is_active,
+                 webshop_url, picker_key, zone, lat, lng, show_in_picker)
+             VALUES
+                (:so, :name, '', '', 'shop', 0,
+                 :url, :key, :zone, :lat, :lng, 1)"
+        );
+        $pickers = [
+            ['halle',     'Halle',     'Hal · Brabant flamand', 50.7331, 4.2364, 'https://halle.latelierby.be'],
+            ['wavre',     'Wavre',     'Brabant wallon',        50.7171, 4.6012, 'https://wavre.latelierby.be'],
+            ['corbais',   'Corbais',   'Mont-Saint-Guibert',    50.6389, 4.6167, 'https://corbais.latelierby.be'],
+            ['gembloux',  'Gembloux',  'Namur',                 50.5611, 4.6917, 'https://gembloux.latelierby.be'],
+            ['sombreffe', 'Sombreffe', 'Namur',                 50.5333, 4.6000, 'https://sombreffe.latelierby.be'],
+            ['gosselies', 'Gosselies', 'Charleroi',             50.4667, 4.4333, 'https://gosselies.latelierby.be'],
+        ];
+        $i = 0;
+        foreach ($pickers as $p) {
+            $pstmt->execute([
+                ':so'   => $base + 1 + $i++, ':name' => $p[1], ':url' => $p[5],
+                ':key'  => $p[0], ':zone' => $p[2], ':lat' => $p[3], ':lng' => $p[4],
+            ]);
+        }
+    }
+
+    echo '<p style="font-family:monospace;color:green">✓ Tables lp_shops + lp_shop_hours + lp_shop_services créées et initialisées (8 boutiques + 6 pickers). Supprimez ce fichier.</p>';
 } catch (PDOException $e) {
     echo '<p style="font-family:monospace;color:red">✗ ' . htmlspecialchars($e->getMessage()) . '</p>';
 }

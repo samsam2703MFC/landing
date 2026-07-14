@@ -180,10 +180,11 @@ function lp_get_shops(PDO $pdo): array {
 }
 
 function lp_get_pickers(PDO $pdo): array {
+    // Les pickers sont désormais des lignes de lp_shops (show_in_picker = 1)
     $rows = $pdo->query(
-        'SELECT picker_key AS `key`, name, zone, lat, lng, shop_url AS shop
-         FROM lp_webshop_pickers
-         WHERE is_active = 1
+        'SELECT picker_key AS `key`, name, zone, lat, lng, webshop_url AS shop
+         FROM lp_shops
+         WHERE show_in_picker = 1
          ORDER BY sort_order ASC'
     )->fetchAll();
 
