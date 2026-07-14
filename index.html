@@ -441,6 +441,20 @@ section[id] { scroll-margin-top: 92px; }
 .seg button { flex: 1; border: none; background: transparent; padding: 8px 6px; border-radius: 6px; font-family: var(--font-ui); font-size: 12px; color: var(--muted); cursor: pointer; transition: all .2s ease; }
 .seg button.is-active { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
 .swatch { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+
+/* ===== SAISON CAROUSEL ===== */
+.scar__viewport { overflow: hidden; }
+.scar__track { display: flex; gap: clamp(20px,3vw,44px); transition: transform .45s cubic-bezier(.25,.46,.45,.94); }
+.scar__track .gitem { flex: 0 0 calc(33.333% - 30px); min-width: 0; }
+@media (max-width: 900px) { .scar__track .gitem { flex: 0 0 calc(50% - 22px); } }
+@media (max-width: 560px) { .scar__track .gitem { flex: 0 0 100%; } }
+.scar__nav { display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 36px; }
+.scar__btn { width: 42px; height: 42px; border-radius: 50%; border: 1.5px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: background .2s, color .2s; }
+.scar__btn:hover { background: var(--ink); color: var(--paper); }
+.scar__btn:disabled { opacity: 0.25; pointer-events: none; }
+.scar__dots { display: flex; gap: 8px; align-items: center; }
+.scar__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ink); opacity: 0.2; border: none; cursor: pointer; transition: opacity .2s, transform .2s; padding: 0; }
+.scar__dot.is-active { opacity: 1; transform: scale(1.3); }
 </style>
 </head>
 <body>
@@ -631,37 +645,40 @@ section[id] { scroll-margin-top: 92px; }
         <h2 class="title" data-i18n="sais.title">Éditions limitées de saison</h2>
         <p class="lede" data-i18n="sais.lede">Disponibles tant que la matière première dure : quelques jours, parfois quelques semaines.</p>
       </div>
-      <div class="gal revs">
-        <a class="gitem" href="index.html#produits">
-          <span class="gitem__art"><img src="img/products/brioche-croustillante.png" alt=""></span>
-          <span class="gitem__tag" data-i18n="sa5.tag">Été</span>
-          <h3 class="gitem__name" data-i18n="sa5.n">Brioche Croustillante Myrtille</h3>
-          <p class="gitem__desc" data-i18n="sa5.d">Brioche filée, cœur de myrtille et crumble citronné. Jusqu'à épuisement des matières de saison.</p>
-        </a>
-        <a class="gitem" href="index.html#produits">
-          <span class="gitem__art"><img src="img/availability/spring.png" alt=""></span>
-          <span class="gitem__tag" data-i18n="sa1.tag">Saison</span>
-          <h3 class="gitem__name" data-i18n="sa1.n">Tarte de printemps</h3>
-          <p class="gitem__desc" data-i18n="sa1.d">On commence quand la matière est prête, on termine quand elle s'épuise.</p>
-        </a>
-        <a class="gitem" href="index.html#produits">
-          <span class="gitem__art"><img src="img/availability/summer.png" alt=""></span>
-          <span class="gitem__tag" data-i18n="sa2.tag">Fugace</span>
-          <h3 class="gitem__name" data-i18n="sa2.n">Les fruits d'été</h3>
-          <p class="gitem__desc" data-i18n="sa2.d">Un producteur, un lot, un goût. Pas de substitution.</p>
-        </a>
-        <a class="gitem" href="galette-des-rois.html">
-          <span class="gitem__art"><img src="img/availability/epiphany.png" alt=""></span>
-          <span class="gitem__tag" data-i18n="sa3.tag">Fête</span>
-          <h3 class="gitem__name" data-i18n="sa3.n">Galette des Rois</h3>
-          <p class="gitem__desc" data-i18n="sa3.d">Frangipane à l'ancienne, fève signée. De janvier à l'Épiphanie.</p>
-        </a>
-        <a class="gitem" href="index.html#produits">
-          <span class="gitem__art"><img src="img/availability/saint-nicholas.png" alt=""></span>
-          <span class="gitem__tag" data-i18n="sa4.tag">Édition</span>
-          <h3 class="gitem__name" data-i18n="sa4.n">Spéculoos de saint Nicolas</h3>
-          <p class="gitem__desc" data-i18n="sa4.d">Si vous l'aimez, ne l'attendez pas.</p>
-        </a>
+      <div class="scar revs" id="saisonCarousel">
+        <div class="scar__viewport">
+          <div class="scar__track" id="saisonTrack">
+            <a class="gitem" href="index.html#produits">
+              <span class="gitem__art"><img src="img/products/brioche-croustillante.png" alt=""></span>
+              <span class="gitem__tag" data-i18n="sa5.tag">Été</span>
+              <h3 class="gitem__name" data-i18n="sa5.n">Brioche Croustillante Myrtille</h3>
+              <p class="gitem__desc" data-i18n="sa5.d">Brioche filée, cœur de myrtille et crumble citronné. Jusqu'à épuisement des matières de saison.</p>
+            </a>
+            <a class="gitem" href="index.html#produits">
+              <span class="gitem__art"><img src="img/availability/spring.png" alt=""></span>
+              <span class="gitem__tag" data-i18n="sa1.tag">Saison</span>
+              <h3 class="gitem__name" data-i18n="sa1.n">Tarte de printemps</h3>
+              <p class="gitem__desc" data-i18n="sa1.d">On commence quand la matière est prête, on termine quand elle s'épuise.</p>
+            </a>
+            <a class="gitem" href="galette-des-rois.html">
+              <span class="gitem__art"><img src="img/availability/epiphany.png" alt=""></span>
+              <span class="gitem__tag" data-i18n="sa3.tag">Fête</span>
+              <h3 class="gitem__name" data-i18n="sa3.n">Galette des Rois</h3>
+              <p class="gitem__desc" data-i18n="sa3.d">Frangipane à l'ancienne, fève signée. De janvier à l'Épiphanie.</p>
+            </a>
+            <a class="gitem" href="index.html#produits">
+              <span class="gitem__art"><img src="img/availability/saint-nicholas.png" alt=""></span>
+              <span class="gitem__tag" data-i18n="sa4.tag">Édition</span>
+              <h3 class="gitem__name" data-i18n="sa4.n">Spéculoos de saint Nicolas</h3>
+              <p class="gitem__desc" data-i18n="sa4.d">Si vous l'aimez, ne l'attendez pas.</p>
+            </a>
+          </div>
+        </div>
+        <div class="scar__nav">
+          <button class="scar__btn" id="saisonPrev" aria-label="Précédent">←</button>
+          <div class="scar__dots" id="saisonDots"></div>
+          <button class="scar__btn" id="saisonNext" aria-label="Suivant">→</button>
+        </div>
       </div>
     </div>
   </section>
@@ -1427,6 +1444,62 @@ section[id] { scroll-margin-top: 92px; }
       document.dispatchEvent(new CustomEvent('lp:data', { detail: data }));
     })
     .catch(function () {});
+})();
+</script>
+
+<script>
+(function () {
+  var track    = document.getElementById('saisonTrack');
+  var dotsWrap = document.getElementById('saisonDots');
+  var btnPrev  = document.getElementById('saisonPrev');
+  var btnNext  = document.getElementById('saisonNext');
+  if (!track) return;
+
+  var items   = Array.prototype.slice.call(track.querySelectorAll('.gitem'));
+  var total   = items.length;
+  var current = 0;
+  var startX  = 0;
+
+  items.forEach(function (_, i) {
+    var d = document.createElement('button');
+    d.className = 'scar__dot';
+    d.setAttribute('aria-label', 'Slide ' + (i + 1));
+    d.addEventListener('click', function () { goTo(i); });
+    dotsWrap.appendChild(d);
+  });
+
+  function getPerPage() {
+    var w = track.parentElement.offsetWidth;
+    if (w < 560) return 1;
+    if (w < 900) return 2;
+    return 3;
+  }
+
+  function goTo(idx) {
+    var per  = getPerPage();
+    var max  = total - per;
+    current  = Math.max(0, Math.min(idx, max));
+    var gap  = parseFloat(getComputedStyle(track).gap) || 24;
+    var itemW = items[0].offsetWidth + gap;
+    track.style.transform = 'translateX(-' + (current * itemW) + 'px)';
+    dotsWrap.querySelectorAll('.scar__dot').forEach(function (d, i) {
+      d.classList.toggle('is-active', i === current);
+    });
+    btnPrev.disabled = current === 0;
+    btnNext.disabled = current >= max;
+  }
+
+  btnPrev.addEventListener('click', function () { goTo(current - 1); });
+  btnNext.addEventListener('click', function () { goTo(current + 1); });
+  window.addEventListener('resize', function () { goTo(current); });
+
+  track.addEventListener('touchstart', function (e) { startX = e.touches[0].clientX; }, { passive: true });
+  track.addEventListener('touchend', function (e) {
+    var dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 40) goTo(current + (dx < 0 ? 1 : -1));
+  });
+
+  goTo(0);
 })();
 </script>
 </body>
