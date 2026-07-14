@@ -797,19 +797,19 @@ section[id] { scroll-margin-top: 92px; }
         <img class="foot__logo" src="img/brand/logo.png" alt="L'Atelier By">
         <p class="foot__tag" data-i18n="ft.tag">Maison de pains et viennoiseries — Belgique, depuis 2019.</p>
       </div>
-      <div class="foot__col">
+      <div class="foot__col" data-foot-col="1">
         <h4 data-i18n="ft.explore">Explorer</h4>
         <a href="index.html#boutiques" data-i18n="ft.shops">Nos boutiques</a>
         <a href="index.html#produits" data-i18n="ft.products">Produits</a>
         <a href="index.html#experiences" data-i18n="ft.experiences">Expériences</a>
       </div>
-      <div class="foot__col">
+      <div class="foot__col" data-foot-col="2">
         <h4 data-i18n="ft.services">Services</h4>
         <a href="index.html#experiences" data-i18n="ft.collect">Click &amp; Collect</a>
         <a href="index.html#experiences" data-i18n="ft.office">Livraison bureau</a>
         <a href="index.html#produits" data-i18n="ft.online">Magasin en ligne</a>
       </div>
-      <div class="foot__col">
+      <div class="foot__col" data-foot-col="3">
         <h4 data-i18n="ft.house">La Maison</h4>
         <a href="franchise-lead.html" data-param-href="franchise_url" data-i18n="ft.franchise">Franchise</a>
         <a href="galette-des-rois.html" data-param-href="galette_url" data-i18n="ft.galette">Galette des rois</a>
@@ -1506,6 +1506,25 @@ section[id] { scroll-margin-top: 92px; }
     });
   }
 
+  function patchFooter(cols) {
+    var nl = lang === 'nl';
+    document.querySelectorAll('.foot__col').forEach(function (col) {
+      var key = col.getAttribute('data-foot-col');
+      if (!key) return;
+      var links = cols[key];
+      // supprimer les <a> existants (garder le <h4>)
+      col.querySelectorAll('a').forEach(function (a) { a.remove(); });
+      if (!links || !links.length) { col.hidden = true; return; }
+      col.hidden = false;
+      links.forEach(function (link) {
+        var a = document.createElement('a');
+        a.href = link.url;
+        a.textContent = nl ? link.label_nl : link.label_fr;
+        col.appendChild(a);
+      });
+    });
+  }
+
   function patchNav(items) {
     var nav = document.querySelector('.head__nav');
     if (!nav) return;
@@ -1634,6 +1653,7 @@ section[id] { scroll-margin-top: 92px; }
       // Chaque patch est isolé : une erreur n'interrompt pas les autres
       function run(fn) { try { fn(); } catch (e) { if (window.console) console.warn('patch error', e); } }
       if (data.nav)                                run(function () { patchNav(data.nav); });
+      if (data.footer)                             run(function () { patchFooter(data.footer); });
       if (data.i18n)                               run(function () { patchI18n(data.i18n); });
       if (data.params)                             run(function () { patchParams(data.params); });
       if (data.sections)                           run(function () { patchSections(data.sections); });
