@@ -1,0 +1,54 @@
+name: Diagnose server
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check server state
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 185.180.206.46
+          username: root
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            echo "=== Web server ==="
+            apache2 -v 2>/dev/null || nginx -v 2>/dev/null || echo "aucun"
+
+            echo ""
+            echo "=== Service actif ==="
+            systemctl is-active apache2 2>/dev/null || systemctl is-active nginx 2>/dev/null
+
+            echo ""
+            echo "=== /var/www/ ==="
+            ls /var/www/
+
+            echo ""
+            echo "=== /var/www/latelierby-landing ==="
+            ls /var/www/latelierby-landing 2>/dev/null || echo "DOSSIER ABSENT"
+
+            echo ""
+            echo "=== /var/www/html ==="
+            ls /var/www/html 2>/dev/null | head -5
+
+            echo ""
+            echo "=== Apache conf-enabled ==="
+            ls /etc/apache2/conf-enabled/ 2>/dev/null || echo "N/A"
+
+            echo ""
+            echo "=== Apache sites-enabled ==="
+            ls /etc/apache2/sites-enabled/ 2>/dev/null || echo "N/A"
+
+            echo ""
+            echo "=== Apache conf latelierby ==="
+            cat /etc/apache2/conf-available/latelierby-landing.conf 2>/dev/null || echo "FICHIER ABSENT"
+
+            echo ""
+            echo "=== Nginx sites-enabled ==="
+            ls /etc/nginx/sites-enabled/ 2>/dev/null || echo "N/A"
+
+            echo ""
+            echo "=== Port 80 ==="
+            ss -tlnp | grep :80
