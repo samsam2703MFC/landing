@@ -544,7 +544,7 @@ section[id] { scroll-margin-top: 92px; }
                 <p class="hero__lede" data-i18n="hero3.lede">Disponibles tant que la matière première dure : quelques jours, parfois quelques semaines.</p>
                 <div class="hero__cta">
                   <a class="lnk" href="#saison" data-i18n="hero3.cta1">Voir les éditions</a>
-                  <a class="lnk lnk--quiet" href="galette-des-rois.html" data-i18n="hero3.cta2">Galette des Rois →</a>
+                  <a class="lnk lnk--quiet" href="galette-des-rois.html" data-param-href="galette_url" data-i18n="hero3.cta2">Galette des Rois →</a>
                 </div>
               </div>
               <div class="hslide__art"><img src="img/availability/spring.png" alt="Tarte de printemps — illustration au trait"></div>
@@ -660,7 +660,7 @@ section[id] { scroll-margin-top: 92px; }
               <h3 class="gitem__name" data-i18n="sa1.n">Tarte de printemps</h3>
               <p class="gitem__desc" data-i18n="sa1.d">On commence quand la matière est prête, on termine quand elle s'épuise.</p>
             </a>
-            <a class="gitem" href="galette-des-rois.html">
+            <a class="gitem" href="galette-des-rois.html" data-param-href="galette_url">
               <span class="gitem__art"><img src="img/availability/epiphany.png" alt=""></span>
               <span class="gitem__tag" data-i18n="sa3.tag">Fête</span>
               <h3 class="gitem__name" data-i18n="sa3.n">Galette des Rois</h3>
@@ -779,7 +779,7 @@ section[id] { scroll-margin-top: 92px; }
         <li data-i18n="frh.p3">Accompagnement complet</li>
       </ul>
       <div class="quiet__cta">
-        <a class="btn-min" href="franchise-lead.html"><span data-i18n="frh.cta">Recevoir le dossier</span> <span class="ar">→</span></a>
+        <a class="btn-min" href="franchise-lead.html" data-param-href="franchise_url"><span data-i18n="frh.cta">Recevoir le dossier</span> <span class="ar">→</span></a>
       </div>
     </div>
   </section>
@@ -808,8 +808,8 @@ section[id] { scroll-margin-top: 92px; }
       </div>
       <div class="foot__col">
         <h4 data-i18n="ft.house">La Maison</h4>
-        <a href="franchise-lead.html" data-i18n="ft.franchise">Franchise</a>
-        <a href="galette-des-rois.html" data-i18n="ft.galette">Galette des rois</a>
+        <a href="franchise-lead.html" data-param-href="franchise_url" data-i18n="ft.franchise">Franchise</a>
+        <a href="galette-des-rois.html" data-param-href="galette_url" data-i18n="ft.galette">Galette des rois</a>
       </div>
     </div>
     <div class="foot__bottom">
@@ -1499,6 +1499,19 @@ section[id] { scroll-margin-top: 92px; }
     });
   }
 
+  function patchI18n(i18n) {
+    if (i18n.fr) Object.keys(i18n.fr).forEach(function (k) { T.fr[k] = i18n.fr[k]; });
+    if (i18n.nl) Object.keys(i18n.nl).forEach(function (k) { T.nl[k] = i18n.nl[k]; });
+    applyStatic();
+  }
+
+  function patchParams(params) {
+    document.querySelectorAll('[data-param-href]').forEach(function (el) {
+      var val = params[el.getAttribute('data-param-href')];
+      if (val) el.href = val;
+    });
+  }
+
   function patchApp(a) {
     var sec = document.getElementById('app');
     if (!sec) return;
@@ -1586,6 +1599,8 @@ section[id] { scroll-margin-top: 92px; }
     .then(function (data) {
       if (!data || data.error) return;
       lang = document.documentElement.lang || 'fr';
+      if (data.i18n)                               patchI18n(data.i18n);
+      if (data.params)                             patchParams(data.params);
       if (data.sections)                           patchSections(data.sections);
       if (data.services  && data.services.length)  patchServices(data.services);
       if (data.app       && Object.keys(data.app).length) patchApp(data.app);

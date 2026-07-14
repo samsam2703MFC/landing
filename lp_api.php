@@ -61,6 +61,8 @@ $handlers = [
     'shops'    => 'lp_get_shops',
     'pickers'  => 'lp_get_pickers',
     'families' => 'lp_get_families',
+    'i18n'     => 'lp_get_i18n',
+    'params'   => 'lp_get_params',
     'app'      => 'lp_get_app',
     'services' => 'lp_get_services',
     'sections' => 'lp_get_sections',
@@ -199,6 +201,25 @@ function lp_get_families(PDO $pdo): array {
     )->fetchAll();
 }
 
+function lp_get_i18n(PDO $pdo): array {
+    $rows = $pdo->query(
+        'SELECT i18n_key, value_fr, value_nl FROM lp_i18n'
+    )->fetchAll();
+    $fr = $nl = [];
+    foreach ($rows as $r) {
+        $fr[$r['i18n_key']] = $r['value_fr'];
+        $nl[$r['i18n_key']] = $r['value_nl'];
+    }
+    return ['fr' => $fr, 'nl' => $nl];
+}
+
+function lp_get_params(PDO $pdo): array {
+    $rows = $pdo->query('SELECT param_key, param_value FROM lp_params')->fetchAll();
+    $out = [];
+    foreach ($rows as $r) $out[$r['param_key']] = $r['param_value'];
+    return $out;
+}
+
 function lp_get_app(PDO $pdo): array {
     $section = $pdo->query(
         'SELECT title_fr, title_nl, lede_fr, lede_nl,
@@ -246,6 +267,8 @@ function lp_get_all(PDO $pdo): array {
         'shops'    => lp_get_shops($pdo),
         'pickers'  => lp_get_pickers($pdo),
         'families' => lp_get_families($pdo),
+        'i18n'     => lp_get_i18n($pdo),
+        'params'   => lp_get_params($pdo),
         'app'      => lp_get_app($pdo),
         'services' => lp_get_services($pdo),
         'sections' => lp_get_sections($pdo),
