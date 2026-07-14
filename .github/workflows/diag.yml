@@ -7,28 +7,28 @@ jobs:
   diag:
     runs-on: ubuntu-latest
     steps:
-      - name: Check server state
+      - name: Check redirects and htaccess
         uses: appleboy/ssh-action@v1
         with:
           host: 185.180.206.46
           username: root
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            echo "=== sites-enabled ==="
-            ls /etc/apache2/sites-enabled/
+            echo "=== curl verbose /landing/ ==="
+            curl -v http://localhost/landing/ 2>&1 | grep -E "< HTTP|< Location|> GET|< Set-Cookie"
 
             echo ""
-            echo "=== 000-default.conf ==="
-            cat /etc/apache2/sites-available/000-default.conf 2>/dev/null || echo "ABSENT"
+            echo "=== .htaccess dans latelierby-landing ==="
+            cat /var/www/latelierby-landing/.htaccess 2>/dev/null || echo "ABSENT"
 
             echo ""
-            echo "=== configtest ==="
-            apache2ctl configtest 2>&1
+            echo "=== latelierby-landing.conf (sites-enabled) ==="
+            cat /etc/apache2/sites-enabled/latelierby-landing.conf 2>/dev/null || echo "ABSENT"
 
             echo ""
-            echo "=== curl localhost/landing/ ==="
-            curl -s -o /dev/null -w "%{http_code}" http://localhost/landing/
+            echo "=== conf-enabled ==="
+            ls /etc/apache2/conf-enabled/
 
             echo ""
-            echo "=== error.log (5 dernieres lignes) ==="
-            tail -5 /var/log/apache2/error.log 2>/dev/null
+            echo "=== latelierby-alias.conf ==="
+            cat /etc/apache2/conf-available/latelierby-alias.conf 2>/dev/null || echo "ABSENT"
