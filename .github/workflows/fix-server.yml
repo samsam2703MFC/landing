@@ -1,0 +1,84 @@
+name: Fix server (emergency restore)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore site
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 185.180.206.46
+          username: root
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            set -e
+
+            # Détection serveur web
+            if command -v apache2 &>/dev/null; then WEB=apache; else WEB=nginx; fi
+            echo ">>> Serveur : $WEB"
+
+            PROJECT=/var/www/latelierby-landing
+            mkdir -p "$PROJECT"
+            git config --global --add safe.directory "$PROJECT"
+
+            # S'assurer que les fichiers sont là
+            if [ ! -d "$PROJECT/.git" ]; then
+              git clone https://github.com/samsam2703MFC/landing.git "$PROJECT"
+            else
+              cd "$PROJECT" && git pull origin main
+            fi
+
+            # ── Apache ──────────────────────────────────────────
+            if [ "$WEB" = "apache" ]; then
+              # VirtualHost qui répond à l'IP ET au domaine
+              cat > /etc/apache2/sites-available/latelierby-landing.conf << 'EOF'
+<VirtualHost *:80>
+    ServerName latelierby.be
+    ServerAlias www.latelierby.be 185.180.206.46
+    DocumentRoot /var/www/latelierby-landing
+    DirectoryIndex index.html index.php
+    <Directory /var/www/latelierby-landing>
+        AllowOverride All
+        Require all granted
+    </Directory>
+    ErrorLog ${APACHE_LOG_DIR}/latelierby-error.log
+    CustomLog ${APACHE_LOG_DIR}/latelierby-access.log combined
+</VirtualHost>
+EOF
+              a2ensite latelierby-landing.conf
+              # Réactiver le default en fallback si besoin
+              a2ensite 000-default.conf 2>/dev/null || true
+              apache2ctl configtest && systemctl reload apache2
+              echo ">>> Apache rechargé"
+            fi
+
+            # ── Nginx ────────────────────────────────────────────
+            if [ "$WEB" = "nginx" ]; then
+              PHP_SOCK=$(ls /var/run/php/php*-fpm.sock 2>/dev/null | sort -V | tail -1)
+              PHP_SOCK=${PHP_SOCK:-/var/run/php/php8.2-fpm.sock}
+
+              cat > /etc/nginx/sites-available/latelierby-landing << NGINXEOF
+server {
+    listen 80 default_server;
+    server_name latelierby.be www.latelierby.be 185.180.206.46 _;
+    root /var/www/latelierby-landing;
+    index index.html index.php;
+    location / { try_files \$uri \$uri/ =404; }
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:$PHP_SOCK;
+    }
+}
+NGINXEOF
+              ln -sf /etc/nginx/sites-available/latelierby-landing \
+                     /etc/nginx/sites-enabled/latelierby-landing
+              nginx -t && systemctl reload nginx
+              echo ">>> Nginx rechargé"
+            fi
+
+            echo ""
+            echo "✓ Site restauré sur /var/www/latelierby-landing"
+            ls "$PROJECT" | head -10
