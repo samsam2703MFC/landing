@@ -7,28 +7,22 @@ jobs:
   diag:
     runs-on: ubuntu-latest
     steps:
-      - name: Check redirects and htaccess
+      - name: Find Roundcube SMTP config
         uses: appleboy/ssh-action@v1
         with:
           host: 185.180.206.46
           username: root
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            echo "=== curl verbose /landing/ ==="
-            curl -v http://localhost/landing/ 2>&1 | grep -E "< HTTP|< Location|> GET|< Set-Cookie"
+            echo "=== Roundcube config ==="
+            grep -r "smtp_server\|smtp_port\|smtp_user" /var/www/html/roundcube/config/ 2>/dev/null \
+              || grep -r "smtp_server\|smtp_port" /etc/roundcube/ 2>/dev/null \
+              || find / -name "config.inc.php" -path "*/roundcube/*" 2>/dev/null | head -3 | xargs grep -l "smtp" 2>/dev/null
 
             echo ""
-            echo "=== .htaccess dans latelierby-landing ==="
-            cat /var/www/latelierby-landing/.htaccess 2>/dev/null || echo "ABSENT"
+            echo "=== Ports mail ouverts ==="
+            ss -tlnp | grep -E ":25|:465|:587|:993|:143"
 
             echo ""
-            echo "=== latelierby-landing.conf (sites-enabled) ==="
-            cat /etc/apache2/sites-enabled/latelierby-landing.conf 2>/dev/null || echo "ABSENT"
-
-            echo ""
-            echo "=== conf-enabled ==="
-            ls /etc/apache2/conf-enabled/
-
-            echo ""
-            echo "=== latelierby-alias.conf ==="
-            cat /etc/apache2/conf-available/latelierby-alias.conf 2>/dev/null || echo "ABSENT"
+            echo "=== Postfix actif ? ==="
+            systemctl is-active postfix 2>/dev/null || echo "non"
