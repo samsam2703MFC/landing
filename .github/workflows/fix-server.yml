@@ -7,7 +7,7 @@ jobs:
   fix:
     runs-on: ubuntu-latest
     steps:
-      - name: Restore site
+      - name: Restore site at /landing/
         uses: appleboy/ssh-action@v1
         with:
           host: 185.180.206.46
@@ -24,61 +24,63 @@ jobs:
             mkdir -p "$PROJECT"
             git config --global --add safe.directory "$PROJECT"
 
-            # S'assurer que les fichiers sont là
+            # Clone ou pull
             if [ ! -d "$PROJECT/.git" ]; then
               git clone https://github.com/samsam2703MFC/landing.git "$PROJECT"
             else
               cd "$PROJECT" && git pull origin main
             fi
 
-            # ── Apache ──────────────────────────────────────────
+            # ── Apache : Alias /landing → dossier projet ─────────
             if [ "$WEB" = "apache" ]; then
-              # VirtualHost qui répond à l'IP ET au domaine
-              cat > /etc/apache2/sites-available/latelierby-landing.conf << 'EOF'
-<VirtualHost *:80>
-    ServerName latelierby.be
-    ServerAlias www.latelierby.be 185.180.206.46
-    DocumentRoot /var/www/latelierby-landing
+              cat > /etc/apache2/conf-available/latelierby-landing.conf << 'EOF'
+Alias /landing /var/www/latelierby-landing
+
+<Directory /var/www/latelierby-landing>
+    AllowOverride All
+    Require all granted
+    Options -Indexes
     DirectoryIndex index.html index.php
-    <Directory /var/www/latelierby-landing>
-        AllowOverride All
-        Require all granted
-    </Directory>
-    ErrorLog ${APACHE_LOG_DIR}/latelierby-error.log
-    CustomLog ${APACHE_LOG_DIR}/latelierby-access.log combined
-</VirtualHost>
+</Directory>
 EOF
-              a2ensite latelierby-landing.conf
-              # Réactiver le default en fallback si besoin
+              a2enconf latelierby-landing
+              # S'assurer que le site par défaut est actif (PHPMyAdmin, Roundcube, etc.)
               a2ensite 000-default.conf 2>/dev/null || true
               apache2ctl configtest && systemctl reload apache2
-              echo ">>> Apache rechargé"
+              echo ">>> Apache : /landing/ configuré"
             fi
 
-            # ── Nginx ────────────────────────────────────────────
+            # ── Nginx : location /landing/ ────────────────────────
             if [ "$WEB" = "nginx" ]; then
               PHP_SOCK=$(ls /var/run/php/php*-fpm.sock 2>/dev/null | sort -V | tail -1)
               PHP_SOCK=${PHP_SOCK:-/var/run/php/php8.2-fpm.sock}
 
-              cat > /etc/nginx/sites-available/latelierby-landing << NGINXEOF
-server {
-    listen 80 default_server;
-    server_name latelierby.be www.latelierby.be 185.180.206.46 _;
-    root /var/www/latelierby-landing;
+              SNIP=/etc/nginx/snippets/latelierby-landing.conf
+              cat > "$SNIP" << NGINXEOF
+location /landing/ {
+    alias /var/www/latelierby-landing/;
     index index.html index.php;
-    location / { try_files \$uri \$uri/ =404; }
-    location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:$PHP_SOCK;
-    }
+    try_files \$uri \$uri/ /landing/index.html;
+}
+
+location ~ ^/landing/(.+\.php)$ {
+    fastcgi_param SCRIPT_FILENAME /var/www/latelierby-landing/\$1;
+    fastcgi_param SCRIPT_NAME /landing/\$1;
+    include fastcgi_params;
+    fastcgi_pass unix:$PHP_SOCK;
 }
 NGINXEOF
-              ln -sf /etc/nginx/sites-available/latelierby-landing \
-                     /etc/nginx/sites-enabled/latelierby-landing
+
+              # Inclure le snippet dans le default server block s'il n'y est pas
+              DEFAULT=/etc/nginx/sites-available/default
+              if ! grep -q "latelierby-landing" "$DEFAULT"; then
+                sed -i '/^}$/i\\tinclude snippets/latelierby-landing.conf;' "$DEFAULT"
+              fi
+
               nginx -t && systemctl reload nginx
-              echo ">>> Nginx rechargé"
+              echo ">>> Nginx : /landing/ configuré"
             fi
 
             echo ""
-            echo "✓ Site restauré sur /var/www/latelierby-landing"
+            echo "✓ Site accessible sur http://185.180.206.46/landing/"
             ls "$PROJECT" | head -10
