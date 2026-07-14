@@ -61,6 +61,7 @@ $handlers = [
     'shops'    => 'lp_get_shops',
     'pickers'  => 'lp_get_pickers',
     'families' => 'lp_get_families',
+    'franchise_page' => 'lp_get_franchise_page',
     'legal'    => 'lp_get_legal',
     'footer'   => 'lp_get_footer',
     'nav'      => 'lp_get_nav',
@@ -202,6 +203,40 @@ function lp_get_families(PDO $pdo): array {
          WHERE is_active = 1
          ORDER BY position ASC'
     )->fetchAll();
+}
+
+function lp_get_franchise_page(PDO $pdo): array {
+    // Textes
+    $rows = $pdo->query(
+        'SELECT i18n_key, value_fr, value_nl FROM lp_franchise_i18n'
+    )->fetchAll();
+    $fr = $nl = [];
+    foreach ($rows as $r) {
+        $fr[$r['i18n_key']] = $r['value_fr'];
+        $nl[$r['i18n_key']] = $r['value_nl'];
+    }
+
+    // Zones : { fr: [ [groupLabel, [[value,label],...]], ... ], nl: [...] }
+    $zrows = $pdo->query(
+        'SELECT lang, group_label, value, label
+         FROM lp_franchise_zones
+         WHERE is_active = 1
+         ORDER BY lang ASC, group_pos ASC, pos ASC'
+    )->fetchAll();
+
+    $zbuf = ['fr' => [], 'nl' => []];   // lang => [groupLabel => [[value,label],...]]
+    foreach ($zrows as $z) {
+        $lg = $z['lang'];
+        $zbuf[$lg][$z['group_label']][] = [$z['value'], $z['label']];
+    }
+    $zones = ['fr' => [], 'nl' => []];
+    foreach ($zbuf as $lg => $groups) {
+        foreach ($groups as $label => $opts) {
+            $zones[$lg][] = [$label, $opts];
+        }
+    }
+
+    return ['i18n' => ['fr' => $fr, 'nl' => $nl], 'zones' => $zones];
 }
 
 function lp_get_legal(PDO $pdo): array {

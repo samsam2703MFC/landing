@@ -592,6 +592,23 @@ html.js .revs.is-in > *:nth-child(8) { transition-delay: .35s; }
       });
     });
     apply();
+
+    // Override depuis la DB (fallback local conservé si l'API échoue)
+    fetch('/landing/lp_api.php?r=franchise_page')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d || d.error) return;
+        if (d.i18n) {
+          if (d.i18n.fr) Object.keys(d.i18n.fr).forEach(function (k) { T.fr[k] = d.i18n.fr[k]; });
+          if (d.i18n.nl) Object.keys(d.i18n.nl).forEach(function (k) { T.nl[k] = d.i18n.nl[k]; });
+        }
+        if (d.zones) {
+          if (d.zones.fr && d.zones.fr.length) Z.fr = d.zones.fr;
+          if (d.zones.nl && d.zones.nl.length) Z.nl = d.zones.nl;
+        }
+        apply();
+      })
+      .catch(function () {});
   })();
 })();
 </script>
