@@ -17,16 +17,17 @@
 
 // ── Config DB ───────────────────────────────────────────────
 define('LP_DB_HOST', 'localhost');
-define('LP_DB_NAME', 'atelier_landing');   // ← votre base
-define('LP_DB_USER', 'atelier_user');      // ← votre user MySQL
-define('LP_DB_PASS', 'CHANGE_ME');         // ← votre mot de passe
+define('LP_DB_NAME', 'atelierby_db');
+define('LP_DB_USER', 'sam');
+define('LP_DB_PASS', 'NhoQyQbKRSPh4Ubg3sR7DMjs5');
 define('LP_DB_PORT', 3306);
 
 // ── CORS ─────────────────────────────────────────────────────
 $allowed_origins = [
     'https://latelierby.be',
     'https://www.latelierby.be',
-    'http://localhost',           // dev local
+    'http://185.180.206.46',
+    'http://localhost',
 ];
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if (in_array($origin, $allowed_origins, true)) {
