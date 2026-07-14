@@ -995,6 +995,8 @@ section[id] { scroll-margin-top: 92px; }
   function applyStatic() {
     document.documentElement.lang = LANG;
     document.title = t('doc.title');
+    var md = document.querySelector('meta[name="description"]');
+    if (md) { var dsc = t('doc.description'); if (dsc) md.setAttribute('content', dsc); }
     document.querySelectorAll('[data-i18n]').forEach(function (el) { el.textContent = t(el.getAttribute('data-i18n')); });
     document.querySelectorAll('[data-i18n-html]').forEach(function (el) { el.innerHTML = t(el.getAttribute('data-i18n-html')); });
     var sw = document.querySelector('[data-lang-switch]');
@@ -1559,6 +1561,7 @@ section[id] { scroll-margin-top: 92px; }
     if (hint)   hint.textContent  = nl ? a.hint_nl : a.hint_fr;
     if (qrImg && a.app_url) {
       qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=440x440&margin=0&data=' + encodeURIComponent(a.app_url);
+      qrImg.alt = (nl ? a.title_nl : a.title_fr) || qrImg.alt;
     }
   }
 
@@ -1618,6 +1621,8 @@ section[id] { scroll-margin-top: 92px; }
       if (ctas[0]) { ctas[0].textContent = g(s, 'cta1_text'); if (s.cta1_url) ctas[0].href = s.cta1_url; }
       if (ctas[1]) { ctas[1].textContent = g(s, 'cta2_text'); if (s.cta2_url) ctas[1].href = s.cta2_url; }
       if (img && s.image_path) img.src = s.image_path;
+      // alt dérivé du titre (sans HTML), adapté à la langue
+      if (img) { var tmp = document.createElement('div'); tmp.innerHTML = g(s, 'title'); img.alt = tmp.textContent || ''; }
     });
   }
 

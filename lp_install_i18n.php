@@ -102,8 +102,11 @@ try {
         ['qr.title',   'Scannez pour télécharger', 'Scan om te downloaden'],
         ['qr.hint',    "Pointez l'appareil photo de votre téléphone sur le code. Disponible sur iOS et Android.", 'Richt de camera van uw telefoon op de code. Beschikbaar op iOS en Android.'],
 
-        // Titre de page
+        // Titre + description de page (SEO)
         ['doc.title', "L'Atelier By — Maison de pains & viennoiseries", "L'Atelier By — Huis van brood & viennoiserie"],
+        ['doc.description',
+         "L'Atelier By — Maison de pains et viennoiseries artisanales en Belgique. Fait main, chaque matin.",
+         "L'Atelier By — Huis van ambachtelijk brood en viennoiserie in België. Met de hand gemaakt, elke ochtend."],
     ];
 
     foreach ($rows as $r) {
