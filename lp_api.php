@@ -328,20 +328,27 @@ function lp_get_sections(PDO $pdo): array {
 }
 
 function lp_get_all(PDO $pdo): array {
-    return [
-        'hero'     => lp_get_hero($pdo),
-        'seasonal' => lp_get_seasonal($pdo),
-        'collabs'  => lp_get_collabs($pdo),
-        'franchise'=> lp_get_franchise($pdo),
-        'shops'    => lp_get_shops($pdo),
-        'pickers'  => lp_get_pickers($pdo),
-        'families' => lp_get_families($pdo),
-        'footer'   => lp_get_footer($pdo),
-        'nav'      => lp_get_nav($pdo),
-        'i18n'     => lp_get_i18n($pdo),
-        'params'   => lp_get_params($pdo),
-        'app'      => lp_get_app($pdo),
-        'services' => lp_get_services($pdo),
-        'sections' => lp_get_sections($pdo),
+    // Chaque handler est isolé : une table manquante ne casse pas tout l'API.
+    $keys = [
+        'hero'     => 'lp_get_hero',
+        'seasonal' => 'lp_get_seasonal',
+        'collabs'  => 'lp_get_collabs',
+        'franchise'=> 'lp_get_franchise',
+        'shops'    => 'lp_get_shops',
+        'pickers'  => 'lp_get_pickers',
+        'families' => 'lp_get_families',
+        'footer'   => 'lp_get_footer',
+        'nav'      => 'lp_get_nav',
+        'i18n'     => 'lp_get_i18n',
+        'params'   => 'lp_get_params',
+        'app'      => 'lp_get_app',
+        'services' => 'lp_get_services',
+        'sections' => 'lp_get_sections',
     ];
+    $out = [];
+    foreach ($keys as $key => $fn) {
+        try { $out[$key] = $fn($pdo); }
+        catch (PDOException $e) { $out[$key] = ($key === 'franchise' || $key === 'app') ? [] : []; }
+    }
+    return $out;
 }
