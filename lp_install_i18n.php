@@ -15,8 +15,8 @@ try {
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS lp_i18n (
             i18n_key   VARCHAR(60)  NOT NULL,
-            value_fr   TEXT         NOT NULL DEFAULT '',
-            value_nl   TEXT         NOT NULL DEFAULT '',
+            value_fr   VARCHAR(500) NOT NULL DEFAULT '',
+            value_nl   VARCHAR(500) NOT NULL DEFAULT '',
             updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (i18n_key)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
