@@ -1418,73 +1418,92 @@ section[id] { scroll-margin-top: 92px; }
 
   function g(o, k) { return o[k + '_' + lang] || o[k + '_fr'] || ''; }
 
+  function makeGitem(tag, name, desc, img, href, isButton, dataHref) {
+    var el = document.createElement(isButton ? 'button' : 'a');
+    el.className = 'gitem';
+    if (isButton) { el.type = 'button'; el.setAttribute('data-collab', ''); if (dataHref) el.dataset.href = dataHref; }
+    else if (href) el.href = href;
+    el.innerHTML =
+      '<span class="gitem__art"><img src="' + img + '" alt=""></span>' +
+      '<span class="gitem__tag">' + tag + '</span>' +
+      '<h3 class="gitem__name">' + name + '</h3>' +
+      '<p class="gitem__desc">' + desc + '</p>';
+    return el;
+  }
+
   function patchCollabs(collabs) {
-    var els = document.querySelectorAll('#collaborations .gitem');
-    collabs.forEach(function (c, i) {
-      var el = els[i]; if (!el) return;
-      var img  = el.querySelector('.gitem__art img');
-      var tag  = el.querySelector('.gitem__tag');
-      var name = el.querySelector('.gitem__name');
-      var desc = el.querySelector('.gitem__desc');
-      if (img)  img.src          = c.image_path;
-      if (tag)  tag.textContent  = lang === 'nl' ? c.tag_nl  : c.tag_fr;
-      if (name) name.textContent = lang === 'nl' ? c.name_nl : c.name_fr;
-      if (desc) desc.textContent = lang === 'nl' ? c.desc_nl : c.desc_fr;
-      if (c.shop_url) el.dataset.href = c.shop_url;
+    var wrap = document.querySelector('#collaborations .gal');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    collabs.forEach(function (c) {
+      var nl = lang === 'nl';
+      wrap.appendChild(makeGitem(
+        nl ? c.tag_nl : c.tag_fr,
+        nl ? c.name_nl : c.name_fr,
+        nl ? c.desc_nl : c.desc_fr,
+        c.image_path, null, true, c.shop_url
+      ));
     });
   }
 
   function patchFranchise(f) {
-    var sec   = document.getElementById('franchise');
+    var sec = document.getElementById('franchise');
     if (!sec) return;
+    var nl = lang === 'nl';
     var title = sec.querySelector('.title');
     var lede  = sec.querySelector('.lede');
     var pts   = sec.querySelectorAll('.quiet__points li');
     var cta   = sec.querySelector('.quiet__cta a');
     var ctaSpan = cta && cta.querySelector('span[data-i18n]');
-    var nl    = lang === 'nl';
-    if (title)   title.innerHTML    = nl ? f.title_nl  : f.title_fr;
-    if (lede)    lede.textContent   = nl ? f.lede_nl   : f.lede_fr;
-    if (pts[0])  pts[0].textContent = nl ? f.point1_nl : f.point1_fr;
-    if (pts[1])  pts[1].textContent = nl ? f.point2_nl : f.point2_fr;
-    if (pts[2])  pts[2].textContent = nl ? f.point3_nl : f.point3_fr;
+    if (title)   title.innerHTML     = nl ? f.title_nl  : f.title_fr;
+    if (lede)    lede.textContent    = nl ? f.lede_nl   : f.lede_fr;
+    if (pts[0])  pts[0].textContent  = nl ? f.point1_nl : f.point1_fr;
+    if (pts[1])  pts[1].textContent  = nl ? f.point2_nl : f.point2_fr;
+    if (pts[2])  pts[2].textContent  = nl ? f.point3_nl : f.point3_fr;
     if (ctaSpan) ctaSpan.textContent = nl ? f.cta_text_nl : f.cta_text_fr;
     if (cta && f.cta_url) cta.href = f.cta_url;
   }
 
   function patchSeasonal(items) {
-    var els = document.querySelectorAll('#saisonTrack .gitem');
-    items.forEach(function (s, i) {
-      var el = els[i]; if (!el) return;
-      var img  = el.querySelector('.gitem__art img');
-      var tag  = el.querySelector('.gitem__tag');
-      var name = el.querySelector('.gitem__name');
-      var desc = el.querySelector('.gitem__desc');
-      if (img)  img.src          = s.image_path;
-      if (tag)  tag.textContent  = lang === 'nl' ? s.tag_nl  : s.tag_fr;
-      if (name) name.textContent = lang === 'nl' ? s.name_nl : s.name_fr;
-      if (desc) desc.textContent = lang === 'nl' ? s.desc_nl : s.desc_fr;
-      if (s.item_url) el.href = s.item_url;
+    var track = document.getElementById('saisonTrack');
+    if (!track) return;
+    track.innerHTML = '';
+    items.forEach(function (s) {
+      var nl = lang === 'nl';
+      track.appendChild(makeGitem(
+        nl ? s.tag_nl : s.tag_fr,
+        nl ? s.name_nl : s.name_fr,
+        nl ? s.desc_nl : s.desc_fr,
+        s.image_path, s.item_url || 'index.html#produits', false, null
+      ));
     });
+    // réinitialiser le carrousel
+    var ev = new CustomEvent('scar:reinit');
+    document.dispatchEvent(ev);
   }
 
   function patchFamilies(families) {
-    var els = document.querySelectorAll('.fam');
-    families.forEach(function (f, i) {
-      var el = els[i]; if (!el) return;
-      var img   = el.querySelector('.fam__art img');
-      var name  = el.querySelector('.fam__name');
-      var count = el.querySelector('.fam__count');
-      if (img)   img.src         = f.image_path;
-      if (name)  name.textContent = lang === 'nl' ? f.name_nl  : f.name_fr;
-      if (count) count.textContent = lang === 'nl' ? f.count_nl : f.count_fr;
-      if (f.href) el.href = f.href;
+    var wrap = document.querySelector('.fams');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    families.forEach(function (f) {
+      var nl = lang === 'nl';
+      var a = document.createElement('a');
+      a.className = 'fam';
+      a.href = f.href || 'index.html#produits';
+      a.innerHTML =
+        '<span class="fam__art"><img src="' + f.image_path + '" alt=""></span>' +
+        '<h3 class="fam__name">'  + (nl ? f.name_nl  : f.name_fr)  + '</h3>' +
+        '<span class="fam__count">' + (nl ? f.count_nl : f.count_fr) + '</span>';
+      wrap.appendChild(a);
     });
   }
 
   function patchHero(slides) {
     document.querySelectorAll('.hslide').forEach(function (el, i) {
-      var s = slides[i]; if (!s) return;
+      if (i >= slides.length) { el.hidden = true; return; }
+      el.hidden = false;
+      var s = slides[i];
       var eyebrow = el.querySelector('.eyebrow');
       var title   = el.querySelector('.hero__title');
       var lede    = el.querySelector('.hero__lede');
@@ -1565,6 +1584,21 @@ section[id] { scroll-margin-top: 92px; }
   track.addEventListener('touchend', function (e) {
     var dx = e.changedTouches[0].clientX - startX;
     if (Math.abs(dx) > 40) goTo(current + (dx < 0 ? 1 : -1));
+  });
+
+  document.addEventListener('scar:reinit', function () {
+    items = Array.prototype.slice.call(track.querySelectorAll('.gitem'));
+    total = items.length;
+    current = 0;
+    dotsWrap.innerHTML = '';
+    items.forEach(function (_, i) {
+      var d = document.createElement('button');
+      d.className = 'scar__dot';
+      d.setAttribute('aria-label', 'Slide ' + (i + 1));
+      d.addEventListener('click', function () { goTo(i); });
+      dotsWrap.appendChild(d);
+    });
+    goTo(0);
   });
 
   goTo(0);
