@@ -1,6 +1,7 @@
 <?php
 /**
  * lp_lead.php — Enregistre un candidat franchise dans lp_candidates
+ * Envoie ensuite 2 mails : notification interne + confirmation candidat
  * Appelé en POST par franchise-lead.html
  */
 
@@ -80,8 +81,128 @@ try {
         ':ip'         => $_SERVER['REMOTE_ADDR'] ?? '',
         ':ua'         => mb_substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255),
     ]);
-    echo json_encode(['ok' => true, 'id' => $pdo->lastInsertId()]);
+    $new_id = $pdo->lastInsertId();
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['error' => 'insert_failed']);
+    exit;
+}
+
+// ── Email ────────────────────────────────────────────────────
+try {
+    $mp = $pdo->query('SELECT * FROM lp_mail_params LIMIT 1')->fetch();
+} catch (PDOException $e) {
+    $mp = null; // table may not exist yet
+}
+
+if ($mp) {
+    $sfx  = '_' . $lang;
+    $from = $mp['from_name'] . ' <' . $mp['from_email'] . '>';
+
+    $replace = function (string $tpl) use ($first_name, $last_name): string {
+        return str_replace(['{prenom}', '{nom}'], [$first_name, $last_name], $tpl);
+    };
+
+    // ── 1) Notification interne ──────────────────────────────
+    $notify_subject = $replace($mp['notify_subject' . $sfx] ?: $mp['notify_subject_fr']);
+    $notify_to      = $mp['notify_name'] . ' <' . $mp['notify_email'] . '>';
+
+    $notify_body  = "Nouveau lead franchise reçu\n";
+    $notify_body .= "================================\n";
+    $notify_body .= "Prénom    : $first_name\n";
+    $notify_body .= "Nom       : $last_name\n";
+    $notify_body .= "Email     : $email\n";
+    $notify_body .= "Téléphone : $phone\n";
+    $notify_body .= "Zone      : $area\n";
+    $notify_body .= "Langue    : $lang\n";
+    $notify_body .= "Message   :\n$message\n";
+
+    lp_send_mail($mp, $notify_to, $notify_subject, $notify_body, $from);
+
+    // ── 2) Confirmation candidat ─────────────────────────────
+    $confirm_subject = $replace($mp['confirm_subject' . $sfx] ?: $mp['confirm_subject_fr']);
+    $confirm_intro   = $replace($mp['confirm_intro'   . $sfx] ?: $mp['confirm_intro_fr']);
+    $confirm_to      = "$first_name $last_name <$email>";
+
+    lp_send_mail($mp, $confirm_to, $confirm_subject, $confirm_intro, $from);
+}
+
+echo json_encode(['ok' => true, 'id' => $new_id]);
+
+// ── Fonction d'envoi (mail() ou SMTP via socket) ─────────────
+function lp_send_mail(array $mp, string $to, string $subject, string $body, string $from): void
+{
+    $headers  = "From: $from\r\n";
+    $headers .= "Reply-To: {$mp['from_email']}\r\n";
+    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+    $headers .= "MIME-Version: 1.0\r\n";
+    $headers .= "X-Mailer: LP-Lead/1.0\r\n";
+
+    if (!empty($mp['smtp_host'])) {
+        lp_smtp_send($mp, $to, $subject, $body, $headers);
+    } else {
+        $encoded_subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
+        @mail($to, $encoded_subject, $body, $headers);
+    }
+}
+
+function lp_smtp_send(array $mp, string $to, string $subject, string $body, string $headers): void
+{
+    $host    = $mp['smtp_host'];
+    $port    = (int)($mp['smtp_port'] ?? 587);
+    $user    = $mp['smtp_user'] ?? '';
+    $pass    = $mp['smtp_pass'] ?? '';
+    $secure  = $mp['smtp_secure'] ?? 'tls';
+    $from_e  = $mp['from_email'];
+
+    $prefix  = ($secure === 'ssl') ? 'ssl://' : '';
+    $socket  = @fsockopen($prefix . $host, $port, $errno, $errstr, 10);
+    if (!$socket) return;
+
+    $read = function () use ($socket): string {
+        $r = '';
+        while ($line = fgets($socket, 512)) {
+            $r .= $line;
+            if ($line[3] === ' ') break;
+        }
+        return $r;
+    };
+    $cmd = function (string $c) use ($socket, $read): string {
+        fwrite($socket, $c . "\r\n");
+        return $read();
+    };
+
+    $read(); // banner
+    $cmd('EHLO ' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
+
+    if ($secure === 'tls') {
+        $cmd('STARTTLS');
+        stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+        $cmd('EHLO ' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
+    }
+
+    if ($user) {
+        $cmd('AUTH LOGIN');
+        $cmd(base64_encode($user));
+        $cmd(base64_encode($pass));
+    }
+
+    $cmd("MAIL FROM:<$from_e>");
+
+    // parse To
+    preg_match('/<(.+?)>/', $to, $m);
+    $to_addr = $m[1] ?? $to;
+    $cmd("RCPT TO:<$to_addr>");
+
+    $cmd('DATA');
+
+    $encoded_subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
+    $msg  = "To: $to\r\n";
+    $msg .= "Subject: $encoded_subject\r\n";
+    $msg .= $headers;
+    $msg .= "\r\n" . $body . "\r\n.";
+    $cmd($msg);
+
+    $cmd('QUIT');
+    fclose($socket);
 }
