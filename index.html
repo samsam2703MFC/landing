@@ -1499,6 +1499,30 @@ section[id] { scroll-margin-top: 92px; }
     });
   }
 
+  function patchSections(sections) {
+    var nl = lang === 'nl';
+    var map = {
+      produits:       'produits',
+      collaborations: 'collaborations',
+      saison:         'saison',
+      boutiques:      'boutiques'
+    };
+    Object.keys(map).forEach(function (key) {
+      var s = sections[key];
+      if (!s) return;
+      var sec = document.getElementById(map[key]);
+      if (!sec) return;
+      var head    = sec.querySelector('.sec__head');
+      if (!head) return;
+      var eyebrow = head.querySelector('.eyebrow');
+      var title   = head.querySelector('.title');
+      var lede    = head.querySelector('.lede');
+      if (eyebrow) eyebrow.textContent = (nl ? s.eyebrow_nl : s.eyebrow_fr) || eyebrow.textContent;
+      if (title)   title.textContent   = (nl ? s.title_nl   : s.title_fr)   || title.textContent;
+      if (lede)    lede.textContent    = (nl ? s.lede_nl    : s.lede_fr)    || lede.textContent;
+    });
+  }
+
   function patchHero(slides) {
     document.querySelectorAll('.hslide').forEach(function (el, i) {
       if (i >= slides.length) { el.hidden = true; return; }
@@ -1523,6 +1547,7 @@ section[id] { scroll-margin-top: 92px; }
     .then(function (data) {
       if (!data || data.error) return;
       lang = document.documentElement.lang || 'fr';
+      if (data.sections)                           patchSections(data.sections);
       if (data.hero      && data.hero.length)      patchHero(data.hero);
       if (data.families  && data.families.length)  patchFamilies(data.families);
       if (data.seasonal  && data.seasonal.length)  patchSeasonal(data.seasonal);
