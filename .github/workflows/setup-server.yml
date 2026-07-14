@@ -1,0 +1,103 @@
+name: Setup server architecture
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 185.180.206.46
+          username: root
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            set -e
+
+            # ── Détection serveur web ────────────────────────────
+            if command -v apache2 &>/dev/null; then
+              WEB=apache
+            elif command -v nginx &>/dev/null; then
+              WEB=nginx
+            else
+              echo "ERREUR : ni Apache ni Nginx trouvé"
+              exit 1
+            fi
+            echo ">>> Serveur web détecté : $WEB"
+
+            # ── Dossier projet ───────────────────────────────────
+            PROJECT=/var/www/latelierby-landing
+            mkdir -p "$PROJECT"
+            git config --global --add safe.directory "$PROJECT"
+
+            # ── Git : clone ou pull ──────────────────────────────
+            if [ -d "$PROJECT/.git" ]; then
+              echo ">>> Repo existant — git pull"
+              cd "$PROJECT" && git pull origin main
+            else
+              echo ">>> Clone du repo"
+              git clone https://github.com/samsam2703MFC/landing.git "$PROJECT"
+            fi
+
+            # ── VirtualHost Apache ───────────────────────────────
+            if [ "$WEB" = "apache" ]; then
+              CONF=/etc/apache2/sites-available/latelierby-landing.conf
+              cat > "$CONF" << 'APACHECONF'
+            <VirtualHost *:80>
+                ServerName latelierby.be
+                ServerAlias www.latelierby.be
+                DocumentRoot /var/www/latelierby-landing
+                DirectoryIndex index.html index.php
+
+                <Directory /var/www/latelierby-landing>
+                    AllowOverride All
+                    Require all granted
+                </Directory>
+
+                ErrorLog ${APACHE_LOG_DIR}/latelierby-landing-error.log
+                CustomLog ${APACHE_LOG_DIR}/latelierby-landing-access.log combined
+            </VirtualHost>
+            APACHECONF
+
+              a2ensite latelierby-landing.conf
+              a2dissite 000-default.conf 2>/dev/null || true
+              systemctl reload apache2
+              echo ">>> Apache configuré et rechargé"
+            fi
+
+            # ── Server block Nginx ───────────────────────────────
+            if [ "$WEB" = "nginx" ]; then
+              # Détection version PHP-FPM
+              PHP_SOCK=$(ls /var/run/php/php*-fpm.sock 2>/dev/null | sort -V | tail -1)
+              PHP_SOCK=${PHP_SOCK:-/var/run/php/php8.2-fpm.sock}
+              echo ">>> PHP-FPM socket : $PHP_SOCK"
+
+              CONF=/etc/nginx/sites-available/latelierby-landing
+              cat > "$CONF" << NGINXCONF
+            server {
+                listen 80;
+                server_name latelierby.be www.latelierby.be;
+                root /var/www/latelierby-landing;
+                index index.html index.php;
+
+                location / {
+                    try_files \$uri \$uri/ =404;
+                }
+
+                location ~ \.php$ {
+                    include snippets/fastcgi-php.conf;
+                    fastcgi_pass unix:$PHP_SOCK;
+                }
+            }
+            NGINXCONF
+
+              ln -sf "$CONF" /etc/nginx/sites-enabled/latelierby-landing
+              rm -f /etc/nginx/sites-enabled/default 2>/dev/null || true
+              nginx -t && systemctl reload nginx
+              echo ">>> Nginx configuré et rechargé"
+            fi
+
+            echo ""
+            echo "✓ Setup terminé — /var/www/latelierby-landing est le nouveau web root"
