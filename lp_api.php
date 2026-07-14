@@ -204,7 +204,7 @@ function lp_get_families(PDO $pdo): array {
 
 function lp_get_nav(PDO $pdo): array {
     return $pdo->query(
-        'SELECT position, label_fr, label_nl, url, icon, style
+        'SELECT position, label_fr, label_nl, url, icon, hex_color
          FROM lp_nav_items
          WHERE is_active = 1
          ORDER BY position ASC'
