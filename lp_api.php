@@ -61,6 +61,7 @@ $handlers = [
     'shops'    => 'lp_get_shops',
     'pickers'  => 'lp_get_pickers',
     'families' => 'lp_get_families',
+    'nav'      => 'lp_get_nav',
     'i18n'     => 'lp_get_i18n',
     'params'   => 'lp_get_params',
     'app'      => 'lp_get_app',
@@ -201,6 +202,15 @@ function lp_get_families(PDO $pdo): array {
     )->fetchAll();
 }
 
+function lp_get_nav(PDO $pdo): array {
+    return $pdo->query(
+        'SELECT position, label_fr, label_nl, url, icon, style
+         FROM lp_nav_items
+         WHERE is_active = 1
+         ORDER BY position ASC'
+    )->fetchAll();
+}
+
 function lp_get_i18n(PDO $pdo): array {
     $rows = $pdo->query(
         'SELECT i18n_key, value_fr, value_nl FROM lp_i18n'
@@ -267,6 +277,7 @@ function lp_get_all(PDO $pdo): array {
         'shops'    => lp_get_shops($pdo),
         'pickers'  => lp_get_pickers($pdo),
         'families' => lp_get_families($pdo),
+        'nav'      => lp_get_nav($pdo),
         'i18n'     => lp_get_i18n($pdo),
         'params'   => lp_get_params($pdo),
         'app'      => lp_get_app($pdo),
