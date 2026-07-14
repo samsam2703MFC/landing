@@ -14,41 +14,21 @@ jobs:
           username: root
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            echo "=== Web server ==="
-            apache2 -v 2>/dev/null || nginx -v 2>/dev/null || echo "aucun"
+            echo "=== sites-enabled ==="
+            ls /etc/apache2/sites-enabled/
 
             echo ""
-            echo "=== Service actif ==="
-            systemctl is-active apache2 2>/dev/null || systemctl is-active nginx 2>/dev/null
+            echo "=== 000-default.conf ==="
+            cat /etc/apache2/sites-available/000-default.conf 2>/dev/null || echo "ABSENT"
 
             echo ""
-            echo "=== /var/www/ ==="
-            ls /var/www/
+            echo "=== configtest ==="
+            apache2ctl configtest 2>&1
 
             echo ""
-            echo "=== /var/www/latelierby-landing ==="
-            ls /var/www/latelierby-landing 2>/dev/null || echo "DOSSIER ABSENT"
+            echo "=== curl localhost/landing/ ==="
+            curl -s -o /dev/null -w "%{http_code}" http://localhost/landing/
 
             echo ""
-            echo "=== /var/www/html ==="
-            ls /var/www/html 2>/dev/null | head -5
-
-            echo ""
-            echo "=== Apache conf-enabled ==="
-            ls /etc/apache2/conf-enabled/ 2>/dev/null || echo "N/A"
-
-            echo ""
-            echo "=== Apache sites-enabled ==="
-            ls /etc/apache2/sites-enabled/ 2>/dev/null || echo "N/A"
-
-            echo ""
-            echo "=== Apache conf latelierby ==="
-            cat /etc/apache2/conf-available/latelierby-landing.conf 2>/dev/null || echo "FICHIER ABSENT"
-
-            echo ""
-            echo "=== Nginx sites-enabled ==="
-            ls /etc/nginx/sites-enabled/ 2>/dev/null || echo "N/A"
-
-            echo ""
-            echo "=== Port 80 ==="
-            ss -tlnp | grep :80
+            echo "=== error.log (5 dernieres lignes) ==="
+            tail -5 /var/log/apache2/error.log 2>/dev/null
