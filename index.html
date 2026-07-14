@@ -9,11 +9,11 @@
 <!-- JS-string-referenced shop illustrations (built into innerHTML) — lifted for the standalone bundler -->
 <meta name="ext-resource-dependency" content="img/products/bread-1.png" data-resource-id="img/products/bread-1.png" />
 <meta name="ext-resource-dependency" content="img/products/cake.png" data-resource-id="img/products/cake.png" />
-<meta name="ext-resource-dependency" content="img/products/bread-3.png" data-resource-id="img/products/bread-3.png" />
-<meta name="ext-resource-dependency" content="img/products/bread-4.png" data-resource-id="img/products/bread-4.png" />
+<meta name="ext-resource-dependency" content="img/products/roll.png" data-resource-id="img/products/roll.png" />
+<meta name="ext-resource-dependency" content="img/products/cookies.png" data-resource-id="img/products/cookies.png" />
 <meta name="ext-resource-dependency" content="img/products/croissant.png" data-resource-id="img/products/croissant.png" />
 <meta name="ext-resource-dependency" content="img/products/savoury-tart.png" data-resource-id="img/products/savoury-tart.png" />
-<meta name="ext-resource-dependency" content="img/products/cupcake.png" data-resource-id="img/products/cupcake.png" />
+<meta name="ext-resource-dependency" content="img/products/sweet-tart-small.png" data-resource-id="img/products/sweet-tart-small.png" />
 <meta name="ext-resource-dependency" content="img/products/sandwiches.png" data-resource-id="img/products/sandwiches.png" />
 <link rel="stylesheet" href="global.css">
 <script>document.documentElement.classList.add('js');</script>
@@ -1003,6 +1003,8 @@ section[id] { scroll-margin-top: 92px; }
   function setLang(l) { LANG = l; try { localStorage.setItem('la_lang', l); } catch (e) {} applyStatic(); langCbs.forEach(function (f) { f(LANG); }); }
   (function () { var sw = document.querySelector('[data-lang-switch]'); if (sw) sw.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { setLang(b.dataset.lang); }); }); })();
   applyStatic();
+  // Expose T + applyStatic pour les patchs DB (autre IIFE)
+  window.__lpI18n = { T: T, apply: applyStatic };
   // ===================== /i18n =====================
 
   var io = new IntersectionObserver(function (entries) {
@@ -1523,9 +1525,11 @@ section[id] { scroll-margin-top: 92px; }
   }
 
   function patchI18n(i18n) {
-    if (i18n.fr) Object.keys(i18n.fr).forEach(function (k) { T.fr[k] = i18n.fr[k]; });
-    if (i18n.nl) Object.keys(i18n.nl).forEach(function (k) { T.nl[k] = i18n.nl[k]; });
-    applyStatic();
+    var api = window.__lpI18n;
+    if (!api || !api.T) return;
+    if (i18n.fr) Object.keys(i18n.fr).forEach(function (k) { api.T.fr[k] = i18n.fr[k]; });
+    if (i18n.nl) Object.keys(i18n.nl).forEach(function (k) { api.T.nl[k] = i18n.nl[k]; });
+    api.apply();
   }
 
   function patchParams(params) {
@@ -1622,17 +1626,19 @@ section[id] { scroll-margin-top: 92px; }
     .then(function (data) {
       if (!data || data.error) return;
       lang = document.documentElement.lang || 'fr';
-      if (data.nav)                                patchNav(data.nav);
-      if (data.i18n)                               patchI18n(data.i18n);
-      if (data.params)                             patchParams(data.params);
-      if (data.sections)                           patchSections(data.sections);
-      if (data.services  && data.services.length)  patchServices(data.services);
-      if (data.app       && Object.keys(data.app).length) patchApp(data.app);
-      if (data.hero      && data.hero.length)      patchHero(data.hero);
-      if (data.families  && data.families.length)  patchFamilies(data.families);
-      if (data.seasonal  && data.seasonal.length)  patchSeasonal(data.seasonal);
-      if (data.collabs   && data.collabs.length)   patchCollabs(data.collabs);
-      if (data.franchise && Object.keys(data.franchise).length) patchFranchise(data.franchise);
+      // Chaque patch est isolé : une erreur n'interrompt pas les autres
+      function run(fn) { try { fn(); } catch (e) { if (window.console) console.warn('patch error', e); } }
+      if (data.nav)                                run(function () { patchNav(data.nav); });
+      if (data.i18n)                               run(function () { patchI18n(data.i18n); });
+      if (data.params)                             run(function () { patchParams(data.params); });
+      if (data.sections)                           run(function () { patchSections(data.sections); });
+      if (data.services  && data.services.length)  run(function () { patchServices(data.services); });
+      if (data.app       && Object.keys(data.app).length) run(function () { patchApp(data.app); });
+      if (data.hero      && data.hero.length)      run(function () { patchHero(data.hero); });
+      if (data.families  && data.families.length)  run(function () { patchFamilies(data.families); });
+      if (data.seasonal  && data.seasonal.length)  run(function () { patchSeasonal(data.seasonal); });
+      if (data.collabs   && data.collabs.length)   run(function () { patchCollabs(data.collabs); });
+      if (data.franchise && Object.keys(data.franchise).length) run(function () { patchFranchise(data.franchise); });
       document.dispatchEvent(new CustomEvent('lp:data', { detail: data }));
     })
     .catch(function () {});
