@@ -7,69 +7,27 @@ jobs:
   fix:
     runs-on: ubuntu-latest
     steps:
-      - name: Restore site at /landing/
+      - name: Add /landing/ alias to Apache
         uses: appleboy/ssh-action@v1
         with:
           host: 185.180.206.46
           username: root
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            set -e
+            # Créer le conf Alias (nom différent pour éviter conflit avec sites-enabled)
+            {
+              echo 'Alias /landing /var/www/latelierby-landing'
+              echo ''
+              echo '<Directory /var/www/latelierby-landing>'
+              echo '    AllowOverride All'
+              echo '    Require all granted'
+              echo '    Options -Indexes'
+              echo '    DirectoryIndex index.html index.php'
+              echo '</Directory>'
+            } > /etc/apache2/conf-available/latelierby-alias.conf
 
-            if command -v apache2 &>/dev/null; then WEB=apache; else WEB=nginx; fi
-            echo "Serveur : $WEB"
+            a2enconf latelierby-alias
+            apache2ctl configtest
+            systemctl reload apache2
 
-            PROJECT=/var/www/latelierby-landing
-            mkdir -p "$PROJECT"
-            git config --global --add safe.directory "$PROJECT"
-
-            if [ ! -d "$PROJECT/.git" ]; then
-              git clone https://github.com/samsam2703MFC/landing.git "$PROJECT"
-            else
-              cd "$PROJECT" && git pull origin main
-            fi
-
-            if [ "$WEB" = "apache" ]; then
-              CONF=/etc/apache2/conf-available/latelierby-landing.conf
-              {
-                echo 'Alias /landing /var/www/latelierby-landing'
-                echo ''
-                echo '<Directory /var/www/latelierby-landing>'
-                echo '    AllowOverride All'
-                echo '    Require all granted'
-                echo '    Options -Indexes'
-                echo '    DirectoryIndex index.html index.php'
-                echo '</Directory>'
-              } > "$CONF"
-              a2enconf latelierby-landing
-              a2ensite 000-default.conf 2>/dev/null || true
-              apache2ctl configtest && systemctl reload apache2
-              echo "Apache : /landing/ configure"
-            fi
-
-            if [ "$WEB" = "nginx" ]; then
-              PHP_SOCK=$(ls /var/run/php/php*-fpm.sock 2>/dev/null | sort -V | tail -1)
-              PHP_SOCK=${PHP_SOCK:-/var/run/php/php8.2-fpm.sock}
-              SNIP=/etc/nginx/snippets/latelierby-landing.conf
-              {
-                echo 'location /landing/ {'
-                echo '    alias /var/www/latelierby-landing/;'
-                echo '    index index.html index.php;'
-                echo '    try_files $uri $uri/ /landing/index.html;'
-                echo '}'
-                echo 'location ~ ^/landing/(.+\.php)$ {'
-                echo "    fastcgi_pass unix:$PHP_SOCK;"
-                echo '    fastcgi_param SCRIPT_FILENAME /var/www/latelierby-landing/$1;'
-                echo '    fastcgi_param SCRIPT_NAME /landing/$1;'
-                echo '    include fastcgi_params;'
-                echo '}'
-              } > "$SNIP"
-              DEFAULT=/etc/nginx/sites-available/default
-              if ! grep -q "latelierby-landing" "$DEFAULT"; then
-                sed -i "s|^}$|    include snippets/latelierby-landing.conf;\n}|" "$DEFAULT"
-              fi
-              nginx -t && systemctl reload nginx
-              echo "Nginx : /landing/ configure"
-            fi
-
-            echo "Site disponible sur http://185.180.206.46/landing/"
+            echo "Done — test: http://185.180.206.46/landing/"
