@@ -7,28 +7,20 @@ jobs:
   fix:
     runs-on: ubuntu-latest
     steps:
-      - name: Create catch-all VirtualHost with /landing/ alias
+      - name: Create IP catch-all VirtualHost
         uses: appleboy/ssh-action@v1
         with:
           host: 185.180.206.46
           username: root
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            # VirtualHost catch-all pour accès par IP
-            # ServerName 185.180.206.46 capte uniquement les requêtes IP
-            # Les autres domaines (plackownia.pl, tfbuddy.com...) ne sont pas affectés
+            CONF=/etc/apache2/sites-available/000-ip-catchall.conf
+
             {
               echo '<VirtualHost *:80>'
               echo '    ServerName 185.180.206.46'
               echo '    DocumentRoot /var/www/html'
-              echo ''
               echo '    Alias /landing /var/www/latelierby-landing'
-              echo ''
-              echo '    <Directory /var/www/html>'
-              echo '        AllowOverride All'
-              echo '        Require all granted'
-              echo '    </Directory>'
-              echo ''
               echo '    <Directory /var/www/latelierby-landing>'
               echo '        AllowOverride All'
               echo '        Require all granted'
@@ -36,9 +28,17 @@ jobs:
               echo '        DirectoryIndex index.html index.php'
               echo '    </Directory>'
               echo '</VirtualHost>'
-            } > /etc/apache2/sites-available/000-default.conf
+            } > "$CONF"
 
-            a2ensite 000-default
-            apache2ctl configtest && systemctl reload apache2
+            echo "=== Fichier créé ==="
+            cat "$CONF"
 
-            echo "Done — http://185.180.206.46/landing/ devrait fonctionner"
+            a2ensite 000-ip-catchall
+            echo "=== sites-enabled ==="
+            ls /etc/apache2/sites-enabled/ | grep catchall
+
+            apache2ctl configtest
+            systemctl reload apache2
+
+            echo "=== Test URL ==="
+            curl -s -o /dev/null -w "HTTP %{http_code}" http://185.180.206.46/landing/
