@@ -1114,7 +1114,7 @@ section[id] { scroll-margin-top: 92px; }
         '<div class="modal__body">' +
           '<span class="modal__city">' + s.cp + ' · ' + s.city + '</span>' +
           '<h3 class="modal__name" id="shopModalName">' + s.name + '</h3>' +
-          '<p class="modal__concept">' + ((LANG === 'nl' && CONCEPT_NL[s.name]) ? CONCEPT_NL[s.name] : s.concept) + '</p>' +
+          '<p class="modal__concept">' + ((LANG === 'nl' && (s.conceptNl || CONCEPT_NL[s.name])) ? (s.conceptNl || CONCEPT_NL[s.name]) : s.concept) + '</p>' +
           '<p class="modal__label">' + t('label.services') + '</p><div class="modal__svcs">' + svcs + '</div>' +
           '<p class="modal__label">' + t('label.contact') + '</p>' +
           '<div class="modal__rows">' +

@@ -119,9 +119,16 @@ function lp_get_franchise(PDO $pdo): array {
 function lp_get_shops(PDO $pdo): array {
     // boutiques
     $shops = $pdo->query(
-        'SELECT id, sort_order, name, city, postal_code, kind,
-                address, phone, email, concept_fr, concept_nl,
-                image_path, webshop_url
+        'SELECT id, sort_order, name, city,
+                postal_code  AS cp,
+                kind,
+                address      AS addr,
+                phone        AS tel,
+                email        AS mail,
+                concept_fr   AS concept,
+                concept_nl   AS conceptNl,
+                image_path   AS illus,
+                webshop_url
          FROM lp_shops
          WHERE is_active = 1
          ORDER BY sort_order ASC'
