@@ -2,6 +2,7 @@
 /**
  * lp_lead.php — Enregistre un candidat franchise dans lp_candidates
  * Envoie ensuite 2 mails : notification interne + confirmation candidat
+ * Logue chaque envoi dans lp_mail_log (créée automatiquement si absente)
  * Appelé en POST par franchise-lead.html
  */
 
@@ -62,7 +63,24 @@ try {
     exit;
 }
 
-// ── Insert ───────────────────────────────────────────────────
+// ── Création automatique de lp_mail_log si absente ───────────
+$pdo->exec("
+    CREATE TABLE IF NOT EXISTS lp_mail_log (
+        id           INT UNSIGNED     NOT NULL AUTO_INCREMENT,
+        candidate_id INT UNSIGNED     DEFAULT NULL,
+        type         ENUM('notify','confirm') NOT NULL,
+        to_email     VARCHAR(255)     NOT NULL,
+        subject      VARCHAR(255)     NOT NULL,
+        status       ENUM('sent','failed') NOT NULL DEFAULT 'sent',
+        error_msg    VARCHAR(500)     DEFAULT NULL,
+        sent_at      TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_candidate (candidate_id),
+        KEY idx_sent_at   (sent_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+");
+
+// ── Insert candidat ──────────────────────────────────────────
 try {
     $stmt = $pdo->prepare(
         'INSERT INTO lp_candidates
@@ -81,7 +99,7 @@ try {
         ':ip'         => $_SERVER['REMOTE_ADDR'] ?? '',
         ':ua'         => mb_substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255),
     ]);
-    $new_id = $pdo->lastInsertId();
+    $new_id = (int)$pdo->lastInsertId();
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['error' => 'insert_failed']);
@@ -92,7 +110,7 @@ try {
 try {
     $mp = $pdo->query('SELECT * FROM lp_mail_params LIMIT 1')->fetch();
 } catch (PDOException $e) {
-    $mp = null; // table may not exist yet
+    $mp = null;
 }
 
 if ($mp) {
@@ -117,20 +135,43 @@ if ($mp) {
     $notify_body .= "Langue    : $lang\n";
     $notify_body .= "Message   :\n$message\n";
 
-    lp_send_mail($mp, $notify_to, $notify_subject, $notify_body, $from);
+    [$ok, $err] = lp_send_mail($mp, $notify_to, $notify_subject, $notify_body, $from);
+    lp_log_mail($pdo, $new_id, 'notify', $mp['notify_email'], $notify_subject, $ok, $err);
 
     // ── 2) Confirmation candidat ─────────────────────────────
     $confirm_subject = $replace($mp['confirm_subject' . $sfx] ?: $mp['confirm_subject_fr']);
     $confirm_intro   = $replace($mp['confirm_intro'   . $sfx] ?: $mp['confirm_intro_fr']);
     $confirm_to      = "$first_name $last_name <$email>";
 
-    lp_send_mail($mp, $confirm_to, $confirm_subject, $confirm_intro, $from);
+    [$ok, $err] = lp_send_mail($mp, $confirm_to, $confirm_subject, $confirm_intro, $from);
+    lp_log_mail($pdo, $new_id, 'confirm', $email, $confirm_subject, $ok, $err);
 }
 
 echo json_encode(['ok' => true, 'id' => $new_id]);
 
-// ── Fonction d'envoi (mail() ou SMTP via socket) ─────────────
-function lp_send_mail(array $mp, string $to, string $subject, string $body, string $from): void
+// ── Log ───────────────────────────────────────────────────────
+function lp_log_mail(PDO $pdo, int $candidate_id, string $type, string $to_email,
+                     string $subject, bool $ok, string $error_msg): void
+{
+    try {
+        $pdo->prepare(
+            'INSERT INTO lp_mail_log (candidate_id, type, to_email, subject, status, error_msg)
+             VALUES (:cid, :type, :to, :subj, :status, :err)'
+        )->execute([
+            ':cid'    => $candidate_id,
+            ':type'   => $type,
+            ':to'     => mb_substr($to_email, 0, 255),
+            ':subj'   => mb_substr($subject,  0, 255),
+            ':status' => $ok ? 'sent' : 'failed',
+            ':err'    => $ok ? null : mb_substr($error_msg, 0, 500),
+        ]);
+    } catch (PDOException $e) {
+        // log failure is non-blocking
+    }
+}
+
+// ── Envoi (mail() ou SMTP via socket) ────────────────────────
+function lp_send_mail(array $mp, string $to, string $subject, string $body, string $from): array
 {
     $headers  = "From: $from\r\n";
     $headers .= "Reply-To: {$mp['from_email']}\r\n";
@@ -139,25 +180,26 @@ function lp_send_mail(array $mp, string $to, string $subject, string $body, stri
     $headers .= "X-Mailer: LP-Lead/1.0\r\n";
 
     if (!empty($mp['smtp_host'])) {
-        lp_smtp_send($mp, $to, $subject, $body, $headers);
-    } else {
-        $encoded_subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
-        @mail($to, $encoded_subject, $body, $headers);
+        return lp_smtp_send($mp, $to, $subject, $body, $headers);
     }
+
+    $encoded_subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
+    $ok = @mail($to, $encoded_subject, $body, $headers);
+    return [$ok, $ok ? '' : 'mail() returned false'];
 }
 
-function lp_smtp_send(array $mp, string $to, string $subject, string $body, string $headers): void
+function lp_smtp_send(array $mp, string $to, string $subject, string $body, string $headers): array
 {
-    $host    = $mp['smtp_host'];
-    $port    = (int)($mp['smtp_port'] ?? 587);
-    $user    = $mp['smtp_user'] ?? '';
-    $pass    = $mp['smtp_pass'] ?? '';
-    $secure  = $mp['smtp_secure'] ?? 'tls';
-    $from_e  = $mp['from_email'];
+    $host   = $mp['smtp_host'];
+    $port   = (int)($mp['smtp_port'] ?? 587);
+    $user   = $mp['smtp_user'] ?? '';
+    $pass   = $mp['smtp_pass'] ?? '';
+    $secure = $mp['smtp_secure'] ?? 'tls';
+    $from_e = $mp['from_email'];
 
-    $prefix  = ($secure === 'ssl') ? 'ssl://' : '';
-    $socket  = @fsockopen($prefix . $host, $port, $errno, $errstr, 10);
-    if (!$socket) return;
+    $prefix = ($secure === 'ssl') ? 'ssl://' : '';
+    $socket = @fsockopen($prefix . $host, $port, $errno, $errstr, 10);
+    if (!$socket) return [false, "fsockopen: $errstr ($errno)"];
 
     $read = function () use ($socket): string {
         $r = '';
@@ -184,25 +226,33 @@ function lp_smtp_send(array $mp, string $to, string $subject, string $body, stri
     if ($user) {
         $cmd('AUTH LOGIN');
         $cmd(base64_encode($user));
-        $cmd(base64_encode($pass));
+        $r = $cmd(base64_encode($pass));
+        if (!str_starts_with(trim($r), '235')) {
+            fclose($socket);
+            return [false, 'SMTP AUTH failed: ' . trim($r)];
+        }
     }
 
     $cmd("MAIL FROM:<$from_e>");
-
-    // parse To
     preg_match('/<(.+?)>/', $to, $m);
     $to_addr = $m[1] ?? $to;
-    $cmd("RCPT TO:<$to_addr>");
+    $r = $cmd("RCPT TO:<$to_addr>");
+    if (!str_starts_with(trim($r), '250')) {
+        fclose($socket);
+        return [false, 'RCPT rejected: ' . trim($r)];
+    }
 
     $cmd('DATA');
-
     $encoded_subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
     $msg  = "To: $to\r\n";
     $msg .= "Subject: $encoded_subject\r\n";
     $msg .= $headers;
     $msg .= "\r\n" . $body . "\r\n.";
-    $cmd($msg);
+    $r = $cmd($msg);
 
     $cmd('QUIT');
     fclose($socket);
+
+    $ok = str_starts_with(trim($r), '250');
+    return [$ok, $ok ? '' : 'DATA rejected: ' . trim($r)];
 }
