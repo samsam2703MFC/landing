@@ -61,6 +61,7 @@ $handlers = [
     'shops'    => 'lp_get_shops',
     'pickers'  => 'lp_get_pickers',
     'families' => 'lp_get_families',
+    'app'      => 'lp_get_app',
     'services' => 'lp_get_services',
     'sections' => 'lp_get_sections',
     'all'      => 'lp_get_all',
@@ -198,6 +199,23 @@ function lp_get_families(PDO $pdo): array {
     )->fetchAll();
 }
 
+function lp_get_app(PDO $pdo): array {
+    $section = $pdo->query(
+        'SELECT title_fr, title_nl, lede_fr, lede_nl,
+                point1_fr, point1_nl, point2_fr, point2_nl, point3_fr, point3_nl,
+                cta_text_fr, cta_text_nl, hint_fr, hint_nl
+         FROM lp_app_section LIMIT 1'
+    )->fetch();
+    if (!$section) return [];
+
+    $app_url = $pdo->query(
+        "SELECT param_value FROM lp_params WHERE param_key = 'app_url'"
+    )->fetchColumn();
+
+    $section['app_url'] = $app_url ?: 'https://latelierby.be/app';
+    return $section;
+}
+
 function lp_get_services(PDO $pdo): array {
     return $pdo->query(
         'SELECT position, name_fr, name_nl, desc_fr, desc_nl, icon_svg
@@ -228,6 +246,7 @@ function lp_get_all(PDO $pdo): array {
         'shops'    => lp_get_shops($pdo),
         'pickers'  => lp_get_pickers($pdo),
         'families' => lp_get_families($pdo),
+        'app'      => lp_get_app($pdo),
         'services' => lp_get_services($pdo),
         'sections' => lp_get_sections($pdo),
     ];

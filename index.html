@@ -1499,6 +1499,29 @@ section[id] { scroll-margin-top: 92px; }
     });
   }
 
+  function patchApp(a) {
+    var sec = document.getElementById('app');
+    if (!sec) return;
+    var nl = lang === 'nl';
+    var title = sec.querySelector('.title');
+    var lede  = sec.querySelector('.lede');
+    var lis   = sec.querySelectorAll('.quiet__points li');
+    var cta   = sec.querySelector('#qrOpen span[data-i18n]');
+    var hint  = sec.querySelector('.app__hint');
+    var qrImg = document.querySelector('.qrmodal__qr img');
+
+    if (title)  title.textContent = nl ? a.title_nl : a.title_fr;
+    if (lede)   lede.textContent  = nl ? a.lede_nl  : a.lede_fr;
+    if (lis[0]) lis[0].textContent = nl ? a.point1_nl : a.point1_fr;
+    if (lis[1]) lis[1].textContent = nl ? a.point2_nl : a.point2_fr;
+    if (lis[2]) lis[2].textContent = nl ? a.point3_nl : a.point3_fr;
+    if (cta)    cta.textContent   = nl ? a.cta_text_nl : a.cta_text_fr;
+    if (hint)   hint.textContent  = nl ? a.hint_nl : a.hint_fr;
+    if (qrImg && a.app_url) {
+      qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=440x440&margin=0&data=' + encodeURIComponent(a.app_url);
+    }
+  }
+
   function patchServices(services) {
     var wrap = document.querySelector('#experiences .xp');
     if (!wrap) return;
@@ -1565,6 +1588,7 @@ section[id] { scroll-margin-top: 92px; }
       lang = document.documentElement.lang || 'fr';
       if (data.sections)                           patchSections(data.sections);
       if (data.services  && data.services.length)  patchServices(data.services);
+      if (data.app       && Object.keys(data.app).length) patchApp(data.app);
       if (data.hero      && data.hero.length)      patchHero(data.hero);
       if (data.families  && data.families.length)  patchFamilies(data.families);
       if (data.seasonal  && data.seasonal.length)  patchSeasonal(data.seasonal);
