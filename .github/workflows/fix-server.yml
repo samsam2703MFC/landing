@@ -7,27 +7,38 @@ jobs:
   fix:
     runs-on: ubuntu-latest
     steps:
-      - name: Add /landing/ alias to Apache
+      - name: Create catch-all VirtualHost with /landing/ alias
         uses: appleboy/ssh-action@v1
         with:
           host: 185.180.206.46
           username: root
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            # Créer le conf Alias (nom différent pour éviter conflit avec sites-enabled)
+            # VirtualHost catch-all pour accès par IP
+            # ServerName 185.180.206.46 capte uniquement les requêtes IP
+            # Les autres domaines (plackownia.pl, tfbuddy.com...) ne sont pas affectés
             {
-              echo 'Alias /landing /var/www/latelierby-landing'
+              echo '<VirtualHost *:80>'
+              echo '    ServerName 185.180.206.46'
+              echo '    DocumentRoot /var/www/html'
               echo ''
-              echo '<Directory /var/www/latelierby-landing>'
-              echo '    AllowOverride All'
-              echo '    Require all granted'
-              echo '    Options -Indexes'
-              echo '    DirectoryIndex index.html index.php'
-              echo '</Directory>'
-            } > /etc/apache2/conf-available/latelierby-alias.conf
+              echo '    Alias /landing /var/www/latelierby-landing'
+              echo ''
+              echo '    <Directory /var/www/html>'
+              echo '        AllowOverride All'
+              echo '        Require all granted'
+              echo '    </Directory>'
+              echo ''
+              echo '    <Directory /var/www/latelierby-landing>'
+              echo '        AllowOverride All'
+              echo '        Require all granted'
+              echo '        Options -Indexes'
+              echo '        DirectoryIndex index.html index.php'
+              echo '    </Directory>'
+              echo '</VirtualHost>'
+            } > /etc/apache2/sites-available/000-default.conf
 
-            a2enconf latelierby-alias
-            apache2ctl configtest
-            systemctl reload apache2
+            a2ensite 000-default
+            apache2ctl configtest && systemctl reload apache2
 
-            echo "Done — test: http://185.180.206.46/landing/"
+            echo "Done — http://185.180.206.46/landing/ devrait fonctionner"
