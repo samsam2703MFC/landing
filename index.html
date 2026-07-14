@@ -108,7 +108,7 @@ html.js .revs.is-in > *:nth-child(5) { transition-delay: .28s; }
 .head__chip:hover { border-color: var(--ink); }
 .head__chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex: 0 0 auto; }
 .head__chip .car { color: var(--muted); font-size: 10px; }
-@media (max-width: 520px) { .head__chip { display: none; } }
+@media (max-width: 520px) { .head__chip { padding: 6px 10px; font-size: 11px; } }
 .head__lang { display: inline-flex; gap: 2px; border: 1px solid var(--hair); border-radius: var(--radius-pill); padding: 3px; }
 .head__lang button { border: none; background: none; font: inherit; font-size: 11px; letter-spacing: 0.06em; color: var(--muted); padding: 5px 10px; border-radius: var(--radius-pill); cursor: pointer; transition: color .2s var(--ease), background .2s var(--ease); }
 .head__lang button:hover { color: var(--ink); }
@@ -430,6 +430,15 @@ button.gitem { display: flex; flex-direction: column; width: 100%; background: n
 .foot__bottom button:hover { color: var(--ink); }
 .foot__legal a { color: var(--faint); transition: color .2s var(--ease); }
 .foot__legal a:hover { color: var(--ink); }
+/* Bannière app (mobile uniquement) */
+.appbar { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 200; display: none; align-items: center; gap: 12px; background: var(--ink); color: var(--paper); border-radius: 14px; padding: 10px 12px; box-shadow: 0 14px 34px -10px rgba(0,0,0,.45); }
+.appbar__logo { width: 34px; height: 34px; border-radius: 8px; background: var(--paper); padding: 5px; flex: 0 0 auto; }
+.appbar__txt { display: flex; flex-direction: column; line-height: 1.25; flex: 1 1 auto; min-width: 0; }
+.appbar__txt strong { font-size: 13px; font-weight: 500; }
+.appbar__txt span { font-size: 11.5px; color: rgba(255,255,255,.7); }
+.appbar__cta { flex: 0 0 auto; background: var(--paper); color: var(--ink); font-size: 12.5px; font-weight: 500; padding: 8px 15px; border-radius: 99px; }
+.appbar__close { flex: 0 0 auto; background: none; border: none; color: rgba(255,255,255,.6); font-size: 20px; line-height: 1; cursor: pointer; padding: 4px 6px; }
+@media (max-width: 760px) { .appbar.is-on { display: flex; } }
 @media (max-width: 720px) { .foot__top { grid-template-columns: 1fr 1fr; gap: 32px; } .foot__brand { grid-column: 1 / -1; } }
 
 section[id] { scroll-margin-top: 92px; }
@@ -829,6 +838,17 @@ section[id] { scroll-margin-top: 92px; }
   </div>
 </footer>
 
+<!-- ===================== BANNIÈRE APP (mobile) ===================== -->
+<div class="appbar" id="appBar" role="region" aria-label="Application mobile">
+  <img class="appbar__logo" src="img/brand/logo.png" alt="">
+  <span class="appbar__txt">
+    <strong data-i18n="appbar.title">L'Atelier By</strong>
+    <span data-i18n="appbar.sub">Plus rapide dans l'application</span>
+  </span>
+  <a class="appbar__cta" id="appBarCta" href="#" target="_blank" rel="noopener" data-i18n="appbar.cta">Ouvrir</a>
+  <button class="appbar__close" id="appBarClose" type="button" aria-label="Fermer">×</button>
+</div>
+
 <!-- ===================== MODAL BOUTIQUE ===================== -->
 <div class="modal" id="shopModal" role="dialog" aria-modal="true" aria-labelledby="shopModalName">
   <div class="modal__backdrop" data-mclose></div>
@@ -950,6 +970,7 @@ section[id] { scroll-margin-top: 92px; }
       'collab.shop':'Voir dans la boutique','card.more':'Voir les détails →','badge.popup':'Pop-up','label.services':'Services','label.contact':'Contact','label.hours':'Horaires','closed':'Fermé',
       'svc.collect':'Click & Collect','svc.delivery':'Livraison','svc.catering':'Traiteur','svc.b2b':'B2B','svc.phone':'Commande téléphonique','svc.office':'Livraison bureau','svc.loyalty':'Programme fidélité',
       'day.mon':'Lun','day.tue':'Mar','day.wed':'Mer','day.thu':'Jeu','day.fri':'Ven','day.sat':'Sam','day.sun':'Dim',
+      'appbar.title':"L'Atelier By",'appbar.sub':"Plus rapide dans l'application",'appbar.cta':'Ouvrir',
       'doc.title':"L'Atelier By — Maison de pains & viennoiseries"
     },
     nl: {
@@ -988,6 +1009,7 @@ section[id] { scroll-margin-top: 92px; }
       'collab.shop':'Bekijk in de winkel','card.more':'Bekijk details →','badge.popup':'Pop-up','label.services':'Diensten','label.contact':'Contact','label.hours':'Openingsuren','closed':'Gesloten',
       'svc.collect':'Click & Collect','svc.delivery':'Levering','svc.catering':'Catering','svc.b2b':'B2B','svc.phone':'Telefonische bestelling','svc.office':'Levering op kantoor','svc.loyalty':'Getrouwheidsprogramma',
       'day.mon':'Ma','day.tue':'Di','day.wed':'Wo','day.thu':'Do','day.fri':'Vr','day.sat':'Za','day.sun':'Zo',
+      'appbar.title':"L'Atelier By",'appbar.sub':'Sneller in de app','appbar.cta':'Openen',
       'doc.title':"L'Atelier By — Huis van brood & viennoiserie"
     }
   };
@@ -1333,7 +1355,8 @@ section[id] { scroll-margin-top: 92px; }
     }
     function syncChip() {
       var b = byKey(get());
-      if (b) { chip.hidden = false; chipName.textContent = b.city || b.name; } else { chip.hidden = true; }
+      chip.hidden = false;   // toujours visible : point d'entrée du picker (aussi sur mobile)
+      chipName.textContent = b ? (b.city || b.name) : t('pk.flagMine');
     }
     function open() { render(); modal.classList.add('is-open'); modal.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; modal.querySelector('.pickmodal__close').focus(); }
     function close() { modal.classList.remove('is-open'); modal.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
@@ -1369,6 +1392,27 @@ section[id] { scroll-margin-top: 92px; }
     document.addEventListener('lp:data', function (e) {
       var d = e.detail;
       if (d && d.pickers) { BOUTIQUES = d.pickers; syncChip(); }
+    });
+  })();
+
+  // --- bannière app (mobile web) ---
+  (function () {
+    var bar = document.getElementById('appBar');
+    if (!bar) return;
+    var cta = document.getElementById('appBarCta');
+    var close = document.getElementById('appBarClose');
+    var DKEY = 'la_appbar_dismissed';
+    function dismissed() { try { return localStorage.getItem(DKEY) === '1'; } catch (e) { return false; } }
+    if (close) close.addEventListener('click', function () {
+      try { localStorage.setItem(DKEY, '1'); } catch (e) {}
+      bar.classList.remove('is-on');
+    });
+    document.addEventListener('lp:data', function (e) {
+      var d = e.detail;
+      var url = d && d.app && d.app.app_url;
+      if (!url || dismissed()) return;
+      if (cta) cta.href = url;
+      bar.classList.add('is-on');   // visible via CSS uniquement en ≤760px
     });
   })();
 
