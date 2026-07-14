@@ -1292,16 +1292,9 @@ section[id] { scroll-margin-top: 92px; }
     start();
   })();
 
-  // --- boutique picker → webshop ---
+  // --- boutique picker → webshop (piloté par lp_shops : webshop_active = 1) ---
   (function () {
-    var BOUTIQUES = [
-      { key: 'halle',     name: 'Halle',     zone: 'Hal · Brabant flamand', lat: 50.7331, lng: 4.2364, shop: 'https://halle.latelierby.be' },
-      { key: 'wavre',     name: 'Wavre',     zone: 'Brabant wallon',        lat: 50.7171, lng: 4.6012, shop: 'https://wavre.latelierby.be' },
-      { key: 'corbais',   name: 'Corbais',   zone: 'Mont-Saint-Guibert',    lat: 50.6389, lng: 4.6167, shop: 'https://corbais.latelierby.be' },
-      { key: 'gembloux',  name: 'Gembloux',  zone: 'Namur',                 lat: 50.5611, lng: 4.6917, shop: 'https://gembloux.latelierby.be' },
-      { key: 'sombreffe', name: 'Sombreffe', zone: 'Namur',                 lat: 50.5333, lng: 4.6000, shop: 'https://sombreffe.latelierby.be' },
-      { key: 'gosselies', name: 'Gosselies', zone: 'Charleroi',             lat: 50.4667, lng: 4.4333, shop: 'https://gosselies.latelierby.be' }
-    ];
+    var BOUTIQUES = [];   // rempli depuis la DB (lp:data → data.pickers)
     var KEY = 'la_boutique';
     var modal = document.getElementById('shopPicker');
     var list = document.getElementById('pickList');
@@ -1325,10 +1318,12 @@ section[id] { scroll-margin-top: 92px; }
       list.innerHTML = BOUTIQUES.map(function (b) {
         var isCur = b.key === cur, isNear = b.key === nearestKey;
         var flag = isNear ? '<span class="pickcard__flag">' + t('pk.flagNear') + '</span>' : (isCur ? '<span class="pickcard__flag">' + t('pk.flagMine') + '</span>' : '');
+        var label  = b.city || b.name || '';
+        var second = (b.city && b.name && b.name !== b.city) ? b.name : (b.zone || '');
         return '<a class="pickcard' + (isCur ? ' is-current' : '') + (isNear ? ' is-nearest' : '') + '" href="' + b.shop + '" target="_blank" rel="noopener" data-key="' + b.key + '">' +
           flag +
-          '<span class="pickcard__name">' + b.name + '</span>' +
-          '<span class="pickcard__zone">' + b.zone + '</span>' +
+          '<span class="pickcard__name">' + label + '</span>' +
+          '<span class="pickcard__zone">' + second + '</span>' +
           '<span class="pickcard__go">' + t('pk.go') + '</span>' +
         '</a>';
       }).join('');
@@ -1338,7 +1333,7 @@ section[id] { scroll-margin-top: 92px; }
     }
     function syncChip() {
       var b = byKey(get());
-      if (b) { chip.hidden = false; chipName.textContent = b.name; } else { chip.hidden = true; }
+      if (b) { chip.hidden = false; chipName.textContent = b.city || b.name; } else { chip.hidden = true; }
     }
     function open() { render(); modal.classList.add('is-open'); modal.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; modal.querySelector('.pickmodal__close').focus(); }
     function close() { modal.classList.remove('is-open'); modal.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
@@ -1373,7 +1368,7 @@ section[id] { scroll-margin-top: 92px; }
     syncChip();
     document.addEventListener('lp:data', function (e) {
       var d = e.detail;
-      if (d.pickers && d.pickers.length) { BOUTIQUES = d.pickers; syncChip(); }
+      if (d && d.pickers) { BOUTIQUES = d.pickers; syncChip(); }
     });
   })();
 
