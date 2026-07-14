@@ -81,6 +81,9 @@ try {
         ['ft.galette',    'Galette des rois',  'Driekoningentaart'],
         ['ft.copyright',  "© 2026 L'Atelier By — Tous droits réservés.", "© 2026 L'Atelier By — Alle rechten voorbehouden."],
         ['ft.legal',      'Mentions légales · Confidentialité · Conditions', 'Wettelijke vermeldingen · Privacy · Voorwaarden'],
+        ['ft.legal1',     'Mentions légales', 'Wettelijke vermeldingen'],
+        ['ft.legal2',     'Confidentialité',  'Privacy'],
+        ['ft.legal3',     'Conditions',       'Voorwaarden'],
         ['ft.totop',      'Haut de page ↑',   'Naar boven ↑'],
 
         // Picker webshop

@@ -428,6 +428,8 @@ button.gitem { display: flex; flex-direction: column; width: 100%; background: n
 .foot__bottom { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: clamp(48px, 7vw, 80px); padding-top: 24px; border-top: 1px solid var(--hair-2); font-size: 12px; color: var(--faint); flex-wrap: wrap; }
 .foot__bottom button { background: none; border: none; cursor: pointer; color: var(--faint); font: inherit; transition: color .2s var(--ease); }
 .foot__bottom button:hover { color: var(--ink); }
+.foot__legal a { color: var(--faint); transition: color .2s var(--ease); }
+.foot__legal a:hover { color: var(--ink); }
 @media (max-width: 720px) { .foot__top { grid-template-columns: 1fr 1fr; gap: 32px; } .foot__brand { grid-column: 1 / -1; } }
 
 section[id] { scroll-margin-top: 92px; }
@@ -817,7 +819,11 @@ section[id] { scroll-margin-top: 92px; }
     </div>
     <div class="foot__bottom">
       <span data-i18n="ft.copyright">© 2026 L'Atelier By — Tous droits réservés.</span>
-      <span data-i18n="ft.legal">Mentions légales · Confidentialité · Conditions</span>
+      <span class="foot__legal">
+        <a href="mentions-legales.html#mentions" data-i18n="ft.legal1">Mentions légales</a> ·
+        <a href="mentions-legales.html#confidentialite" data-i18n="ft.legal2">Confidentialité</a> ·
+        <a href="mentions-legales.html#conditions" data-i18n="ft.legal3">Conditions</a>
+      </span>
       <button type="button" data-totop data-i18n="ft.totop">Haut de page ↑</button>
     </div>
   </div>

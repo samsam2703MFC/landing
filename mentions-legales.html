@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>L'Atelier By — Mentions légales, Confidentialité & Conditions</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Mentions légales, politique de confidentialité (RGPD) et conditions générales de L'Atelier By.">
+<meta name="robots" content="index, follow">
+<link rel="stylesheet" href="global.css">
+<script>document.documentElement.classList.add('js');</script>
+<style>
+:root {
+  --paper:  #FCFBF8;
+  --ink:    #232220;
+  --muted:  #8A847C;
+  --faint:  #B8B2A8;
+  --hair:   rgba(35,34,32,0.12);
+  --hair-2: rgba(35,34,32,0.06);
+  --accent: var(--color-primary);
+  --maxw:   820px;
+  --wide:   1280px;
+  --gutter: clamp(24px, 6vw, 72px);
+  --ease:   cubic-bezier(0.4, 0, 0.2, 1);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+html, body { background: var(--paper); }
+body {
+  margin: 0; color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 16px; line-height: 1.7; font-weight: 400;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+::selection { background: var(--accent); color: #fff; }
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding-inline: var(--gutter); }
+.wrap--wide { max-width: var(--wide); }
+
+.eyebrow {
+  font-family: var(--font-ui); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.26em; text-transform: uppercase; color: var(--muted); margin: 0;
+}
+.title {
+  font-family: var(--font-ui); font-weight: 400; letter-spacing: -0.01em;
+  line-height: 1.14; margin: 0; font-size: clamp(25px, 3vw, 36px);
+}
+.hr { height: 1px; background: var(--hair); border: 0; margin: 0; }
+
+/* HEADER (identique au site) */
+.head {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--paper) 90%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--hair-2);
+}
+.head__in { display: flex; align-items: center; justify-content: space-between; gap: 24px; height: 78px; }
+.head__logo { height: 23px; width: auto; }
+.head__back { font-size: 13px; letter-spacing: 0.04em; color: var(--muted); display: inline-flex; align-items: center; gap: 7px; transition: color .25s var(--ease), gap .25s var(--ease); }
+.head__back:hover { color: var(--ink); gap: 11px; }
+
+/* CONTENU LÉGAL */
+.legal { padding: clamp(48px, 8vw, 96px) 0 clamp(64px, 10vw, 120px); }
+.legal__intro { margin-bottom: clamp(40px, 6vw, 64px); }
+.legal__intro .title { margin-top: 14px; }
+.legal__updated { font-size: 13px; color: var(--faint); margin-top: 18px; }
+
+.legal__toc { display: flex; flex-wrap: wrap; gap: 10px; margin: 32px 0 0; }
+.legal__toc a {
+  font-size: 13px; letter-spacing: 0.02em; color: var(--muted);
+  border: 1px solid var(--hair); border-radius: var(--radius-pill, 99px);
+  padding: 7px 16px; transition: color .2s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
+}
+.legal__toc a:hover { color: var(--ink); border-color: var(--ink); }
+
+.legal__section { padding-top: clamp(40px, 6vw, 64px); scroll-margin-top: 92px; }
+.legal__section h2 {
+  font-family: var(--font-ui); font-weight: 400; font-size: clamp(20px, 2.4vw, 27px);
+  letter-spacing: -0.01em; margin: 0 0 8px;
+}
+.legal__section h3 {
+  font-family: var(--font-ui); font-weight: 500; font-size: 15px;
+  letter-spacing: 0.01em; margin: 30px 0 6px; color: var(--ink);
+}
+.legal__section p, .legal__section li { color: var(--muted); font-size: 15.5px; }
+.legal__section p { margin: 10px 0; }
+.legal__section ul { margin: 10px 0; padding-left: 20px; }
+.legal__section li { margin: 5px 0; }
+.legal__section a[href^="mailto"], .legal__section a[href^="http"] { color: var(--accent); }
+.legal__lead { color: var(--muted); font-size: 15.5px; margin-top: 4px; }
+
+.fill { background: #FFF4D6; color: #7A5600; padding: 1px 6px; border-radius: 4px; font-size: 0.92em; white-space: nowrap; }
+@media (prefers-color-scheme: dark) { .fill { background: rgba(251,191,36,.18); color: #FCD34D; } }
+
+.legal__note {
+  margin-top: clamp(48px, 7vw, 72px); padding: 20px 24px;
+  background: var(--hair-2); border-radius: var(--radius-md, 12px);
+  font-size: 13.5px; color: var(--muted);
+}
+
+.foot { border-top: 1px solid var(--hair-2); padding: clamp(40px, 6vw, 64px) 0; }
+.foot__bottom { display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 12px; color: var(--faint); flex-wrap: wrap; }
+.foot__bottom a { color: var(--faint); transition: color .2s var(--ease); }
+.foot__bottom a:hover { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header class="head">
+  <div class="wrap wrap--wide head__in">
+    <a href="index.html" aria-label="L'Atelier By"><img class="head__logo" src="img/brand/logo.png" alt="L'Atelier By"></a>
+    <a class="head__back" href="index.html">← Retour à l'accueil</a>
+  </div>
+</header>
+
+<main class="legal">
+  <div class="wrap">
+
+    <div class="legal__intro">
+      <p class="eyebrow">Informations légales</p>
+      <h1 class="title">Mentions légales, confidentialité & conditions</h1>
+      <p class="legal__lead">Cette page regroupe les informations légales obligatoires relatives au site et aux services de L'Atelier By.</p>
+      <p class="legal__updated">Dernière mise à jour : <span class="fill">[DATE]</span></p>
+      <nav class="legal__toc">
+        <a href="#mentions">Mentions légales</a>
+        <a href="#confidentialite">Confidentialité (RGPD)</a>
+        <a href="#conditions">Conditions générales</a>
+        <a href="#cookies">Cookies</a>
+      </nav>
+    </div>
+
+    <hr class="hr">
+
+    <!-- ============ MENTIONS LÉGALES ============ -->
+    <section class="legal__section" id="mentions">
+      <h2>1. Mentions légales</h2>
+      <p>Conformément aux dispositions du Code de droit économique belge, les informations suivantes sont portées à la connaissance des utilisateurs du site.</p>
+
+      <h3>Éditeur du site</h3>
+      <ul>
+        <li>Dénomination sociale : <span class="fill">[RAISON SOCIALE]</span></li>
+        <li>Forme juridique : <span class="fill">[SA / SRL / indépendant…]</span></li>
+        <li>Siège social : <span class="fill">[ADRESSE COMPLÈTE]</span></li>
+        <li>Numéro d'entreprise (BCE) : <span class="fill">[0XXX.XXX.XXX]</span></li>
+        <li>Numéro de TVA : <span class="fill">[BE 0XXX.XXX.XXX]</span></li>
+        <li>Éditeur responsable : <span class="fill">[NOM PRÉNOM]</span></li>
+        <li>E-mail : <a href="mailto:[EMAIL DE CONTACT]">[EMAIL DE CONTACT]</a></li>
+        <li>Téléphone : <span class="fill">[+32 …]</span></li>
+      </ul>
+
+      <h3>Hébergeur</h3>
+      <ul>
+        <li>Nom de l'hébergeur : <span class="fill">[NOM HÉBERGEUR]</span></li>
+        <li>Adresse : <span class="fill">[ADRESSE HÉBERGEUR]</span></li>
+        <li>Contact : <span class="fill">[EMAIL / TÉL HÉBERGEUR]</span></li>
+      </ul>
+
+      <h3>Propriété intellectuelle</h3>
+      <p>L'ensemble des éléments de ce site (textes, illustrations, logos, images, mise en page, éléments graphiques) sont la propriété exclusive de L'Atelier By ou de leurs titulaires respectifs et sont protégés par le droit d'auteur. Toute reproduction, représentation, modification ou exploitation, totale ou partielle, sans autorisation écrite préalable, est interdite.</p>
+
+      <h3>Responsabilité</h3>
+      <p>L'éditeur s'efforce d'assurer l'exactitude et la mise à jour des informations diffusées sur ce site, mais ne peut garantir qu'elles soient exemptes d'erreurs ou d'omissions. L'éditeur ne saurait être tenu responsable des dommages directs ou indirects résultant de l'accès ou de l'utilisation du site.</p>
+    </section>
+
+    <!-- ============ CONFIDENTIALITÉ / RGPD ============ -->
+    <section class="legal__section" id="confidentialite">
+      <h2>2. Politique de confidentialité (RGPD)</h2>
+      <p>La présente politique décrit la manière dont L'Atelier By collecte et traite vos données à caractère personnel, conformément au Règlement (UE) 2016/679 (RGPD) et à la loi belge du 30 juillet 2018.</p>
+
+      <h3>Responsable du traitement</h3>
+      <p><span class="fill">[RAISON SOCIALE]</span>, <span class="fill">[ADRESSE]</span> — contact : <a href="mailto:[EMAIL DPO/CONTACT]">[EMAIL DPO/CONTACT]</a>.</p>
+
+      <h3>Données collectées</h3>
+      <ul>
+        <li>Données d'identification : nom, prénom, adresse e-mail, numéro de téléphone ;</li>
+        <li>Données transmises via nos formulaires (ex. demande de franchise, contact) ;</li>
+        <li>Données techniques : adresse IP, type de navigateur, pages consultées (via les cookies).</li>
+      </ul>
+
+      <h3>Finalités et base légale</h3>
+      <ul>
+        <li>Répondre à vos demandes de contact et de renseignements — <em>exécution de mesures précontractuelles / intérêt légitime</em> ;</li>
+        <li>Gérer les candidatures à la franchise — <em>exécution de mesures précontractuelles</em> ;</li>
+        <li>Améliorer le site et nos services — <em>intérêt légitime</em> ;</li>
+        <li>Envoyer des communications commerciales — <em>uniquement avec votre consentement</em>.</li>
+      </ul>
+
+      <h3>Durée de conservation</h3>
+      <p>Vos données sont conservées le temps nécessaire aux finalités décrites, puis archivées ou supprimées conformément aux délais légaux applicables. Les données de prospection sont conservées au maximum <span class="fill">[X ans/mois]</span> après le dernier contact.</p>
+
+      <h3>Destinataires</h3>
+      <p>Vos données ne sont jamais vendues. Elles peuvent être communiquées à nos sous-traitants techniques (hébergement, envoi d'e-mails) agissant sur nos instructions et soumis à des obligations de confidentialité.</p>
+
+      <h3>Vos droits</h3>
+      <p>Vous disposez à tout moment des droits suivants : accès, rectification, effacement, limitation, opposition, portabilité, et retrait du consentement. Pour les exercer, contactez-nous à <a href="mailto:[EMAIL DPO/CONTACT]">[EMAIL DPO/CONTACT]</a>.</p>
+      <p>Vous avez également le droit d'introduire une réclamation auprès de l'Autorité de protection des données (APD) : Rue de la Presse 35, 1000 Bruxelles — <a href="https://www.autoriteprotectiondonnees.be" target="_blank" rel="noopener">www.autoriteprotectiondonnees.be</a>.</p>
+    </section>
+
+    <!-- ============ CONDITIONS GÉNÉRALES ============ -->
+    <section class="legal__section" id="conditions">
+      <h2>3. Conditions générales</h2>
+      <p>Les présentes conditions générales régissent l'utilisation du site et, le cas échéant, les commandes passées auprès de L'Atelier By.</p>
+
+      <h3>Objet</h3>
+      <p>Elles s'appliquent à toute commande de produits ou de services proposés via le site ou en boutique. Toute commande implique l'acceptation pleine et entière des présentes conditions.</p>
+
+      <h3>Prix</h3>
+      <p>Les prix sont indiqués en euros, toutes taxes comprises (TVA belge applicable). L'Atelier By se réserve le droit de modifier ses prix à tout moment ; les produits sont facturés sur la base des tarifs en vigueur au moment de la validation de la commande.</p>
+
+      <h3>Commande et paiement</h3>
+      <p>La commande est confirmée après validation du paiement selon les moyens proposés (<span class="fill">[MOYENS DE PAIEMENT]</span>). L'Atelier By se réserve le droit de refuser toute commande en cas de litige, de non-paiement ou d'indisponibilité.</p>
+
+      <h3>Retrait et livraison</h3>
+      <p>Les modalités de retrait en boutique (Click &amp; Collect) et de livraison sont précisées lors de la commande. Les créneaux et zones de livraison peuvent varier selon la boutique.</p>
+
+      <h3>Droit de rétractation</h3>
+      <p>Conformément à l'article VI.53 du Code de droit économique, le droit de rétractation ne s'applique pas aux denrées alimentaires périssables ni aux biens confectionnés selon les spécifications du consommateur. Pour les autres produits éligibles, vous disposez d'un délai de 14 jours.</p>
+
+      <h3>Responsabilité</h3>
+      <p>L'Atelier By met tout en œuvre pour assurer la qualité de ses produits. Sa responsabilité ne saurait être engagée en cas de mauvaise conservation par le client ou de non-respect des recommandations (allergènes, dates de consommation).</p>
+
+      <h3>Droit applicable et litiges</h3>
+      <p>Les présentes conditions sont régies par le droit belge. En cas de litige, une solution amiable sera recherchée en priorité. À défaut, les tribunaux de <span class="fill">[ARRONDISSEMENT JUDICIAIRE]</span> seront seuls compétents. Les consommateurs peuvent également recourir à la plateforme européenne de règlement en ligne des litiges : <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">ec.europa.eu/consumers/odr</a>.</p>
+    </section>
+
+    <!-- ============ COOKIES ============ -->
+    <section class="legal__section" id="cookies">
+      <h2>4. Cookies</h2>
+      <p>Le site utilise des cookies afin d'assurer son bon fonctionnement, de mémoriser vos préférences (langue, boutique sélectionnée) et de mesurer l'audience.</p>
+      <ul>
+        <li><strong>Cookies essentiels</strong> : nécessaires au fonctionnement du site (ne peuvent être désactivés).</li>
+        <li><strong>Cookies de préférence</strong> : mémorisent votre langue et votre boutique.</li>
+        <li><strong>Cookies de mesure d'audience</strong> : <span class="fill">[si applicable — outil utilisé]</span>, soumis à votre consentement.</li>
+      </ul>
+      <p>Vous pouvez à tout moment configurer votre navigateur pour refuser les cookies ou supprimer ceux déjà enregistrés.</p>
+
+      <div class="legal__note">
+        ⚠️ Ce document est un modèle générique fourni à titre informatif. Il doit être complété avec vos données réelles (champs surlignés) et adapté à votre situation. Nous vous recommandons de le faire relire par un conseiller juridique avant publication.
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap wrap--wide">
+    <div class="foot__bottom">
+      <span>© <span id="year">2026</span> L'Atelier By — Tous droits réservés.</span>
+      <a href="index.html">Retour à l'accueil →</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var y = document.getElementById('year');
+    // Année dynamique (fallback 2026 si indisponible)
+    try { y.textContent = new Date().getFullYear(); } catch (e) {}
+  })();
+</script>
+</body>
+</html>
