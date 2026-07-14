@@ -170,22 +170,68 @@ function lp_log_mail(PDO $pdo, int $candidate_id, string $type, string $to_email
     }
 }
 
-// ── Envoi (mail() ou SMTP via socket) ────────────────────────
+// ── Envoi (Brevo API → SMTP → mail()) ───────────────────────
 function lp_send_mail(array $mp, string $to, string $subject, string $body, string $from): array
 {
+    // Extraire email + nom depuis "Nom <email>"
+    preg_match('/<(.+?)>/', $to, $m);
+    $to_email = $m[1] ?? $to;
+    $to_name  = trim(str_replace('<'.$to_email.'>', '', $to));
+
+    // Priorité 1 : Brevo API
+    if (!empty($mp['brevo_api_key'])) {
+        return lp_brevo_send($mp['brevo_api_key'], $to_email, $to_name,
+                             $mp['from_email'], $mp['from_name'], $subject, $body);
+    }
+
     $headers  = "From: $from\r\n";
     $headers .= "Reply-To: {$mp['from_email']}\r\n";
     $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
     $headers .= "MIME-Version: 1.0\r\n";
     $headers .= "X-Mailer: LP-Lead/1.0\r\n";
 
+    // Priorité 2 : SMTP
     if (!empty($mp['smtp_host'])) {
         return lp_smtp_send($mp, $to, $subject, $body, $headers);
     }
 
+    // Priorité 3 : PHP mail()
     $encoded_subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
     $ok = @mail($to, $encoded_subject, $body, $headers);
     return [$ok, $ok ? '' : 'mail() returned false'];
+}
+
+function lp_brevo_send(string $api_key, string $to_email, string $to_name,
+                        string $from_email, string $from_name,
+                        string $subject, string $body): array
+{
+    $payload = json_encode([
+        'sender'      => ['name' => $from_name, 'email' => $from_email],
+        'to'          => [['email' => $to_email, 'name' => $to_name]],
+        'subject'     => $subject,
+        'textContent' => $body,
+    ], JSON_UNESCAPED_UNICODE);
+
+    $ch = curl_init('https://api.brevo.com/v3/smtp/email');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => $payload,
+        CURLOPT_HTTPHEADER     => [
+            'accept: application/json',
+            'api-key: ' . $api_key,
+            'content-type: application/json',
+        ],
+        CURLOPT_TIMEOUT        => 10,
+    ]);
+    $resp = curl_exec($ch);
+    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $err  = curl_error($ch);
+    curl_close($ch);
+
+    if ($err)                        return [false, 'curl: ' . $err];
+    if ($code >= 200 && $code < 300) return [true,  ''];
+    return [false, 'Brevo ' . $code . ': ' . $resp];
 }
 
 function lp_smtp_send(array $mp, string $to, string $subject, string $body, string $headers): array
