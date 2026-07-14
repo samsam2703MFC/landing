@@ -1418,6 +1418,56 @@ section[id] { scroll-margin-top: 92px; }
 
   function g(o, k) { return o[k + '_' + lang] || o[k + '_fr'] || ''; }
 
+  function patchCollabs(collabs) {
+    var els = document.querySelectorAll('#collaborations .gitem');
+    collabs.forEach(function (c, i) {
+      var el = els[i]; if (!el) return;
+      var img  = el.querySelector('.gitem__art img');
+      var tag  = el.querySelector('.gitem__tag');
+      var name = el.querySelector('.gitem__name');
+      var desc = el.querySelector('.gitem__desc');
+      if (img)  img.src          = c.image_path;
+      if (tag)  tag.textContent  = lang === 'nl' ? c.tag_nl  : c.tag_fr;
+      if (name) name.textContent = lang === 'nl' ? c.name_nl : c.name_fr;
+      if (desc) desc.textContent = lang === 'nl' ? c.desc_nl : c.desc_fr;
+      if (c.shop_url) el.dataset.href = c.shop_url;
+    });
+  }
+
+  function patchFranchise(f) {
+    var sec   = document.getElementById('franchise');
+    if (!sec) return;
+    var title = sec.querySelector('.title');
+    var lede  = sec.querySelector('.lede');
+    var pts   = sec.querySelectorAll('.quiet__points li');
+    var cta   = sec.querySelector('.quiet__cta a');
+    var ctaSpan = cta && cta.querySelector('span[data-i18n]');
+    var nl    = lang === 'nl';
+    if (title)   title.innerHTML    = nl ? f.title_nl  : f.title_fr;
+    if (lede)    lede.textContent   = nl ? f.lede_nl   : f.lede_fr;
+    if (pts[0])  pts[0].textContent = nl ? f.point1_nl : f.point1_fr;
+    if (pts[1])  pts[1].textContent = nl ? f.point2_nl : f.point2_fr;
+    if (pts[2])  pts[2].textContent = nl ? f.point3_nl : f.point3_fr;
+    if (ctaSpan) ctaSpan.textContent = nl ? f.cta_text_nl : f.cta_text_fr;
+    if (cta && f.cta_url) cta.href = f.cta_url;
+  }
+
+  function patchSeasonal(items) {
+    var els = document.querySelectorAll('#saisonTrack .gitem');
+    items.forEach(function (s, i) {
+      var el = els[i]; if (!el) return;
+      var img  = el.querySelector('.gitem__art img');
+      var tag  = el.querySelector('.gitem__tag');
+      var name = el.querySelector('.gitem__name');
+      var desc = el.querySelector('.gitem__desc');
+      if (img)  img.src          = s.image_path;
+      if (tag)  tag.textContent  = lang === 'nl' ? s.tag_nl  : s.tag_fr;
+      if (name) name.textContent = lang === 'nl' ? s.name_nl : s.name_fr;
+      if (desc) desc.textContent = lang === 'nl' ? s.desc_nl : s.desc_fr;
+      if (s.item_url) el.href = s.item_url;
+    });
+  }
+
   function patchFamilies(families) {
     var els = document.querySelectorAll('.fam');
     families.forEach(function (f, i) {
@@ -1454,8 +1504,11 @@ section[id] { scroll-margin-top: 92px; }
     .then(function (data) {
       if (!data || data.error) return;
       lang = document.documentElement.lang || 'fr';
-      if (data.hero     && data.hero.length)     patchHero(data.hero);
-      if (data.families && data.families.length) patchFamilies(data.families);
+      if (data.hero      && data.hero.length)      patchHero(data.hero);
+      if (data.families  && data.families.length)  patchFamilies(data.families);
+      if (data.seasonal  && data.seasonal.length)  patchSeasonal(data.seasonal);
+      if (data.collabs   && data.collabs.length)   patchCollabs(data.collabs);
+      if (data.franchise && Object.keys(data.franchise).length) patchFranchise(data.franchise);
       document.dispatchEvent(new CustomEvent('lp:data', { detail: data }));
     })
     .catch(function () {});
