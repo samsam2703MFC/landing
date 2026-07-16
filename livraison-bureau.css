@@ -893,9 +893,93 @@ textarea.lb-fld { resize: vertical; }
 }
 .lb-modal__done:hover { border-color: var(--lp-ink); color: var(--lp-ruby); }
 
+/* Mise en œuvre / déploiement --------------------------------------- */
+.lb-rollout {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: clamp(28px, 4vw, 56px);
+  align-items: start;
+}
+.lb-rollout__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.lb-rollout__step {
+  display: flex;
+  gap: 20px;
+  padding: 0 0 26px;
+  position: relative;
+}
+.lb-rollout__step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: 40px;
+  bottom: 0;
+  width: 2px;
+  background: var(--lp-hair);
+}
+.lb-rollout__num {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--lp-ruby);
+  color: #fff;
+  font-family: var(--lp-ff-ui);
+  font-weight: 600;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+.lb-rollout__body { padding-top: 5px; }
+.lb-rollout__body .lb-card-title { margin-bottom: 6px; }
+.lb-rollout__benefit {
+  position: sticky;
+  top: 96px;
+  background: var(--lp-ruby);
+  color: #fff;
+  border-radius: 20px;
+  padding: clamp(26px, 3vw, 34px);
+  box-shadow: 0 30px 60px -40px rgba(107, 68, 32, 0.7);
+}
+.lb-rollout__benefit .lb-eyebrow { color: var(--lp-abricot); margin: 14px 0 12px; }
+.lb-rollout__benefit-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.lb-rollout__benefit-text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #fff;
+}
+
+/* Footer legal links (harmonisé avec le site) */
+.lb-footer__legal a {
+  display: inline;
+  padding: 0;
+  color: rgba(251, 243, 234, 0.6);
+}
+.lb-footer__legal a:hover { color: #fff; }
+
 /* Responsive -------------------------------------------------------- */
 @media (max-width: 860px) {
   .lb-nav { display: none; }
+  .lb-rollout { grid-template-columns: 1fr; }
+  .lb-rollout__benefit { position: static; }
   .lb-contact__grid { grid-template-columns: 1fr; }
   .lb-footer__cols { grid-template-columns: 1fr 1fr; gap: 32px; }
 }

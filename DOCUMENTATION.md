@@ -201,6 +201,42 @@ Les scripts `lp_migrate_*.php` et `lp_fix_*.php` / `lp_diag_*.php` sont des util
 | `index.html` | Accueil | `?r=all` |
 | `franchise-lead.html` | Formulaire de franchise | `?r=franchise_page` + POST `lp_lead.php` |
 | `mentions-legales.html` | Mentions légales / RGPD / CGV | `?r=legal` |
+| `livraison-bureau.html` | Landing « Livraison bureau » (B2B) | `?r=od` (+ footer partagé) |
+
+---
+
+## 10. Livraison bureau (`livraison-bureau.html`) — tables `lp_od_*`
+
+Page B2B « Livraison au bureau », **entièrement pilotée par la base** comme le
+reste du site : contenu codé en dur comme *fallback*, puis remplacé par la DB
+via `lp_api.php?r=od`. Si les tables `lp_od_*` n'existent pas encore, la page
+reste pleinement fonctionnelle sur son fallback.
+
+**Installation** : visitez une fois `…/landing/lp_od_install.php` (crée + seed
+les 13 tables), puis **supprimez le fichier**. Comme les autres `lp_install_*`.
+
+| Zone de la page | Table `lp_od_*` |
+|---|---|
+| Tous les textes d'interface (FR/NL) | `lp_od_i18n` (clé/valeur bilingue) |
+| Listes simples (recPoints, prodAssure, contactPoints, clients, freq) | `lp_od_list` |
+| Boutiques du réseau (routage) — `sid=0` = direction | `lp_od_shops` |
+| Zones de livraison (jours, cutoff, créneaux, minimum, note) | `lp_od_zones` |
+| Section « Pour qui, pour quoi » | `lp_od_usecases` |
+| Section « Comment ça marche » (4 étapes) | `lp_od_steps` |
+| Section « Mise en place » (5 étapes de déploiement) | `lp_od_rollout` |
+| Carrousel « Les formules » | `lp_od_offers` (includes séparés par `|`) |
+| Carrousel « Nos produits » | `lp_od_products` |
+| Chiffres de preuve | `lp_od_specs` |
+| Témoignages | `lp_od_testimonials` |
+| FAQ | `lp_od_faqs` |
+| Champs du formulaire de contact | `lp_od_form_fields` |
+| **Footer** | **partagé** : `lp_footer_links` + `lp_i18n` (`ft.*`) |
+
+- `lp_od_zones.days` = codes séparés par virgule (`lun,mar,mer`) ; `slots` séparés par `|`.
+- Le **footer est harmonisé** avec le reste du site : il lit `lp_footer_links`
+  (colonnes 1/2/3) et les titres `ft.explore` / `ft.services` / `ft.house` de
+  `lp_i18n` — modifier le footer du site met à jour cette page aussi.
+- Route API : `?r=od` renvoie tout le contenu `lp_od_*` **plus** le footer partagé.
 
 ---
 

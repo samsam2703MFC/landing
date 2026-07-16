@@ -70,6 +70,7 @@ $handlers = [
     'app'      => 'lp_get_app',
     'services' => 'lp_get_services',
     'sections' => 'lp_get_sections',
+    'od'       => 'lp_get_od',
     'all'      => 'lp_get_all',
 ];
 
@@ -325,6 +326,102 @@ function lp_get_sections(PDO $pdo): array {
         $out[$r['section_key']] = $r;
     }
     return $out;
+}
+
+/**
+ * Office Delivery (Livraison Bureau) — pilote livraison-bureau.html.
+ * Renvoie tout le contenu des tables lp_od_* + le footer partagé
+ * (lp_footer_links + lp_i18n ft.*) pour harmonisation avec le site.
+ * Chaque sous-requête est isolée : une table lp_od_* manquante n'empêche
+ * pas le reste (la page garde de toute façon son fallback codé en dur).
+ */
+function lp_get_od(PDO $pdo): array {
+    $q = function (string $sql) use ($pdo): array {
+        try { return $pdo->query($sql)->fetchAll(); }
+        catch (PDOException $e) { return []; }
+    };
+
+    // i18n scalaires → { fr:{key:val}, nl:{key:val} }
+    $i18n = ['fr' => [], 'nl' => []];
+    foreach ($q('SELECT i18n_key, value_fr, value_nl FROM lp_od_i18n') as $r) {
+        $i18n['fr'][$r['i18n_key']] = $r['value_fr'];
+        $i18n['nl'][$r['i18n_key']] = $r['value_nl'];
+    }
+
+    // listes simples → { list_key: [ {fr,nl}, ... ] }
+    $lists = [];
+    foreach ($q('SELECT list_key, value_fr, value_nl FROM lp_od_list WHERE is_active = 1 ORDER BY list_key ASC, position ASC') as $r) {
+        $lists[$r['list_key']][] = ['fr' => $r['value_fr'], 'nl' => $r['value_nl']];
+    }
+
+    // shops (sid=0 = système)
+    $shops = [];
+    foreach ($q('SELECT sid, name, city, email, is_system FROM lp_od_shops WHERE is_active = 1 ORDER BY sid ASC') as $r) {
+        $shops[] = [
+            'id' => (int) $r['sid'], 'name' => $r['name'], 'city' => $r['city'],
+            'email' => $r['email'], 'is_system' => ((int) $r['is_system'] === 1),
+        ];
+    }
+
+    // zones (days/slots éclatés en tableaux)
+    $zones = [];
+    foreach ($q('SELECT id, shop_id, region, zone_name, city, cutoff_time, days, slots, min_qty, note_fr, note_nl, priority FROM lp_od_zones WHERE is_active = 1 ORDER BY region ASC, priority ASC') as $r) {
+        $zones[] = [
+            'id' => (int) $r['id'], 'shop_id' => (int) $r['shop_id'], 'region' => $r['region'],
+            'zone_name' => $r['zone_name'], 'city' => $r['city'], 'cutoff_time' => $r['cutoff_time'],
+            'days'  => ($r['days']  !== '' ? explode(',', $r['days'])  : []),
+            'slots' => ($r['slots'] !== '' ? explode('|', $r['slots']) : []),
+            'min' => (int) $r['min_qty'],
+            'note_fr' => $r['note_fr'], 'note_nl' => $r['note_nl'],
+            'priority' => (int) $r['priority'],
+        ];
+    }
+
+    $usecases = $q('SELECT name_fr, name_nl, desc_fr, desc_nl, icon_path FROM lp_od_usecases WHERE is_active = 1 ORDER BY position ASC');
+    $steps    = $q('SELECT title_fr, title_nl, desc_fr, desc_nl FROM lp_od_steps WHERE is_active = 1 ORDER BY position ASC');
+    $rollout  = $q('SELECT title_fr, title_nl, desc_fr, desc_nl FROM lp_od_rollout WHERE is_active = 1 ORDER BY position ASC');
+
+    // offers (includes éclatés)
+    $offers = [];
+    foreach ($q('SELECT name_fr, name_nl, desc_fr, desc_nl, icon_path, includes_fr, includes_nl, audience_fr, audience_nl, setup_fr, setup_nl, is_recurring FROM lp_od_offers WHERE is_active = 1 ORDER BY position ASC') as $r) {
+        $r['includes_fr'] = ($r['includes_fr'] !== '' ? explode('|', $r['includes_fr']) : []);
+        $r['includes_nl'] = ($r['includes_nl'] !== '' ? explode('|', $r['includes_nl']) : []);
+        $r['is_recurring'] = ((int) $r['is_recurring'] === 1);
+        $offers[] = $r;
+    }
+
+    $products     = $q('SELECT title_fr, title_nl, note_fr, note_nl, image_path FROM lp_od_products WHERE is_active = 1 ORDER BY position ASC');
+    $specs        = $q('SELECT value, label_fr, label_nl FROM lp_od_specs WHERE is_active = 1 ORDER BY position ASC');
+    $testimonials = $q('SELECT quote_fr, quote_nl, author, company_fr, company_nl, initial FROM lp_od_testimonials WHERE is_active = 1 ORDER BY position ASC');
+
+    $faqs = [];
+    foreach ($q('SELECT question_fr, question_nl, answer_fr, answer_nl, zone_link FROM lp_od_faqs WHERE is_active = 1 ORDER BY position ASC') as $r) {
+        $r['zone_link'] = ((int) $r['zone_link'] === 1);
+        $faqs[] = $r;
+    }
+
+    $fields = [];
+    foreach ($q('SELECT field_key, field_type, col_span, required, depends FROM lp_od_form_fields WHERE is_active = 1 ORDER BY position ASC') as $r) {
+        $fields[] = [
+            'key' => $r['field_key'], 'type' => $r['field_type'],
+            'span' => (int) $r['col_span'], 'required' => ((int) $r['required'] === 1),
+            'depends' => $r['depends'],
+        ];
+    }
+
+    // Footer partagé avec le reste du site (harmonisation)
+    $footer = [];
+    try { $footer = lp_get_footer($pdo); } catch (PDOException $e) { $footer = []; }
+    $footer_i18n = ['fr' => [], 'nl' => []];
+    try { $footer_i18n = lp_get_i18n($pdo); } catch (PDOException $e) {}
+
+    return [
+        'i18n' => $i18n, 'lists' => $lists, 'shops' => $shops, 'zones' => $zones,
+        'usecases' => $usecases, 'steps' => $steps, 'rollout' => $rollout,
+        'offers' => $offers, 'products' => $products, 'specs' => $specs,
+        'testimonials' => $testimonials, 'faqs' => $faqs, 'form_fields' => $fields,
+        'footer' => $footer, 'footer_i18n' => $footer_i18n,
+    ];
 }
 
 function lp_get_all(PDO $pdo): array {

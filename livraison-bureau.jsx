@@ -83,6 +83,17 @@
         { title: 'On livre, on facture en fin de mois', description: "Livraison au bureau à l'heure convenue. Une seule facture mensuelle, rien à gérer." }
       ],
       stepZoneHint: 'Choisir ma zone pour voir mes modalités →', stepBefore: 'avant',
+      mepEyebrow: 'Mise en place', mepTitle: 'De votre premier contact au déploiement dans vos équipes.',
+      mepLede: "On s'occupe de tout le cadrage. Une fois lancé, chacun commande et paie de son côté — vous n'avez plus rien à gérer.",
+      mepBenefit: 'Chaque commande est payée via le compte de chaque collaborateur : aucune avance, aucune centralisation. Vous gagnez un temps précieux.',
+      mepBenefitLabel: 'Le gain pour vous',
+      rollout: [
+        { title: 'Vous nous contactez', description: 'Un formulaire, deux minutes. On identifie aussitôt la boutique qui couvre votre zone.' },
+        { title: 'Le responsable de boutique prend rendez-vous', description: 'Votre interlocuteur local vous rappelle et fixe un moment pour parler de vos besoins.' },
+        { title: 'On discute des modalités', description: 'Jours, créneaux, formules, budget et fréquence : tout est cadré ensemble, sans engagement.' },
+        { title: 'Préparation de votre voucher de bienvenue', description: 'On configure vos accès et un voucher de bienvenue, prêt à partager avec vos équipes.' },
+        { title: 'Vous déployez dans vos équipes', description: 'Chaque collaborateur commande et paie via son propre compte. Vous ne gérez rien — vous gagnez du temps.' }
+      ],
       offEyebrow: 'Les formules', offTitle: 'Des compositions pensées pour le bureau.',
       offLede: 'Votre boutique adapte les quantités et la mise en place. On vous propose une formule, jamais un catalogue à trier.',
       offerBadge: 'Dispo en hebdo', lblFor: 'Pour :', lblSetup: 'Mise en place :',
@@ -177,6 +188,17 @@
         { title: 'Wij leveren, we factureren op het maandeinde', description: 'Levering op kantoor op het afgesproken uur. Eén maandelijkse factuur, niets te beheren.' }
       ],
       stepZoneHint: 'Kies mijn zone om mijn voorwaarden te zien →', stepBefore: 'vóór',
+      mepEyebrow: 'Ingebruikname', mepTitle: 'Van uw eerste contact tot de uitrol in uw teams.',
+      mepLede: 'Wij regelen de volledige opstart. Eenmaal gelanceerd bestelt en betaalt iedereen zelf — u hoeft niets meer te beheren.',
+      mepBenefit: 'Elke bestelling wordt betaald via het account van elke medewerker: geen voorschot, geen centralisatie. U wint kostbare tijd.',
+      mepBenefitLabel: 'Uw voordeel',
+      rollout: [
+        { title: 'U neemt contact op', description: 'Eén formulier, twee minuten. We bepalen meteen de winkel die uw zone dekt.' },
+        { title: 'De winkelverantwoordelijke maakt een afspraak', description: 'Uw lokale contactpersoon belt u terug en plant een moment om uw behoeften te bespreken.' },
+        { title: 'We bespreken de voorwaarden', description: 'Dagen, tijdvakken, formules, budget en frequentie: alles wordt samen afgesproken, zonder verbintenis.' },
+        { title: 'Voorbereiding van uw welkomstvoucher', description: 'We configureren uw toegang en een welkomstvoucher, klaar om met uw teams te delen.' },
+        { title: 'U rolt het uit naar uw teams', description: 'Elke medewerker bestelt en betaalt via zijn eigen account. U beheert niets — u wint tijd.' }
+      ],
       offEyebrow: 'De formules', offTitle: 'Samenstellingen bedacht voor kantoor.',
       offLede: 'Uw winkel past de hoeveelheden en de presentatie aan. Wij stellen een formule voor, nooit een catalogus om uit te zoeken.',
       offerBadge: 'Wekelijks beschikbaar', lblFor: 'Voor:', lblSetup: 'Presentatie:',
@@ -240,15 +262,15 @@
   };
 
   // ---- Services partagés ----
-  function resolveShop(zoneId) {
+  function resolveShop(zoneId, shopsMap, zones) {
     if (zoneId === '' || zoneId == null) return null;
-    if (String(zoneId) === '0') return SHOPS[0];
-    const z = ZONES.find(x => String(x.id) === String(zoneId));
-    if (!z || !z.is_active) return SHOPS[0];
-    return SHOPS[z.shop_id] || SHOPS[0];
+    if (String(zoneId) === '0') return shopsMap[0];
+    const z = zones.find(x => String(x.id) === String(zoneId));
+    if (!z || !z.is_active) return shopsMap[0];
+    return shopsMap[z.shop_id] || shopsMap[0];
   }
-  function getZoneParams(zoneId) {
-    const z = ZONES.find(x => String(x.id) === String(zoneId));
+  function getZoneParams(zoneId, zones) {
+    const z = zones.find(x => String(x.id) === String(zoneId));
     if (!z || !z.is_active) return null;
     return z;
   }
@@ -309,7 +331,131 @@
     }, deps);
   }
 
+  // ---- Table-driven layer (lp_od_* via lp_api.php) --------------------
+  // The page renders from the hardcoded fallback below, then — exactly like
+  // the rest of the site — fetches the DB and patches over it. If the API or
+  // the lp_od_* tables are absent, the fallback keeps the page fully working.
+  const API_URL = '/landing/lp_api.php?r=od';
+
+  const DEFAULT_FORM_DEFS = [
+    { key: 'first_name', type: 'text', full: false, required: true },
+    { key: 'last_name', type: 'text', full: false, required: true },
+    { key: 'company', type: 'text', full: true, required: true },
+    { key: 'email', type: 'email', full: false, required: true },
+    { key: 'phone', type: 'tel', full: false, required: false },
+    { key: 'zone_id', type: 'zone', full: true, required: true },
+    { key: 'postal_code', type: 'text', full: true, required: true, depends: 'zone0' },
+    { key: 'team_size', type: 'number', full: false, required: false },
+    { key: 'frequency', type: 'freq', full: false, required: false },
+    { key: 'message', type: 'textarea', full: true, required: false },
+    { key: 'consent', type: 'checkbox', full: true, required: true }
+  ];
+
+  // Shared footer (harmonisé avec le reste du site : lp_footer_links + lp_i18n ft.*)
+  const FALLBACK_FOOTER = {
+    tag: { fr: 'Maison de pains et viennoiseries — Belgique, depuis 2019.', nl: 'Huis van brood en viennoiserie — België, sinds 2019.' },
+    titles: { 1: { fr: 'Explorer', nl: 'Ontdekken' }, 2: { fr: 'Services', nl: 'Diensten' }, 3: { fr: 'La Maison', nl: 'Het huis' } },
+    cols: {
+      '1': [
+        { url: 'index.html#boutiques', label_fr: 'Nos boutiques', label_nl: 'Onze winkels' },
+        { url: 'index.html#produits', label_fr: 'Produits', label_nl: 'Producten' },
+        { url: 'index.html#experiences', label_fr: 'Expériences', label_nl: 'Ervaringen' }
+      ],
+      '2': [
+        { url: 'index.html#experiences', label_fr: 'Click & Collect', label_nl: 'Click & Collect' },
+        { url: 'livraison-bureau.html', label_fr: 'Livraison bureau', label_nl: 'Levering op kantoor' },
+        { url: 'index.html#produits', label_fr: 'Magasin en ligne', label_nl: 'Webshop' }
+      ],
+      '3': [
+        { url: 'franchise-lead.html', label_fr: 'Franchise', label_nl: 'Franchise' },
+        { url: 'galette-des-rois.html', label_fr: 'Galette des rois', label_nl: 'Driekoningentaart' }
+      ]
+    },
+    copyright: { fr: "© 2026 L'Atelier By — Tous droits réservés.", nl: "© 2026 L'Atelier By — Alle rechten voorbehouden." },
+    legal: [
+      { url: 'mentions-legales.html#mentions', fr: 'Mentions légales', nl: 'Wettelijke vermeldingen' },
+      { url: 'mentions-legales.html#confidentialite', fr: 'Confidentialité', nl: 'Privacy' },
+      { url: 'mentions-legales.html#conditions', fr: 'Conditions', nl: 'Voorwaarden' }
+    ]
+  };
+
+  function fallbackPack() {
+    return { T: T, shopsMap: SHOPS, zones: ZONES, footer: FALLBACK_FOOTER, formDefs: DEFAULT_FORM_DEFS };
+  }
+
+  // Build one language pack in the exact shape the render code expects.
+  function buildLang(lang, od) {
+    const s = od.i18n[lang] || {};
+    const listOf = (k) => (od.lists[k] || []).map(x => x[lang]);
+    return Object.assign({}, s, {
+      regions: { bw: s['region.bw'], bf: s['region.bf'], nm: s['region.nm'], eb: s['region.eb'] },
+      days: { lun: s['day.lun'], mar: s['day.mar'], mer: s['day.mer'], jeu: s['day.jeu'], ven: s['day.ven'], sam: s['day.sam'], dim: s['day.dim'] },
+      err: { required: s['err.required'], email: s['err.email'], zone: s['err.zone'], postal: s['err.postal'], consent: s['err.consent'] },
+      fields: {
+        first_name: { label: s['field.first_name'] }, last_name: { label: s['field.last_name'] }, company: { label: s['field.company'] },
+        email: { label: s['field.email'], ph: s['field.email.ph'] }, phone: { label: s['field.phone'], ph: s['field.phone.ph'] },
+        zone_id: { label: s['field.zone_id'] }, postal_code: { label: s['field.postal_code'], ph: s['field.postal_code.ph'] },
+        team_size: { label: s['field.team_size'], ph: s['field.team_size.ph'] }, frequency: { label: s['field.frequency'] },
+        message: { label: s['field.message'], ph: s['field.message.ph'] }
+      },
+      useCases: od.usecases.map(u => ({ name: u['name_' + lang], description: u['desc_' + lang], icon: u.icon_path })),
+      steps: od.steps.map(x => ({ title: x['title_' + lang], description: x['desc_' + lang] })),
+      rollout: od.rollout.map(x => ({ title: x['title_' + lang], description: x['desc_' + lang] })),
+      offers: od.offers.map(o => ({ name: o['name_' + lang], description: o['desc_' + lang], icon: o.icon_path, includes: o['includes_' + lang], audience: o['audience_' + lang], setup: o['setup_' + lang], rec: o.is_recurring })),
+      products: od.products.map(p => ({ title: p['title_' + lang], note: p['note_' + lang], img: p.image_path })),
+      specs: od.specs.map(x => ({ value: x.value, label: x['label_' + lang] })),
+      clients: listOf('clients'),
+      testimonials: od.testimonials.map(t => ({ quote: t['quote_' + lang], author: t.author, company: t['company_' + lang], initial: t.initial })),
+      faqs: od.faqs.map(fq => ({ question: fq['question_' + lang], answer: fq['answer_' + lang], zoneLink: fq.zone_link })),
+      recPoints: listOf('recPoints'), prodAssure: listOf('prodAssure'), contactPoints: listOf('contactPoints'), freqOptions: listOf('freq')
+    });
+  }
+
+  function buildFooter(od) {
+    const fi = od.footer_i18n || {};
+    const fr = fi.fr || {}, nl = fi.nl || {};
+    const cols = od.footer || {};
+    if (!(cols['1'] || cols['2'] || cols['3'])) return null;
+    const pk = (o, k, fb) => (o && o[k] != null && o[k] !== '') ? o[k] : fb;
+    const F = FALLBACK_FOOTER;
+    return {
+      tag: { fr: pk(fr, 'ft.tag', F.tag.fr), nl: pk(nl, 'ft.tag', F.tag.nl) },
+      titles: {
+        1: { fr: pk(fr, 'ft.explore', F.titles[1].fr), nl: pk(nl, 'ft.explore', F.titles[1].nl) },
+        2: { fr: pk(fr, 'ft.services', F.titles[2].fr), nl: pk(nl, 'ft.services', F.titles[2].nl) },
+        3: { fr: pk(fr, 'ft.house', F.titles[3].fr), nl: pk(nl, 'ft.house', F.titles[3].nl) }
+      },
+      cols: cols,
+      copyright: { fr: pk(fr, 'ft.copyright', F.copyright.fr), nl: pk(nl, 'ft.copyright', F.copyright.nl) },
+      legal: [
+        { url: 'mentions-legales.html#mentions', fr: pk(fr, 'ft.legal1', F.legal[0].fr), nl: pk(nl, 'ft.legal1', F.legal[0].nl) },
+        { url: 'mentions-legales.html#confidentialite', fr: pk(fr, 'ft.legal2', F.legal[1].fr), nl: pk(nl, 'ft.legal2', F.legal[1].nl) },
+        { url: 'mentions-legales.html#conditions', fr: pk(fr, 'ft.legal3', F.legal[2].fr), nl: pk(nl, 'ft.legal3', F.legal[2].nl) }
+      ]
+    };
+  }
+
+  function buildPackFromOD(od) {
+    if (!od || !od.i18n || !od.i18n.fr) return null;
+    const need = ['zones', 'usecases', 'steps', 'rollout', 'offers', 'products', 'faqs'];
+    for (let i = 0; i < need.length; i++) { if (!Array.isArray(od[need[i]]) || !od[need[i]].length) return null; }
+    const T2 = { fr: buildLang('fr', od), nl: buildLang('nl', od) };
+    const shopsMap = {};
+    (od.shops || []).forEach(s => { shopsMap[s.id] = s; });
+    const zones = od.zones.map(z => ({
+      id: z.id, shop_id: z.shop_id, region: z.region, zone_name: z.zone_name, city: z.city,
+      cutoff_time: z.cutoff_time, days: z.days, slots: z.slots, min: z.min, priority: z.priority,
+      is_active: true, note: (z.note_fr || z.note_nl) ? { fr: z.note_fr, nl: z.note_nl } : null
+    }));
+    const footer = buildFooter(od) || FALLBACK_FOOTER;
+    const formDefs = (od.form_fields && od.form_fields.length)
+      ? od.form_fields.map(d => ({ key: d.key, type: d.type, full: d.span === 2, required: !!d.required, depends: d.depends || undefined }))
+      : DEFAULT_FORM_DEFS;
+    return { T: T2, shopsMap, zones, footer, formDefs };
+  }
+
   function LivraisonBureau() {
+    const [pack, setPack] = useState(fallbackPack);
     const [lang, setLang] = useState('fr');
     const [zoneId, setZoneId] = useState('');
     const [form, setForm] = useState({});
@@ -320,13 +466,23 @@
     const [ucIndex, setUcIndex] = useState(0);
     const [prodIndex, setProdIndex] = useState(0);
 
-    useReveals([lang, zoneId]);
+    // Fetch the DB content once and patch over the fallback (site convention).
+    useEffect(() => {
+      let alive = true;
+      fetch(API_URL, { headers: { Accept: 'application/json' } })
+        .then(r => r.ok ? r.json() : null)
+        .then(od => { if (!alive || !od) return; const p = buildPackFromOD(od); if (p) setPack(p); })
+        .catch(() => { /* garde le fallback */ });
+      return () => { alive = false; };
+    }, []);
 
-    const L = T[lang];
-    const z = getZoneParams(zoneId);
+    useReveals([lang, zoneId, pack]);
+
+    const L = pack.T[lang];
+    const z = getZoneParams(zoneId, pack.zones);
     const zoneNone = zoneId === '';
     const zoneOut = zoneId === '0';
-    const shop = resolveShop(zoneId);
+    const shop = resolveShop(zoneId, pack.shopsMap, pack.zones);
 
     // ---- Handlers ----
     const onZoneSelect = (e) => {
@@ -355,13 +511,13 @@
       if (zoneId === '0' && (!f.postal_code || !f.postal_code.trim())) errs.postal_code = E.postal;
       if (!f.consent) errs.consent = E.consent;
       if (Object.keys(errs).length) { setErrors(errs); return; }
-      setSubmission({ shop: resolveShop(zoneId) });
+      setSubmission({ shop: resolveShop(zoneId, pack.shopsMap, pack.zones) });
       setSubmitted(true);
     };
     const closeModal = () => setSubmitted(false);
 
     // ---- Derived data ----
-    const active = ZONES.filter(x => x.is_active);
+    const active = pack.zones.filter(x => x.is_active);
     const regionOrder = ['bw', 'bf', 'nm', 'eb'];
     const byRegion = {};
     active.forEach(x => { (byRegion[x.region] = byRegion[x.region] || []).push(x); });
@@ -381,7 +537,7 @@
     const offerDots = buildDots(offersL, wrap(offerIndex, offersL.length), setOfferIndex);
     const ucDots = buildDots(L.useCases, wrap(ucIndex, L.useCases.length), setUcIndex);
 
-    const prods = L.products.map((p, i) => ({ ...p, img: PRODUCT_IMAGES[PRODUCT_KEYS[i]] }));
+    const prods = L.products.map((p, i) => ({ ...p, img: p.img || PRODUCT_IMAGES[PRODUCT_KEYS[i]] }));
     const prodCarousel = buildCarousel(prods, wrap(prodIndex, prods.length), 1, setProdIndex);
     const prodDots = buildDots(prods, wrap(prodIndex, prods.length), setProdIndex);
 
@@ -392,24 +548,11 @@
     const rName = rShop ? (rShop.is_system ? L.shopSystemName : rShop.name) : '';
     const routingMessage = rShop ? (rShop.is_system ? L.routingSys : (L.routingNormalPre + rShop.name + L.routingNormalPost)) : '';
 
-    // Form field definitions (piloté par lp_form_field)
+    // Form field definitions (pilotées par lp_od_form_fields, fallback inclus)
     const f = form || {};
     const border = (k) => errors[k] ? 'lb-fld--err' : '';
-    const formDefs = [
-      { key: 'first_name', type: 'text', full: false, required: true },
-      { key: 'last_name', type: 'text', full: false, required: true },
-      { key: 'company', type: 'text', full: true, required: true },
-      { key: 'email', type: 'email', full: false, required: true },
-      { key: 'phone', type: 'tel', full: false, required: false },
-      { key: 'zone_id', type: 'zone', full: true, required: true },
-      { key: 'postal_code', type: 'text', full: true, required: true, depends: 'zone0' },
-      { key: 'team_size', type: 'number', full: false, required: false },
-      { key: 'frequency', type: 'freq', full: false, required: false },
-      { key: 'message', type: 'textarea', full: true, required: false },
-      { key: 'consent', type: 'checkbox', full: true, required: true }
-    ];
-
-    const stepChip = (i) => (i === 1 && z) || (i === 1 && !z);
+    const formDefs = pack.formDefs;
+    const ft = pack.footer;
 
     return (
       <div className="lb" id="top">
@@ -622,6 +765,37 @@
             </div>
           </section>
 
+          {/* ============ MISE EN ŒUVRE ============ */}
+          <section id="mise-en-oeuvre" className="lb-section lb-section--abricot" data-screen-label="Rollout" data-reveal>
+            <div className="lb-wrap">
+              <div className="lb-head">
+                <p className="lb-eyebrow">{L.mepEyebrow}</p>
+                <h2 className="lb-h2">{L.mepTitle}</h2>
+                <p className="lb-lede">{L.mepLede}</p>
+              </div>
+              <div className="lb-rollout">
+                <ol className="lb-rollout__list">
+                  {L.rollout.map((s, i) => (
+                    <li key={i} className="lb-rollout__step">
+                      <span className="lb-rollout__num">{i + 1}</span>
+                      <div className="lb-rollout__body">
+                        <h3 className="lb-card-title">{s.title}</h3>
+                        <p className="lb-card-desc">{s.description}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+                <aside className="lb-rollout__benefit">
+                  <span className="lb-rollout__benefit-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
+                  </span>
+                  <p className="lb-eyebrow">{L.mepBenefitLabel}</p>
+                  <p className="lb-rollout__benefit-text">{L.mepBenefit}</p>
+                </aside>
+              </div>
+            </div>
+          </section>
+
           {/* ============ NOS PRODUITS ============ */}
           <section id="produits" className="lb-section" data-screen-label="Products" data-reveal>
             <div className="lb-wrap">
@@ -813,29 +987,28 @@
             <div className="lb-footer__cols">
               <div>
                 <img src="img/brand/logo.png" alt="L'Atelier By" className="lb-footer__logo" />
-                <p className="lb-footer__tag">{L.footTag}</p>
+                <p className="lb-footer__tag">{ft.tag[lang]}</p>
               </div>
-              <div>
-                <h4>{L.footCol1}</h4>
-                <a href="#zone">{L.navZone}</a>
-                <a href="#formules">{L.navFormules}</a>
-                <a href="#process">{L.navProcess}</a>
-              </div>
-              <div>
-                <h4>{L.footCol2}</h4>
-                <a href="#">{L.footNet1}</a>
-                <a href="#">{L.footNet2}</a>
-                <a href="#">{L.footNet3}</a>
-              </div>
-              <div>
-                <h4>{L.footCol3}</h4>
-                <a href="#contact">{L.ctaHeader}</a>
-                <a href="#">{L.footEmail}</a>
-              </div>
+              {[1, 2, 3].map((col) => {
+                const links = ft.cols[String(col)] || [];
+                if (!links.length) return null;
+                return (
+                  <div key={col}>
+                    <h4>{ft.titles[col][lang]}</h4>
+                    {links.map((lnk, i) => (
+                      <a key={i} href={lnk.url}>{lang === 'nl' ? lnk.label_nl : lnk.label_fr}</a>
+                    ))}
+                  </div>
+                );
+              })}
             </div>
             <div className="lb-footer__bottom">
-              <span>{L.footLegal}</span>
-              <span>{L.footLegal2}</span>
+              <span>{ft.copyright[lang]}</span>
+              <span className="lb-footer__legal">
+                {ft.legal.map((lg, i) => (
+                  <React.Fragment key={i}>{i > 0 ? ' · ' : ''}<a href={lg.url}>{lang === 'nl' ? lg.nl : lg.fr}</a></React.Fragment>
+                ))}
+              </span>
             </div>
           </div>
         </footer>
