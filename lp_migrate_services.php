@@ -38,7 +38,7 @@ $rows = [
      'Pauses gourmandes et petits-déjeuners livrés directement à votre entreprise.',
      'Lekkere pauzes en ontbijten rechtstreeks op kantoor geleverd.',
      '<path d="M4 21V8l8-5 8 5v13M9 21v-6h6v6"/>',
-     'img/services/delivery.png', '', 'apricot'],
+     'img/services/delivery.png', 'livraison-bureau.html', 'apricot'],
     [1,
      'Comptes B2B', 'B2B-accounts',
      'Hôtels, restaurants, collectivités. Livraisons avant 7 h, facturation mensuelle.',
