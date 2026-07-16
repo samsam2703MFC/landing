@@ -100,12 +100,16 @@
 }
 .lb-btn--primary {
   background: var(--lp-ruby);
-  color: #fff;
+  color: var(--lp-paper);
   font-size: 15px;
   font-weight: 500;
   padding: 16px 28px;
 }
 .lb-btn--primary:hover { background: var(--lp-ruby-deep); }
+/* `.lb a{color:inherit}` (0,1,1) would otherwise beat the button classes on
+   anchor buttons — pin the button text colors with matching specificity. */
+.lb a.lb-btn--primary { color: var(--lp-paper); }
+.lb a.lb-btn--ghost { color: var(--lp-ink); }
 .lb-btn--ghost {
   background: transparent;
   color: var(--lp-ink);
@@ -123,7 +127,7 @@
   height: 40px;
   padding: 0 22px;
 }
-.lb a.lb-btn--ink:hover { background: var(--lp-ruby); color: #fff; }
+.lb a.lb-btn--ink:hover { background: var(--lp-ruby); color: var(--lp-paper); }
 .lb-btn--sm { font-size: 14px; font-weight: 500; padding: 13px 22px; }
 
 /* Header ------------------------------------------------------------ */
@@ -391,7 +395,7 @@
   box-shadow: 0 10px 24px -14px rgba(107, 68, 32, 0.6);
   transition: background .2s, color .2s, border-color .2s;
 }
-.lb-carousel__nav:hover { background: var(--lp-ruby); color: #fff; border-color: var(--lp-ruby); }
+.lb-carousel__nav:hover { background: var(--lp-ruby); color: var(--lp-paper); border-color: var(--lp-ruby); }
 .lb-carousel__nav--prev { left: 0; }
 .lb-carousel__nav--next { right: 0; }
 .lb-card {
@@ -769,7 +773,7 @@ textarea.lb-fld { resize: vertical; }
   width: 100%;
   justify-content: center;
   background: var(--lp-ruby);
-  color: #fff;
+  color: var(--lp-paper);
   font-size: 15px;
   font-weight: 500;
   border-radius: 999px;
