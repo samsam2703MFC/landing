@@ -152,14 +152,14 @@ function lp_get_shops(PDO $pdo): array {
 
     // horaires
     $stmt = $pdo->prepare(
-        "SELECT shop_id, day, hours FROM lp_shop_hours WHERE shop_id IN ($placeholders)"
+        "SELECT shop_id, day, hours FROM shop_hours WHERE shop_id IN ($placeholders)"
     );
     $stmt->execute($ids);
     $hours_raw = $stmt->fetchAll();
 
     // services
     $stmt = $pdo->prepare(
-        "SELECT shop_id, service_key FROM lp_shop_services WHERE shop_id IN ($placeholders)"
+        "SELECT shop_id, service_key FROM shop_services WHERE shop_id IN ($placeholders)"
     );
     $stmt->execute($ids);
     $svc_raw = $stmt->fetchAll();
