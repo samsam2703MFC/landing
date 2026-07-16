@@ -131,17 +131,17 @@ function lp_get_shops(PDO $pdo): array {
     // boutiques
     $shops = $pdo->query(
         'SELECT id, sort_order, name, city,
-                postal_code  AS cp,
+                zip          AS cp,
                 kind,
-                address      AS addr,
+                address_line AS addr,
                 phone        AS tel,
                 email        AS mail,
                 concept_fr   AS concept,
                 concept_nl   AS conceptNl,
                 image_path   AS illus,
                 webshop_url
-         FROM lp_shops
-         WHERE is_active = 1
+         FROM shops
+         WHERE active = 1
          ORDER BY sort_order ASC'
     )->fetchAll();
 
@@ -184,8 +184,8 @@ function lp_get_pickers(PDO $pdo): array {
     // Picker = boutiques réelles dont le webshop est actif ; étiquette = ville
     $rows = $pdo->query(
         'SELECT CAST(id AS CHAR) AS `key`, city, name, zone, lat, lng, webshop_url AS shop
-         FROM lp_shops
-         WHERE webshop_active = 1
+         FROM shops
+         WHERE webshop_enabled = 1
          ORDER BY sort_order ASC'
     )->fetchAll();
 
