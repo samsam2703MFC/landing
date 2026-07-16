@@ -113,6 +113,14 @@
   border: 1px solid var(--lp-hair);
 }
 .lb-btn--ghost:hover { border-color: var(--lp-ink); }
+.lb a.lb-btn--ink {
+  background: var(--lp-ink);
+  color: var(--lp-paper);
+  font-size: 15px;
+  font-weight: 500;
+  padding: 16px 28px;
+}
+.lb a.lb-btn--ink:hover { background: var(--lp-ruby); color: #fff; }
 .lb-btn--sm { font-size: 14px; font-weight: 500; padding: 13px 22px; }
 
 /* Header ------------------------------------------------------------ */
@@ -158,6 +166,7 @@
   transition: color .2s;
 }
 .lb-nav a:hover { color: var(--lp-ruby); }
+.lb-nav a.is-active { color: var(--lp-ruby); font-weight: 600; }
 .lb-header__right { display: flex; align-items: center; gap: 14px; }
 .lb-lang {
   display: inline-flex;

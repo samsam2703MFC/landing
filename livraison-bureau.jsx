@@ -457,6 +457,7 @@
   function LivraisonBureau() {
     const [pack, setPack] = useState(fallbackPack);
     const [lang, setLang] = useState('fr');
+    const [activeNav, setActiveNav] = useState('');
     const [zoneId, setZoneId] = useState('');
     const [form, setForm] = useState({});
     const [errors, setErrors] = useState({});
@@ -477,6 +478,23 @@
     }, []);
 
     useReveals([lang, zoneId, pack]);
+
+    // Scroll-spy : met en couleur le lien de nav de la section active.
+    useEffect(() => {
+      const ids = ['zone', 'process', 'formules', 'produits', 'faq'];
+      const els = ids.map(id => document.getElementById(id)).filter(Boolean);
+      if (!els.length || typeof IntersectionObserver === 'undefined') return undefined;
+      const visible = new Set();
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(en => { if (en.isIntersecting) visible.add(en.target.id); else visible.delete(en.target.id); });
+        // la section la plus basse (ordre du document) dans la bande centrale gagne
+        let current = '';
+        ids.forEach(id => { if (visible.has(id)) current = id; });
+        if (current) setActiveNav(current);
+      }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+      els.forEach(el => obs.observe(el));
+      return () => obs.disconnect();
+    }, [pack]);
 
     const L = pack.T[lang];
     const z = getZoneParams(zoneId, pack.zones);
@@ -562,21 +580,20 @@
           <div className="lb-header__inner">
             <a href="#top" className="lb-brand">
               <img src="img/brand/logo.png" alt="L'Atelier By" />
-              <span className="lb-brand__tag">Bureau</span>
             </a>
             <nav className="lb-nav">
-              <a href="#zone">{L.navZone}</a>
-              <a href="#process">{L.navProcess}</a>
-              <a href="#formules">{L.navFormules}</a>
-              <a href="#produits">{L.navProduits}</a>
-              <a href="#faq">{L.navFaq}</a>
+              <a href="#zone" className={activeNav === 'zone' ? 'is-active' : ''}>{L.navZone}</a>
+              <a href="#process" className={activeNav === 'process' ? 'is-active' : ''}>{L.navProcess}</a>
+              <a href="#formules" className={activeNav === 'formules' ? 'is-active' : ''}>{L.navFormules}</a>
+              <a href="#produits" className={activeNav === 'produits' ? 'is-active' : ''}>{L.navProduits}</a>
+              <a href="#faq" className={activeNav === 'faq' ? 'is-active' : ''}>{L.navFaq}</a>
             </nav>
             <div className="lb-header__right">
               <div className="lb-lang">
                 <button type="button" aria-label="Français" className={lang === 'fr' ? 'is-active' : ''} onClick={() => setLang('fr')}>FR</button>
                 <button type="button" aria-label="Nederlands" className={lang === 'nl' ? 'is-active' : ''} onClick={() => setLang('nl')}>NL</button>
               </div>
-              <a href="#contact" className="lb-btn lb-btn--primary lb-btn--sm">{L.ctaHeader}</a>
+              <a href="#contact" className="lb-btn lb-btn--ink lb-btn--sm">{L.ctaHeader}</a>
             </div>
           </div>
         </header>
