@@ -52,7 +52,7 @@ try {
                 'Hôtels, restaurants, collectivités. Livraisons avant 7 h, facturation mensuelle.',
                 'Hotels, restaurants, gemeenschappen. Levering vóór 7 u, maandelijkse facturatie.',
                 '<path d="M3 20h18M5 20V9l7-4 7 4v11"/><path d="M10 20v-5h4v5"/>',
-                'img/services/b2b.png', '', 'copper',
+                'img/services/b2b.png', 'evenements-b2b.html', 'copper',
             ],
         ];
 
