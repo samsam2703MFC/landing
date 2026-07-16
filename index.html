@@ -361,6 +361,8 @@ button.gitem { display: flex; flex-direction: column; width: 100%; background: n
 .xtile:hover { transform: translateY(-3px); box-shadow: 0 22px 48px -24px rgba(0,0,0,.3); }
 .xtile__ic { width: 56px; height: 56px; flex: 0 0 auto; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; transition: background .3s var(--ease), color .3s var(--ease); }
 .xtile__ic svg { width: 26px; height: 26px; stroke: currentColor; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.xtile__ic--img { width: 76px; height: 76px; background: transparent !important; }
+.xtile__ic--img img { width: 100%; height: 100%; object-fit: contain; }
 .xtile__body { flex: 1 1 auto; min-width: 0; }
 .xtile__name { font-family: var(--font-ui); font-weight: 400; font-size: clamp(19px, 2.3vw, 24px); letter-spacing: -0.01em; margin: 0 0 5px; }
 .xtile__desc { font-size: 14.5px; line-height: 1.6; color: var(--muted); margin: 0; }
@@ -753,7 +755,10 @@ section[id] { scroll-margin-top: 92px; }
       </div>
       <div class="xstack rev">
         <a class="xtile xtile--apricot">
-          <span class="xtile__ic"><svg viewBox="0 0 24 24"><path d="M4 21V8l8-5 8 5v13M9 21v-6h6v6"/></svg></span>
+          <span class="xtile__ic xtile__ic--img">
+            <img src="img/services/delivery.png" alt="Livraison au bureau" onerror="this.style.display='none';this.parentNode.classList.remove('xtile__ic--img');this.parentNode.querySelector('svg').style.display=''">
+            <svg viewBox="0 0 24 24" style="display:none"><path d="M4 21V8l8-5 8 5v13M9 21v-6h6v6"/></svg>
+          </span>
           <span class="xtile__body">
             <h3 class="xtile__name">Livraison au bureau</h3>
             <p class="xtile__desc">Pauses gourmandes et petits-déjeuners livrés directement à votre entreprise.</p>
@@ -761,7 +766,10 @@ section[id] { scroll-margin-top: 92px; }
           <span class="xtile__arrow">→</span>
         </a>
         <a class="xtile xtile--copper">
-          <span class="xtile__ic"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 20V9l7-4 7 4v11"/><path d="M10 20v-5h4v5"/></svg></span>
+          <span class="xtile__ic xtile__ic--img">
+            <img src="img/services/b2b.png" alt="Comptes B2B" onerror="this.style.display='none';this.parentNode.classList.remove('xtile__ic--img');this.parentNode.querySelector('svg').style.display=''">
+            <svg viewBox="0 0 24 24" style="display:none"><path d="M3 20h18M5 20V9l7-4 7 4v11"/><path d="M10 20v-5h4v5"/></svg>
+          </span>
           <span class="xtile__body">
             <h3 class="xtile__name">Comptes B2B</h3>
             <p class="xtile__desc">Hôtels, restaurants, collectivités. Livraisons avant 7 h, facturation mensuelle.</p>
@@ -1649,10 +1657,19 @@ section[id] { scroll-margin-top: 92px; }
       var a = document.createElement('a');
       a.className = 'xtile' + (s.theme ? ' xtile--' + s.theme : '');
       if (s.url) a.href = s.url;   // pas d'url → tuile non cliquable (pas de 404)
+      var nm = nl ? s.name_nl : s.name_fr;
+      // icône : illustration (image_path) avec repli sur l'icône SVG si absente
+      var ic = s.image_path
+        ? '<span class="xtile__ic xtile__ic--img">' +
+            '<img src="' + s.image_path + '" alt="' + nm + '" ' +
+            'onerror="this.style.display=\'none\';this.parentNode.classList.remove(\'xtile__ic--img\');this.parentNode.querySelector(\'svg\').style.display=\'\'">' +
+            '<svg viewBox="0 0 24 24" style="display:none">' + s.icon_svg + '</svg>' +
+          '</span>'
+        : '<span class="xtile__ic"><svg viewBox="0 0 24 24">' + s.icon_svg + '</svg></span>';
       a.innerHTML =
-        '<span class="xtile__ic"><svg viewBox="0 0 24 24">' + s.icon_svg + '</svg></span>' +
+        ic +
         '<span class="xtile__body">' +
-          '<h3 class="xtile__name">' + (nl ? s.name_nl : s.name_fr) + '</h3>' +
+          '<h3 class="xtile__name">' + nm + '</h3>' +
           '<p class="xtile__desc">' + (nl ? s.desc_nl : s.desc_fr) + '</p>' +
         '</span>' +
         '<span class="xtile__arrow">→</span>';

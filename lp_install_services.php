@@ -21,6 +21,7 @@ try {
             desc_fr     TEXT,
             desc_nl     TEXT,
             icon_svg    VARCHAR(600)  NOT NULL DEFAULT '',
+            image_path  VARCHAR(255)  NOT NULL DEFAULT '',
             url         VARCHAR(255)  NOT NULL DEFAULT '',
             theme       VARCHAR(30)   NOT NULL DEFAULT '',
             is_active   TINYINT(1)    NOT NULL DEFAULT 1,
@@ -32,8 +33,8 @@ try {
     $exists = $pdo->query('SELECT COUNT(*) FROM lp_services')->fetchColumn();
     if (!$exists) {
         $stmt = $pdo->prepare(
-            'INSERT INTO lp_services (position, name_fr, name_nl, desc_fr, desc_nl, icon_svg, url, theme)
-             VALUES (:pos, :nfr, :nnl, :dfr, :dnl, :svg, :url, :theme)'
+            'INSERT INTO lp_services (position, name_fr, name_nl, desc_fr, desc_nl, icon_svg, image_path, url, theme)
+             VALUES (:pos, :nfr, :nnl, :dfr, :dnl, :svg, :img, :url, :theme)'
         );
 
         $rows = [
@@ -43,7 +44,7 @@ try {
                 'Pauses gourmandes et petits-déjeuners livrés directement à votre entreprise.',
                 'Lekkere pauzes en ontbijten rechtstreeks op kantoor geleverd.',
                 '<path d="M4 21V8l8-5 8 5v13M9 21v-6h6v6"/>',
-                '', 'apricot',
+                'img/services/delivery.png', '', 'apricot',
             ],
             [
                 1,
@@ -51,7 +52,7 @@ try {
                 'Hôtels, restaurants, collectivités. Livraisons avant 7 h, facturation mensuelle.',
                 'Hotels, restaurants, gemeenschappen. Levering vóór 7 u, maandelijkse facturatie.',
                 '<path d="M3 20h18M5 20V9l7-4 7 4v11"/><path d="M10 20v-5h4v5"/>',
-                '', 'copper',
+                'img/services/b2b.png', '', 'copper',
             ],
         ];
 
@@ -59,7 +60,7 @@ try {
             $stmt->execute([
                 ':pos' => $r[0], ':nfr' => $r[1], ':nnl' => $r[2],
                 ':dfr' => $r[3], ':dnl' => $r[4], ':svg' => $r[5],
-                ':url' => $r[6], ':theme' => $r[7],
+                ':img' => $r[6], ':url' => $r[7], ':theme' => $r[8],
             ]);
         }
     }

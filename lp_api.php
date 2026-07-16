@@ -308,7 +308,7 @@ function lp_get_app(PDO $pdo): array {
 
 function lp_get_services(PDO $pdo): array {
     return $pdo->query(
-        'SELECT position, name_fr, name_nl, desc_fr, desc_nl, icon_svg, url, theme
+        'SELECT position, name_fr, name_nl, desc_fr, desc_nl, icon_svg, image_path, url, theme
          FROM lp_services
          WHERE is_active = 1
          ORDER BY position ASC'
