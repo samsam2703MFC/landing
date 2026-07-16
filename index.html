@@ -355,6 +355,25 @@ button.gitem { display: flex; flex-direction: column; width: 100%; background: n
 .xpi__name { font-family: var(--font-ui); font-weight: 400; font-size: 17px; margin: 4px 0 6px; }
 .xpi__desc { font-size: 13.5px; line-height: 1.6; color: var(--muted); margin: 0; }
 @media (max-width: 720px) { .xp { grid-template-columns: 1fr; } }
+/* Services en 2 tuiles empilées (thèmes couleur) */
+.xstack { display: flex; flex-direction: column; gap: 16px; margin-top: clamp(32px, 5vw, 48px); }
+.xtile { display: flex; align-items: center; gap: 22px; padding: clamp(24px, 3.5vw, 34px) clamp(22px, 3vw, 34px); border-radius: 18px; border: 1px solid var(--hair); background: var(--paper); color: var(--ink); transition: transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s var(--ease); }
+.xtile:hover { transform: translateY(-3px); box-shadow: 0 22px 48px -24px rgba(0,0,0,.3); }
+.xtile__ic { width: 56px; height: 56px; flex: 0 0 auto; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; transition: background .3s var(--ease), color .3s var(--ease); }
+.xtile__ic svg { width: 26px; height: 26px; stroke: currentColor; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.xtile__body { flex: 1 1 auto; min-width: 0; }
+.xtile__name { font-family: var(--font-ui); font-weight: 400; font-size: clamp(19px, 2.3vw, 24px); letter-spacing: -0.01em; margin: 0 0 5px; }
+.xtile__desc { font-size: 14.5px; line-height: 1.6; color: var(--muted); margin: 0; }
+.xtile__arrow { flex: 0 0 auto; font-size: 22px; line-height: 1; transition: transform .3s var(--ease); }
+.xtile:hover .xtile__arrow { transform: translateX(5px); }
+.xtile--apricot { border-color: color-mix(in srgb, #C28247 45%, var(--hair)); background: color-mix(in srgb, #C28247 6%, var(--paper)); }
+.xtile--apricot .xtile__ic { background: color-mix(in srgb, #C28247 16%, transparent); color: #B06E32; }
+.xtile--apricot .xtile__name, .xtile--apricot .xtile__arrow { color: #9C5E28; }
+.xtile--apricot:hover .xtile__ic { background: #C28247; color: #fff; }
+.xtile--copper { border-color: color-mix(in srgb, #7A4A2B 45%, var(--hair)); background: color-mix(in srgb, #7A4A2B 6%, var(--paper)); }
+.xtile--copper .xtile__ic { background: color-mix(in srgb, #7A4A2B 16%, transparent); color: #7A4A2B; }
+.xtile--copper .xtile__name, .xtile--copper .xtile__arrow { color: #5E3A22; }
+.xtile--copper:hover .xtile__ic { background: #7A4A2B; color: #fff; }
 
 /* ==========================================================================
    FRANCHISE / APP — quiet centered
@@ -732,31 +751,23 @@ section[id] { scroll-margin-top: 92px; }
         <p class="eyebrow" data-i18n="exp.eyebrow">Expériences</p>
         <h2 class="title" data-i18n="exp.title">Nos services</h2>
       </div>
-      <div class="xp rev">
-        <div class="xpi">
-          <span class="xpi__ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M8 12l3 3 5-6"/></svg></span>
-          <div><h3 class="xpi__name" data-i18n="e1.n">Click &amp; Collect</h3><p class="xpi__desc" data-i18n="e1.d">Commandez en ligne, récupérez chaud. Le créneau ouvre 48 h à l'avance.</p></div>
-        </div>
-        <div class="xpi">
-          <span class="xpi__ic"><svg viewBox="0 0 24 24"><path d="M3 16V7h11v9M14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg></span>
-          <div><h3 class="xpi__name" data-i18n="e2.n">Livraison</h3><p class="xpi__desc" data-i18n="e2.d">Zone urbaine, livreurs à vélo. Créneau de 30 minutes garanti à l'heure choisie.</p></div>
-        </div>
-        <div class="xpi">
-          <span class="xpi__ic"><svg viewBox="0 0 24 24"><path d="M5 4h3l2 5-2 1a11 11 0 006 6l1-2 5 2v3a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></svg></span>
-          <div><h3 class="xpi__name" data-i18n="e3.n">Commande téléphonique</h3><p class="xpi__desc" data-i18n="e3.d">Plateaux, allergènes, cadeaux d'entreprise. Une voix, une oreille.</p></div>
-        </div>
-        <div class="xpi">
-          <span class="xpi__ic"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 20V9l7-4 7 4v11"/><path d="M10 20v-5h4v5"/></svg></span>
-          <div><h3 class="xpi__name" data-i18n="e4.n">Comptes B2B</h3><p class="xpi__desc" data-i18n="e4.d">Hôtels, restaurants, collectivités. Livraisons avant 7 h, facturation mensuelle.</p></div>
-        </div>
-        <div class="xpi">
-          <span class="xpi__ic"><svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></span>
-          <div><h3 class="xpi__name" data-i18n="e5.n">Boutique en ligne</h3><p class="xpi__desc" data-i18n="e5.d">Toute la Maison au bout des doigts. Choisissez, réglez, récupérez depuis chez vous.</p></div>
-        </div>
-        <div class="xpi">
-          <span class="xpi__ic"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-10a4 4 0 017-2.7A4 4 0 0119 11c0 5.5-7 10-7 10z"/></svg></span>
-          <div><h3 class="xpi__name" data-i18n="e6.n">Programme fidélité</h3><p class="xpi__desc" data-i18n="e6.d">Un QR code scanné en caisse, des récompenses qui grandissent à chaque visite.</p></div>
-        </div>
+      <div class="xstack rev">
+        <a class="xtile xtile--apricot" href="livraison-bureau.html">
+          <span class="xtile__ic"><svg viewBox="0 0 24 24"><path d="M4 21V8l8-5 8 5v13M9 21v-6h6v6"/></svg></span>
+          <span class="xtile__body">
+            <h3 class="xtile__name">Livraison au bureau</h3>
+            <p class="xtile__desc">Pauses gourmandes et petits-déjeuners livrés directement à votre entreprise.</p>
+          </span>
+          <span class="xtile__arrow">→</span>
+        </a>
+        <a class="xtile xtile--copper" href="b2b.html">
+          <span class="xtile__ic"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 20V9l7-4 7 4v11"/><path d="M10 20v-5h4v5"/></svg></span>
+          <span class="xtile__body">
+            <h3 class="xtile__name">Comptes B2B</h3>
+            <p class="xtile__desc">Hôtels, restaurants, collectivités. Livraisons avant 7 h, facturation mensuelle.</p>
+          </span>
+          <span class="xtile__arrow">→</span>
+        </a>
       </div>
     </div>
   </section>
@@ -1630,18 +1641,22 @@ section[id] { scroll-margin-top: 92px; }
   }
 
   function patchServices(services) {
-    var wrap = document.querySelector('#experiences .xp');
+    var wrap = document.querySelector('#experiences .xstack');
     if (!wrap) return;
     var nl = lang === 'nl';
     wrap.innerHTML = '';
     services.forEach(function (s) {
-      var div = document.createElement('div');
-      div.className = 'xpi';
-      div.innerHTML =
-        '<span class="xpi__ic"><svg viewBox="0 0 24 24">' + s.icon_svg + '</svg></span>' +
-        '<div><h3 class="xpi__name">' + (nl ? s.name_nl : s.name_fr) + '</h3>' +
-        '<p class="xpi__desc">' + (nl ? s.desc_nl : s.desc_fr) + '</p></div>';
-      wrap.appendChild(div);
+      var a = document.createElement('a');
+      a.className = 'xtile' + (s.theme ? ' xtile--' + s.theme : '');
+      a.href = s.url || '#';
+      a.innerHTML =
+        '<span class="xtile__ic"><svg viewBox="0 0 24 24">' + s.icon_svg + '</svg></span>' +
+        '<span class="xtile__body">' +
+          '<h3 class="xtile__name">' + (nl ? s.name_nl : s.name_fr) + '</h3>' +
+          '<p class="xtile__desc">' + (nl ? s.desc_nl : s.desc_fr) + '</p>' +
+        '</span>' +
+        '<span class="xtile__arrow">→</span>';
+      wrap.appendChild(a);
     });
   }
 
