@@ -366,14 +366,14 @@ button.gitem { display: flex; flex-direction: column; width: 100%; background: n
 .xtile__desc { font-size: 14.5px; line-height: 1.6; color: var(--muted); margin: 0; }
 .xtile__arrow { flex: 0 0 auto; font-size: 22px; line-height: 1; transition: transform .3s var(--ease); }
 .xtile:hover .xtile__arrow { transform: translateX(5px); }
-.xtile--apricot { border-color: color-mix(in srgb, #C28247 45%, var(--hair)); background: color-mix(in srgb, #C28247 6%, var(--paper)); }
-.xtile--apricot .xtile__ic { background: color-mix(in srgb, #C28247 16%, transparent); color: #B06E32; }
-.xtile--apricot .xtile__name, .xtile--apricot .xtile__arrow { color: #9C5E28; }
-.xtile--apricot:hover .xtile__ic { background: #C28247; color: #fff; }
-.xtile--copper { border-color: color-mix(in srgb, #7A4A2B 45%, var(--hair)); background: color-mix(in srgb, #7A4A2B 6%, var(--paper)); }
-.xtile--copper .xtile__ic { background: color-mix(in srgb, #7A4A2B 16%, transparent); color: #7A4A2B; }
-.xtile--copper .xtile__name, .xtile--copper .xtile__arrow { color: #5E3A22; }
-.xtile--copper:hover .xtile__ic { background: #7A4A2B; color: #fff; }
+/* thème apricot — « Livraison au bureau » (tokens design system : delivery mode) */
+.xtile--apricot { border-color: color-mix(in srgb, var(--color-secondary) 65%, var(--hair)); background: color-mix(in srgb, var(--color-secondary) 16%, var(--paper)); }
+.xtile--apricot .xtile__ic { background: var(--color-secondary); color: var(--color-on-abricot); }
+.xtile--apricot .xtile__name, .xtile--apricot .xtile__arrow { color: var(--color-on-abricot); }
+/* thème old copper — « B2B » (tokens design system : badge Collection) */
+.xtile--copper { border-color: color-mix(in srgb, var(--color-collection-border) 65%, var(--hair)); background: color-mix(in srgb, var(--color-collection-fill) 22%, var(--paper)); }
+.xtile--copper .xtile__ic { background: var(--color-collection-fill); color: var(--color-collection-icon); }
+.xtile--copper .xtile__name, .xtile--copper .xtile__arrow { color: var(--color-collection-icon); }
 
 /* ==========================================================================
    FRANCHISE / APP — quiet centered
