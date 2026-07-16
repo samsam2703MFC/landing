@@ -28,7 +28,9 @@
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  /* `clip` contains the hero art's horizontal bleed WITHOUT creating a scroll
+     container — unlike `hidden`, which silently breaks the sticky header. */
+  overflow-x: clip;
 }
 
 .lb *, .lb *::before, .lb *::after { box-sizing: border-box; }
@@ -116,9 +118,10 @@
 .lb a.lb-btn--ink {
   background: var(--lp-ink);
   color: var(--lp-paper);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
-  padding: 16px 28px;
+  height: 40px;
+  padding: 0 22px;
 }
 .lb a.lb-btn--ink:hover { background: var(--lp-ruby); color: #fff; }
 .lb-btn--sm { font-size: 14px; font-weight: 500; padding: 13px 22px; }
@@ -170,6 +173,8 @@
 .lb-header__right { display: flex; align-items: center; gap: 14px; }
 .lb-lang {
   display: inline-flex;
+  align-items: center;
+  height: 40px;
   gap: 2px;
   border: 1px solid var(--lp-hair);
   border-radius: 999px;
