@@ -35,5 +35,21 @@ jobs:
             echo "=== Deployed commit ==="
             git log --oneline -1
 
-            echo "=== Smoke test ==="
+            # The repo's .htaccess ships a no-cache policy for html/js/css so
+            # browsers always revalidate after a redeploy — but it lives inside
+            # <IfModule mod_headers.c>/<IfModule mod_expires.c> and is silently
+            # skipped unless those modules are loaded. Without it, no
+            # Cache-Control header is sent and visitors keep seeing a stale
+            # cached page. Enabling them is idempotent, so the deploy self-heals.
+            echo "=== Ensure mod_headers + mod_expires are enabled ==="
+            if a2enmod headers expires 2>&1 | grep -qiE "enabling|to activate"; then
+              echo "modules newly enabled -> reloading apache"
+              systemctl reload apache2 || apache2ctl graceful || true
+            else
+              echo "modules already enabled"
+            fi
+
+            echo "=== Smoke test (status + cache header) ==="
             curl -s -o /dev/null -w "landing HTTP %{http_code}\n" http://localhost/landing/livraison-bureau.html
+            echo -n "Cache-Control: "
+            curl -sI http://localhost/landing/livraison-bureau.html | grep -i "cache-control" || echo "(none - modules may need a manual reload)"
