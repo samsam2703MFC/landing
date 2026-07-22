@@ -553,6 +553,23 @@
       if (Object.keys(errs).length) { setErrors(errs); return; }
       setSubmission({ shop: resolveShop(zoneId, pack.shopsMap, pack.zones) });
       setSubmitted(true);
+      // Prospect « hors zone » (aucune tournée) : on enregistre le client B2B.
+      // Le serveur déduit le franchisé du code postal (zone de chalandise) ;
+      // sans franchisé → prospect (id_main_shop = 0) visible côté franchisor.
+      if (zoneId === '0' && f.postal_code && String(f.postal_code).trim()) {
+        try {
+          fetch('/landing/lp_office_lead.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              first_name: f.first_name || '', last_name: f.last_name || '',
+              company: f.company || '', email: f.email || '', phone: f.phone || '',
+              postal_code: f.postal_code,
+              lang: (typeof document !== 'undefined' && document.documentElement.lang === 'nl') ? 'nl' : 'fr',
+            }),
+          }).catch(() => {});
+        } catch (_) { /* le message de confirmation reste affiché quoi qu'il arrive */ }
+      }
     };
     const closeModal = () => setSubmitted(false);
 
