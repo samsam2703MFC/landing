@@ -120,9 +120,22 @@ try {
     $st = $pdo->prepare("SELECT id, id_main_shop FROM client WHERE email IS NOT NULL AND LOWER(TRIM(email))=? LIMIT 1");
     $st->execute([strtolower($email)]);
     if ($ex = $st->fetch()) {
-        $logIt('duplicate', (int) $ex['id']);
-        echo json_encode(['ok' => true, 'duplicate' => true,
-            'attached' => ((int) $ex['id_main_shop'] !== 0), 'shop' => $shopName]);
+        // Client déjà connu → la demande bureau ACTIVE les drapeaux B2B sur sa
+        // fiche (au lieu d'être ignorée). Le trigger 0021 crée alors son bureau
+        // (ws_offices, pending) chez sa boutique. Un client sans boutique prend
+        // celle déduite du CP ; s'il en a déjà une, on ne la change pas.
+        $sets = [];
+        if ($colExists('client', 'is_b2b'))          $sets[] = 'is_b2b=1';
+        if ($colExists('client', 'office_delivery')) $sets[] = 'office_delivery=1';
+        if ($colExists('client', 'status'))          $sets[] = 'status=1';
+        if ((int) $ex['id_main_shop'] === 0 && $shopId > 0) $sets[] = 'id_main_shop=' . (int) $shopId;
+        if ($sets) {
+            try { $pdo->exec("UPDATE client SET " . implode(',', $sets) . " WHERE id=" . (int) $ex['id']); }
+            catch (PDOException $e2) { $logIt('update_failed', (int) $ex['id'], $e2->getMessage()); }
+        }
+        $logIt('duplicate_updated', (int) $ex['id']);
+        echo json_encode(['ok' => true, 'duplicate' => true, 'client_id' => (int) $ex['id'],
+            'attached' => ((int) $ex['id_main_shop'] !== 0 || $shopId > 0), 'shop' => $shopName]);
         exit;
     }
 } catch (PDOException $e) { /* si la lecture échoue, on tente quand même l'insert */ }
