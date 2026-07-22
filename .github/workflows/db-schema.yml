@@ -1,0 +1,32 @@
+name: DB schema (tables + columns)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  schema:
+    runs-on: ubuntu-latest
+    steps:
+      - name: List tables and their columns (structure only, no data)
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 185.180.206.46
+          username: root
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            # Read DB credentials from the app file on the server so no secret
+            # is echoed into the workflow logs.
+            F=/var/www/latelierby-landing/lp_api.php
+            DBN=$(grep -oP "LP_DB_NAME'\s*,\s*'\K[^']+" "$F" | head -1)
+            DBU=$(grep -oP "LP_DB_USER'\s*,\s*'\K[^']+" "$F" | head -1)
+            export MYSQL_PWD=$(grep -oP "LP_DB_PASS'\s*,\s*'\K[^']+" "$F" | head -1)
+
+            echo "=== Database: $DBN ==="
+            echo ""
+            echo "=== All tables + their columns (no row data) ==="
+            mysql -u "$DBU" -N -e "
+              SELECT table_name, GROUP_CONCAT(column_name ORDER BY ordinal_position SEPARATOR ', ') AS cols
+              FROM information_schema.columns
+              WHERE table_schema='$DBN'
+              GROUP BY table_name
+              ORDER BY table_name;" | sed 's/\t/\n    cols: /'
