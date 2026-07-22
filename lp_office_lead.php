@@ -145,8 +145,8 @@ try {
             try {
                 $up = $pdo->prepare("UPDATE ws_offices SET name=? WHERE client_id=?");
                 $up->execute([$company, (int) $ex['id']]);
-                if ($colExists('client', 'company')) {
-                    $uc = $pdo->prepare("UPDATE client SET company=? WHERE id=?");
+                if ($colExists('client', 'company_name')) {
+                    $uc = $pdo->prepare("UPDATE client SET company_name=? WHERE id=?");
                     $uc->execute([$company, (int) $ex['id']]);
                 }
             } catch (PDOException $e2) { $logIt('office_rename_failed', (int) $ex['id'], $e2->getMessage()); }
@@ -160,17 +160,28 @@ try {
 } catch (PDOException $e) { /* si la lecture échoue, on tente quand même l'insert */ }
 
 // ── 3) INSERT client (miroir de l'inscription webshop + drapeaux B2B) ──
+// Téléphone : normalisation BE → phone_e164 (+32…) + préfixe.
+$pdigits = preg_replace('/[^\d+]/', '', $phone);
+$e164 = null;
+if ($pdigits !== '') {
+    if ($pdigits[0] === '+')      $e164 = $pdigits;
+    elseif ($pdigits[0] === '0')  $e164 = '+32' . substr($pdigits, 1);
+}
+$locality = ($body['locality'] ?? null) ?: null;
+
 $cols = ['id_main_shop', 'email', 'phone', 'phone_prefix', 'phone_e164',
-         'name', 'surname', 'zip', 'password_hash', 'active',
+         'name', 'surname', 'zip', 'city', 'password_hash', 'active',
          'source_channel', 'webshop_user', 'preferred_auth_method'];
-$vals = [$shopId, $email, ($phone ?: null), null, null,
-         ($company ?: trim($first . ' ' . $last)), $last, $zip, null, 1,
+$vals = [$shopId, $email, ($phone ?: null), ($e164 ? '+32' : null), $e164,
+         ($first ?: null), ($last ?: null), $zip, (string) ($locality ?? ''), null, 1,
          'webshop', 0, null];
 
+if ($colExists('client', 'company_name'))    { $cols[] = 'company_name';    $vals[] = $company ?: null; }  // raison sociale dédiée
 if ($colExists('client', 'is_b2b'))          { $cols[] = 'is_b2b';          $vals[] = 1; }
 if ($colExists('client', 'office_delivery')) { $cols[] = 'office_delivery'; $vals[] = 1; }
 if ($colExists('client', 'status'))          { $cols[] = 'status';          $vals[] = 1; } // 1 = à valider
-if ($colExists('client', 'locality'))        { $cols[] = 'locality';        $vals[] = ($body['locality'] ?? null) ?: null; }
+if ($colExists('client', 'locality'))        { $cols[] = 'locality';        $vals[] = $locality; }
+if ($colExists('client', 'tax_number') && !empty($body['vat'])) { $cols[] = 'tax_number'; $vals[] = lp_clean($body['vat'], 35); }
 
 try {
     $ph  = implode(',', array_fill(0, count($cols), '?'));
