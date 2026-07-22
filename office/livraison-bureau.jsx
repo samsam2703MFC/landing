@@ -149,7 +149,7 @@
       footNet1: 'Nos 6 boutiques', footNet2: 'Magasin en ligne', footNet3: 'Franchise', footEmail: 'bureau@latelierby.be',
       footLegal: '© 2026 L’Atelier By — Tous droits réservés.', footLegal2: 'Mentions légales · Confidentialité · RGPD',
       mEyebrow: 'Demande reçue', mTitle: "Merci — c'est bien enregistré.",
-      mShopLabel: 'Destinataire', mNotifLabel: 'Notification', mRefLabel: 'Référence (shop_id)', mClose: 'Fermer',
+      mShopLabel: 'Destinataire', mNotifLabel: 'Notification', mRefLabel: 'Boutique', mClose: 'Fermer',
       shopSystemName: 'Direction Opérationnelle',
       routingSys: "Votre commune n'est pas encore couverte : votre demande part vers notre direction opérationnelle, qui la garde pour étendre nos tournées.",
       routingNormalPre: 'Votre demande est transmise à la boutique de ', routingNormalPost: ', qui vous recontacte pour organiser vos livraisons.'
@@ -254,7 +254,7 @@
       footNet1: 'Onze 6 winkels', footNet2: 'Webshop', footNet3: 'Franchise', footEmail: 'kantoor@latelierby.be',
       footLegal: '© 2026 L’Atelier By — Alle rechten voorbehouden.', footLegal2: 'Wettelijke vermeldingen · Privacy · AVG',
       mEyebrow: 'Aanvraag ontvangen', mTitle: 'Bedankt — goed geregistreerd.',
-      mShopLabel: 'Bestemmeling', mNotifLabel: 'Melding', mRefLabel: 'Referentie (shop_id)', mClose: 'Sluiten',
+      mShopLabel: 'Bestemmeling', mNotifLabel: 'Melding', mRefLabel: 'Winkel', mClose: 'Sluiten',
       shopSystemName: 'Operationele directie',
       routingSys: 'Uw gemeente is nog niet gedekt: uw aanvraag gaat naar onze operationele directie, die ze bewaart om onze rondes uit te breiden.',
       routingNormalPre: 'Uw aanvraag wordt bezorgd aan de winkel van ', routingNormalPost: ', die contact met u opneemt om uw leveringen te regelen.'
@@ -1116,7 +1116,7 @@
               <div className="lb-modal__recap">
                 <div className="lb-modal__row"><span>{L.mShopLabel}</span><span>{rName}</span></div>
                 <div className="lb-modal__row"><span>{L.mNotifLabel}</span><span>{rShop ? rShop.email : ''}</span></div>
-                <div className="lb-modal__row"><span>{L.mRefLabel}</span><span>#{rShop ? rShop.id : ''}</span></div>
+                <div className="lb-modal__row"><span>{L.mRefLabel}</span><span>{rName}{rShop && rShop.id !== '' && rShop.id !== undefined ? ' (#' + rShop.id + ')' : ''}</span></div>
               </div>
               <button type="button" className="lb-modal__done" onClick={closeModal}>{L.mClose}</button>
             </div>
