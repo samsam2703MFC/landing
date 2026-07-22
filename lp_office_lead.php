@@ -96,20 +96,29 @@ $logIt = function (string $outcome, $clientId = null, $error = null) use ($pdo, 
 // Validations APRÈS la mise en place du journal : même une tentative invalide
 // laisse une trace (sinon impossible de distinguer « POST jamais arrivé » de
 // « POST rejeté à la validation »).
-if (!$email)                          { $logIt('invalid_email');  http_response_code(422); echo json_encode(['error' => 'missing_email']);  exit; }
-if (!preg_match('/^\d{4}$/', $zip))   { $logIt('invalid_postal'); http_response_code(422); echo json_encode(['error' => 'invalid_postal']); exit; }
+// Zone listée : le formulaire ne demande pas de CP mais envoie shop_id (la
+// boutique de la zone choisie) → le CP devient optionnel.
+$shopHint = (int) ($body['shop_id'] ?? 0);
+if (!$email) { $logIt('invalid_email'); http_response_code(422); echo json_encode(['error' => 'missing_email']); exit; }
+if (!preg_match('/^\d{4}$/', $zip)) {
+    if ($shopHint > 0) { $zip = ''; }
+    else { $logIt('invalid_postal'); http_response_code(422); echo json_encode(['error' => 'invalid_postal']); exit; }
+}
 
-// ── 1) Shop déduit du code postal (le franchisé dont la chalandise couvre le CP) ──
+// ── 1) Shop : déduit du code postal (chalandise), sinon shop_id de la zone listée ──
 $shopId = 0; $shopName = null;
-try {
-    $st = $pdo->prepare("SELECT shop_id FROM ws_franchisor_catchment
-                          WHERE active=1 AND shop_id IS NOT NULL
-                            AND postcodes REGEXP CONCAT('(^|[^0-9])', ?, '($|[^0-9])')
-                          ORDER BY shop_id LIMIT 1");
-    $st->execute([$zip]);
-    $sid = $st->fetchColumn();
-    if ($sid !== false && $sid !== null) $shopId = (int) $sid;
-} catch (PDOException $e) { /* pas de table chalandise → prospect non rattaché */ }
+if ($zip !== '') {
+    try {
+        $st = $pdo->prepare("SELECT shop_id FROM ws_franchisor_catchment
+                              WHERE active=1 AND shop_id IS NOT NULL
+                                AND postcodes REGEXP CONCAT('(^|[^0-9])', ?, '($|[^0-9])')
+                              ORDER BY shop_id LIMIT 1");
+        $st->execute([$zip]);
+        $sid = $st->fetchColumn();
+        if ($sid !== false && $sid !== null) $shopId = (int) $sid;
+    } catch (PDOException $e) { /* pas de table chalandise → prospect non rattaché */ }
+}
+if ($shopId === 0 && $shopHint > 0) $shopId = $shopHint;
 $shopEmail = null;
 if ($shopId) {
     try {

@@ -553,31 +553,33 @@
       if (Object.keys(errs).length) { setErrors(errs); return; }
       setSubmission({ shop: resolveShop(zoneId, pack.shopsMap, pack.zones) });
       setSubmitted(true);
-      // Prospect « hors zone » (aucune tournée) : on enregistre le client B2B.
-      // Le serveur déduit le franchisé du code postal (zone de chalandise) ;
-      // sans franchisé → prospect (id_main_shop = 0) visible côté franchisor.
-      if (zoneId === '0' && f.postal_code && String(f.postal_code).trim()) {
-        try {
-          fetch('/landing/lp_office_lead.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              first_name: f.first_name || '', last_name: f.last_name || '',
-              company: f.company || '', email: f.email || '', phone: f.phone || '',
-              postal_code: f.postal_code,
-              lang: (typeof document !== 'undefined' && document.documentElement.lang === 'nl') ? 'nl' : 'fr',
-            }),
-          }).then(r => r.json()).then(j => {
-            console.info('[office-lead]', j);
-            // CP couvert par un franchisé → la modale affiche la VRAIE boutique
-            // (ex. « L'Atelier By Berlo - Corbais »), pas la direction (#0).
-            if (j && j.ok && j.attached && j.shop) {
-              setSubmission({ shop: { id: j.shop_id || '', name: j.shop,
-                email: j.shop_email || 'direction@latelierby.be', is_system: false } });
-            }
-          }).catch(err => console.warn('[office-lead] échec réseau', err));
-        } catch (_) { /* le message de confirmation reste affiché quoi qu'il arrive */ }
-      }
+      // TOUTE demande crée/actualise le client B2B côté serveur :
+      // — zone listée : rattachée à la boutique de la zone (shop_id envoyé) ;
+      // — hors zone (« Ma zone n'est pas dans la liste ») : le serveur déduit le
+      //   franchisé du code postal (chalandise), sinon prospect (id_main_shop=0).
+      try {
+        const zSel = (zoneId !== '0') ? (pack.zones || []).find(z => String(z.id) === String(zoneId)) : null;
+        fetch('/landing/lp_office_lead.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            first_name: f.first_name || '', last_name: f.last_name || '',
+            company: f.company || '', email: f.email || '', phone: f.phone || '',
+            postal_code: f.postal_code || '',
+            shop_id: zSel && zSel.shop_id ? zSel.shop_id : 0,
+            zone_id: zoneId, zone_name: zSel ? (zSel.zone_name || '') : '',
+            lang: (typeof document !== 'undefined' && document.documentElement.lang === 'nl') ? 'nl' : 'fr',
+          }),
+        }).then(r => r.json()).then(j => {
+          console.info('[office-lead]', j);
+          // CP couvert par un franchisé → la modale affiche la VRAIE boutique
+          // (ex. « L'Atelier By Berlo - Corbais »), pas la direction (#0).
+          if (j && j.ok && j.attached && j.shop) {
+            setSubmission({ shop: { id: j.shop_id || '', name: j.shop,
+              email: j.shop_email || 'direction@latelierby.be', is_system: false } });
+          }
+        }).catch(err => console.warn('[office-lead] échec réseau', err));
+      } catch (_) { /* le message de confirmation reste affiché quoi qu'il arrive */ }
     };
     const closeModal = () => setSubmitted(false);
 
