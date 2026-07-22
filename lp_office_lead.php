@@ -138,6 +138,19 @@ try {
             try { $pdo->exec("UPDATE client SET " . implode(',', $sets) . " WHERE id=" . (int) $ex['id']); }
             catch (PDOException $e2) { $logIt('update_failed', (int) $ex['id'], $e2->getMessage()); }
         }
+        // Le trigger nomme le bureau d'après client.name (= la personne pour un
+        // client ERP existant). La SOCIÉTÉ saisie dans le formulaire doit primer :
+        // on renomme le bureau juste après (le trigger a déjà tourné, synchrone).
+        if ($company !== '') {
+            try {
+                $up = $pdo->prepare("UPDATE ws_offices SET name=? WHERE client_id=?");
+                $up->execute([$company, (int) $ex['id']]);
+                if ($colExists('client', 'company')) {
+                    $uc = $pdo->prepare("UPDATE client SET company=? WHERE id=?");
+                    $uc->execute([$company, (int) $ex['id']]);
+                }
+            } catch (PDOException $e2) { $logIt('office_rename_failed', (int) $ex['id'], $e2->getMessage()); }
+        }
         $logIt('duplicate_updated', (int) $ex['id']);
         echo json_encode(['ok' => true, 'duplicate' => true, 'client_id' => (int) $ex['id'],
             'attached' => ((int) $ex['id_main_shop'] !== 0 || $shopId > 0),
