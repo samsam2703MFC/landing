@@ -110,9 +110,14 @@ try {
     $sid = $st->fetchColumn();
     if ($sid !== false && $sid !== null) $shopId = (int) $sid;
 } catch (PDOException $e) { /* pas de table chalandise → prospect non rattaché */ }
+$shopEmail = null;
 if ($shopId) {
-    try { $s = $pdo->prepare("SELECT name FROM shops WHERE id=? LIMIT 1"); $s->execute([$shopId]); $shopName = $s->fetchColumn() ?: null; }
-    catch (PDOException $e) { /* nom facultatif */ }
+    try {
+        $emailCol = $colExists('shops', 'email') ? ', email' : '';
+        $s = $pdo->prepare("SELECT name$emailCol FROM shops WHERE id=? LIMIT 1");
+        $s->execute([$shopId]);
+        if ($row = $s->fetch()) { $shopName = $row['name'] ?: null; $shopEmail = $row['email'] ?? null; }
+    } catch (PDOException $e) { /* nom facultatif */ }
 }
 
 // ── 2) Anti-doublon : un client avec cet e-mail existe déjà → on ne recrée pas ──
@@ -135,7 +140,8 @@ try {
         }
         $logIt('duplicate_updated', (int) $ex['id']);
         echo json_encode(['ok' => true, 'duplicate' => true, 'client_id' => (int) $ex['id'],
-            'attached' => ((int) $ex['id_main_shop'] !== 0 || $shopId > 0), 'shop' => $shopName]);
+            'attached' => ((int) $ex['id_main_shop'] !== 0 || $shopId > 0),
+            'shop' => $shopName, 'shop_id' => $shopId, 'shop_email' => $shopEmail]);
         exit;
     }
 } catch (PDOException $e) { /* si la lecture échoue, on tente quand même l'insert */ }
@@ -171,11 +177,13 @@ try {
 }
 
 echo json_encode([
-    'ok'        => true,
-    'client_id' => $cid,
-    'attached'  => ($shopId !== 0),
-    'shop'      => $shopName,
-    'message'   => $shopId !== 0
+    'ok'         => true,
+    'client_id'  => $cid,
+    'attached'   => ($shopId !== 0),
+    'shop'       => $shopName,
+    'shop_id'    => $shopId,
+    'shop_email' => $shopEmail,
+    'message'    => $shopId !== 0
         ? 'Votre demande est rattachée à votre boutique de quartier.'
         : 'Votre demande est enregistrée — nous cherchons un franchisé pour votre zone.',
 ]);

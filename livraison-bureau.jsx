@@ -567,8 +567,15 @@
               postal_code: f.postal_code,
               lang: (typeof document !== 'undefined' && document.documentElement.lang === 'nl') ? 'nl' : 'fr',
             }),
-          }).then(r => r.json()).then(j => console.info('[office-lead]', j))
-            .catch(err => console.warn('[office-lead] échec réseau', err));
+          }).then(r => r.json()).then(j => {
+            console.info('[office-lead]', j);
+            // CP couvert par un franchisé → la modale affiche la VRAIE boutique
+            // (ex. « L'Atelier By Berlo - Corbais »), pas la direction (#0).
+            if (j && j.ok && j.attached && j.shop) {
+              setSubmission({ shop: { id: j.shop_id || '', name: j.shop,
+                email: j.shop_email || 'direction@latelierby.be', is_system: false } });
+            }
+          }).catch(err => console.warn('[office-lead] échec réseau', err));
         } catch (_) { /* le message de confirmation reste affiché quoi qu'il arrive */ }
       }
     };
