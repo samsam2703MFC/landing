@@ -52,9 +52,6 @@ $phone   = lp_clean($body['phone'] ?? '', 40);
 $zip     = preg_replace('/\D+/', '', lp_clean($body['postal_code'] ?? '', 12)); // 4 chiffres (BE)
 $lang    = in_array($body['lang'] ?? 'fr', ['fr', 'nl'], true) ? $body['lang'] : 'fr';
 
-if (!$email)                          { http_response_code(422); echo json_encode(['error' => 'missing_email']);   exit; }
-if (!preg_match('/^\d{4}$/', $zip))   { http_response_code(422); echo json_encode(['error' => 'invalid_postal']); exit; }
-
 try {
     $dsn = sprintf('mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4', LP_DB_HOST, LP_DB_PORT, LP_DB_NAME);
     $pdo = new PDO($dsn, LP_DB_USER, LP_DB_PASS, [
@@ -95,6 +92,12 @@ $logIt = function (string $outcome, $clientId = null, $error = null) use ($pdo, 
                       mb_substr(json_encode($body, JSON_UNESCAPED_UNICODE), 0, 2000)]);
     } catch (PDOException $e) { /* le log ne doit jamais casser le flux */ }
 };
+
+// Validations APRÈS la mise en place du journal : même une tentative invalide
+// laisse une trace (sinon impossible de distinguer « POST jamais arrivé » de
+// « POST rejeté à la validation »).
+if (!$email)                          { $logIt('invalid_email');  http_response_code(422); echo json_encode(['error' => 'missing_email']);  exit; }
+if (!preg_match('/^\d{4}$/', $zip))   { $logIt('invalid_postal'); http_response_code(422); echo json_encode(['error' => 'invalid_postal']); exit; }
 
 // ── 1) Shop déduit du code postal (le franchisé dont la chalandise couvre le CP) ──
 $shopId = 0; $shopName = null;
