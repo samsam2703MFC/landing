@@ -129,26 +129,25 @@ try {
         // fiche (au lieu d'être ignorée). Le trigger 0021 crée alors son bureau
         // (ws_offices, pending) chez sa boutique. Un client sans boutique prend
         // celle déduite du CP ; s'il en a déjà une, on ne la change pas.
-        $sets = [];
+        // UN SEUL UPDATE paramétré : drapeaux B2B + raison sociale (company_name).
+        $sets = []; $uvals = [];
         if ($colExists('client', 'is_b2b'))          $sets[] = 'is_b2b=1';
         if ($colExists('client', 'office_delivery')) $sets[] = 'office_delivery=1';
         if ($colExists('client', 'status'))          $sets[] = 'status=1';
         if ((int) $ex['id_main_shop'] === 0 && $shopId > 0) $sets[] = 'id_main_shop=' . (int) $shopId;
+        if ($company !== '' && $colExists('client', 'company_name')) { $sets[] = 'company_name=?'; $uvals[] = $company; }
         if ($sets) {
-            try { $pdo->exec("UPDATE client SET " . implode(',', $sets) . " WHERE id=" . (int) $ex['id']); }
-            catch (PDOException $e2) { $logIt('update_failed', (int) $ex['id'], $e2->getMessage()); }
+            try {
+                $uvals[] = (int) $ex['id'];
+                $st2 = $pdo->prepare("UPDATE client SET " . implode(',', $sets) . " WHERE id=?");
+                $st2->execute($uvals);
+            } catch (PDOException $e2) { $logIt('update_failed', (int) $ex['id'], $e2->getMessage()); }
         }
-        // Le trigger nomme le bureau d'après client.name (= la personne pour un
-        // client ERP existant). La SOCIÉTÉ saisie dans le formulaire doit primer :
-        // on renomme le bureau juste après (le trigger a déjà tourné, synchrone).
+        // Le bureau (créé par le trigger) prend la société saisie.
         if ($company !== '') {
             try {
                 $up = $pdo->prepare("UPDATE ws_offices SET name=? WHERE client_id=?");
                 $up->execute([$company, (int) $ex['id']]);
-                if ($colExists('client', 'company_name')) {
-                    $uc = $pdo->prepare("UPDATE client SET company_name=? WHERE id=?");
-                    $uc->execute([$company, (int) $ex['id']]);
-                }
             } catch (PDOException $e2) { $logIt('office_rename_failed', (int) $ex['id'], $e2->getMessage()); }
         }
         $logIt('duplicate_updated', (int) $ex['id']);
