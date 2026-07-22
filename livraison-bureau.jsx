@@ -913,8 +913,8 @@
                       </span>
                     </div>
                     <div className="lb-params">
-                      <div className="lb-param"><p className="lb-param__k">{L.lblDays}</p><p className="lb-param__v">{daysStr}</p></div>
-                      <div className="lb-param"><p className="lb-param__k">{L.lblCutoff}</p><p className="lb-param__v lb-param__v--ruby">{cutoffStr}</p></div>
+                      {daysStr && (<div className="lb-param"><p className="lb-param__k">{L.lblDays}</p><p className="lb-param__v">{daysStr}</p></div>)}
+                      {z.cutoff_time && (<div className="lb-param"><p className="lb-param__k">{L.lblCutoff}</p><p className="lb-param__v lb-param__v--ruby">{cutoffStr}</p></div>)}
                       {slotsStr && (<div className="lb-param"><p className="lb-param__k">{L.lblSlots}</p><p className="lb-param__v">{slotsStr}</p></div>)}
                       {(z.min != null && Number(z.min) > 0) && (<div className="lb-param"><p className="lb-param__k">{L.lblMin}</p><p className="lb-param__v">{minStr}</p></div>)}
                     </div>
