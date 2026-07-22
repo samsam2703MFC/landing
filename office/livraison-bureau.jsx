@@ -40,11 +40,11 @@
   // Real photography for each product key (design shipped empty image-slots).
   // Chosen for a consistent photographic look across the carousel.
   const PRODUCT_IMAGES = {
-    sandwich: 'img/p-sandwich-club.jpg',
-    fruits: 'img/p-chou-farci.jpg',
-    dessert: 'img/p-parfait.jpg',
-    salades: 'img/p-salade-chef-saumon.jpg',
-    breakfast: 'img/p-sand-oeufs-bacon.jpg'
+    sandwich: '/landing/img/p-sandwich-club.jpg',
+    fruits: '/landing/img/p-chou-farci.jpg',
+    dessert: '/landing/img/p-parfait.jpg',
+    salades: '/landing/img/p-salade-chef-saumon.jpg',
+    breakfast: '/landing/img/p-sand-oeufs-bacon.jpg'
   };
 
   // ---- i18n ----
@@ -69,11 +69,11 @@
       ucEyebrow: 'Pour qui, pour quoi', ucTitle: "Chaque moment d'équipe a sa formule.",
       ucLede: "Que vous soyez cinq ou quatre-vingts, on s'occupe des pauses qui font du bien au bureau.",
       useCases: [
-        { name: 'Réunions & comités', description: 'De quoi tenir une matinée de travail : viennoiseries, café, eau, sans interrompre le rythme.', icon: 'img/sandwiches.png' },
-        { name: "Petits-déjeuners d'accueil", description: 'Recevez clients et partenaires avec un petit-déjeuner qui donne le ton.', icon: 'img/croissant.png' },
-        { name: 'Onboarding & arrivées', description: 'Marquez le premier jour des nouveaux : une attention simple, chaleureuse, sur le bureau.', icon: 'img/rolls.png' },
-        { name: 'Anniversaires & pots', description: 'Un moment à fêter ? Cakes, tartes et pièces sucrées, livrés prêts à partager.', icon: 'img/cupcake.png' },
-        { name: "Vendredis d'équipe", description: 'Terminez la semaine en douceur avec une pause gourmande récurrente.', icon: 'img/cookies.png' }
+        { name: 'Réunions & comités', description: 'De quoi tenir une matinée de travail : viennoiseries, café, eau, sans interrompre le rythme.', icon: '/landing/img/sandwiches.png' },
+        { name: "Petits-déjeuners d'accueil", description: 'Recevez clients et partenaires avec un petit-déjeuner qui donne le ton.', icon: '/landing/img/croissant.png' },
+        { name: 'Onboarding & arrivées', description: 'Marquez le premier jour des nouveaux : une attention simple, chaleureuse, sur le bureau.', icon: '/landing/img/rolls.png' },
+        { name: 'Anniversaires & pots', description: 'Un moment à fêter ? Cakes, tartes et pièces sucrées, livrés prêts à partager.', icon: '/landing/img/cupcake.png' },
+        { name: "Vendredis d'équipe", description: 'Terminez la semaine en douceur avec une pause gourmande récurrente.', icon: '/landing/img/cookies.png' }
       ],
       procEyebrow: 'Comment ça marche', procTitle: 'Quatre étapes, zéro gestion.',
       steps: [
@@ -98,10 +98,10 @@
       offLede: 'Votre boutique adapte les quantités et la mise en place. On vous propose une formule, jamais un catalogue à trier.',
       offerBadge: 'Dispo en hebdo', lblFor: 'Pour :', lblSetup: 'Mise en place :',
       offers: [
-        { name: "Le Petit-Déjeuner d'équipe", description: 'La corbeille du matin : viennoiseries pur beurre, pains et jus pressé.', icon: 'img/croissant.png', includes: ['Croissants & pains au chocolat', 'Petits pains & confitures maison', 'Jus de fruits frais'], audience: 'Matinées de travail, réunions', setup: 'Corbeilles + serviettes incluses', rec: true },
-        { name: 'La Pause Gourmande', description: "Le petit plaisir de l'après-midi, sucré et réconfortant.", icon: 'img/cookies.png', includes: ['Cookies & financiers du jour', 'Cakes tranchés', 'Café et thé en option'], audience: 'Pauses, fins de journée', setup: 'Prêt à partager', rec: true },
-        { name: 'Le Lunch au Bureau', description: 'Un déjeuner complet et fait maison, sans sortir du bureau.', icon: 'img/sandwiches.png', includes: ['Sandwiches garnis & wraps', 'Salades de saison', 'Tartes salées'], audience: "Déjeuners d'équipe, ateliers", setup: 'Vaisselle & mise en place incluses', rec: false },
-        { name: 'Le Plateau Célébration', description: 'Pour marquer le coup : pièces festives et desserts à partager.', icon: 'img/cake-slice.png', includes: ['Tartes sucrées & entremets', 'Cupcakes décorés', 'Pièces à partager'], audience: 'Anniversaires, pots, événements', setup: 'Présentoir & découpe inclus', rec: true }
+        { name: "Le Petit-Déjeuner d'équipe", description: 'La corbeille du matin : viennoiseries pur beurre, pains et jus pressé.', icon: '/landing/img/croissant.png', includes: ['Croissants & pains au chocolat', 'Petits pains & confitures maison', 'Jus de fruits frais'], audience: 'Matinées de travail, réunions', setup: 'Corbeilles + serviettes incluses', rec: true },
+        { name: 'La Pause Gourmande', description: "Le petit plaisir de l'après-midi, sucré et réconfortant.", icon: '/landing/img/cookies.png', includes: ['Cookies & financiers du jour', 'Cakes tranchés', 'Café et thé en option'], audience: 'Pauses, fins de journée', setup: 'Prêt à partager', rec: true },
+        { name: 'Le Lunch au Bureau', description: 'Un déjeuner complet et fait maison, sans sortir du bureau.', icon: '/landing/img/sandwiches.png', includes: ['Sandwiches garnis & wraps', 'Salades de saison', 'Tartes salées'], audience: "Déjeuners d'équipe, ateliers", setup: 'Vaisselle & mise en place incluses', rec: false },
+        { name: 'Le Plateau Célébration', description: 'Pour marquer le coup : pièces festives et desserts à partager.', icon: '/landing/img/cake-slice.png', includes: ['Tartes sucrées & entremets', 'Cupcakes décorés', 'Pièces à partager'], audience: 'Anniversaires, pots, événements', setup: 'Présentoir & découpe inclus', rec: true }
       ],
       recEyebrow: 'Récurrence', recTitle: 'Envie de régularité ? Passez en hebdo.',
       recBody: "Un abonnement hebdomadaire pour vos formules éligibles. Vous gardez la main : modifiez, mettez en pause ou annulez d'une semaine à l'autre, sans engagement.",
@@ -174,11 +174,11 @@
       ucEyebrow: 'Voor wie, waarvoor', ucTitle: 'Elk teammoment heeft zijn formule.',
       ucLede: 'Of u nu met vijf of tachtig bent, wij zorgen voor de pauzes die deugd doen op kantoor.',
       useCases: [
-        { name: 'Vergaderingen & comités', description: 'Genoeg voor een werkochtend: viennoiserie, koffie, water, zonder het ritme te breken.', icon: 'img/sandwiches.png' },
-        { name: 'Onthaalontbijten', description: 'Ontvang klanten en partners met een ontbijt dat de toon zet.', icon: 'img/croissant.png' },
-        { name: 'Onboarding & nieuwkomers', description: "Vier de eerste dag van nieuwe collega's: een eenvoudige, warme attentie op het bureau.", icon: 'img/rolls.png' },
-        { name: 'Verjaardagen & recepties', description: 'Iets te vieren? Cakes, taarten en zoetigheden, klaar om te delen.', icon: 'img/cupcake.png' },
-        { name: 'Teamvrijdagen', description: 'Sluit de week zacht af met een terugkerende lekkere pauze.', icon: 'img/cookies.png' }
+        { name: 'Vergaderingen & comités', description: 'Genoeg voor een werkochtend: viennoiserie, koffie, water, zonder het ritme te breken.', icon: '/landing/img/sandwiches.png' },
+        { name: 'Onthaalontbijten', description: 'Ontvang klanten en partners met een ontbijt dat de toon zet.', icon: '/landing/img/croissant.png' },
+        { name: 'Onboarding & nieuwkomers', description: "Vier de eerste dag van nieuwe collega's: een eenvoudige, warme attentie op het bureau.", icon: '/landing/img/rolls.png' },
+        { name: 'Verjaardagen & recepties', description: 'Iets te vieren? Cakes, taarten en zoetigheden, klaar om te delen.', icon: '/landing/img/cupcake.png' },
+        { name: 'Teamvrijdagen', description: 'Sluit de week zacht af met een terugkerende lekkere pauze.', icon: '/landing/img/cookies.png' }
       ],
       procEyebrow: 'Hoe het werkt', procTitle: 'Vier stappen, nul beheer.',
       steps: [
@@ -203,10 +203,10 @@
       offLede: 'Uw winkel past de hoeveelheden en de presentatie aan. Wij stellen een formule voor, nooit een catalogus om uit te zoeken.',
       offerBadge: 'Wekelijks beschikbaar', lblFor: 'Voor:', lblSetup: 'Presentatie:',
       offers: [
-        { name: 'Het Teamontbijt', description: 'De ochtendmand: roomboterviennoiserie, brood en versgeperst sap.', icon: 'img/croissant.png', includes: ['Croissants & chocoladebroodjes', 'Pistolets & huisgemaakte confituur', 'Vers fruitsap'], audience: 'Werkochtenden, vergaderingen', setup: 'Manden + servetten inbegrepen', rec: true },
-        { name: 'De Zoete Pauze', description: 'Het namiddagplezier, zoet en troostend.', icon: 'img/cookies.png', includes: ['Cookies & financiers van de dag', 'Gesneden cake', 'Koffie en thee optioneel'], audience: 'Pauzes, einde van de dag', setup: 'Klaar om te delen', rec: true },
-        { name: 'De Lunch op Kantoor', description: 'Een volledige, huisgemaakte lunch zonder het kantoor te verlaten.', icon: 'img/sandwiches.png', includes: ['Belegde broodjes & wraps', 'Seizoenssalades', 'Hartige taarten'], audience: 'Teamlunches, workshops', setup: 'Servies & presentatie inbegrepen', rec: false },
-        { name: 'Het Feestplateau', description: 'Om het moment te vieren: feestelijke stukken en desserts om te delen.', icon: 'img/cake-slice.png', includes: ['Zoete taarten & entremets', 'Versierde cupcakes', 'Stukken om te delen'], audience: 'Verjaardagen, recepties, evenementen', setup: 'Presentatie & versnijding inbegrepen', rec: true }
+        { name: 'Het Teamontbijt', description: 'De ochtendmand: roomboterviennoiserie, brood en versgeperst sap.', icon: '/landing/img/croissant.png', includes: ['Croissants & chocoladebroodjes', 'Pistolets & huisgemaakte confituur', 'Vers fruitsap'], audience: 'Werkochtenden, vergaderingen', setup: 'Manden + servetten inbegrepen', rec: true },
+        { name: 'De Zoete Pauze', description: 'Het namiddagplezier, zoet en troostend.', icon: '/landing/img/cookies.png', includes: ['Cookies & financiers van de dag', 'Gesneden cake', 'Koffie en thee optioneel'], audience: 'Pauzes, einde van de dag', setup: 'Klaar om te delen', rec: true },
+        { name: 'De Lunch op Kantoor', description: 'Een volledige, huisgemaakte lunch zonder het kantoor te verlaten.', icon: '/landing/img/sandwiches.png', includes: ['Belegde broodjes & wraps', 'Seizoenssalades', 'Hartige taarten'], audience: 'Teamlunches, workshops', setup: 'Servies & presentatie inbegrepen', rec: false },
+        { name: 'Het Feestplateau', description: 'Om het moment te vieren: feestelijke stukken en desserts om te delen.', icon: '/landing/img/cake-slice.png', includes: ['Zoete taarten & entremets', 'Versierde cupcakes', 'Stukken om te delen'], audience: 'Verjaardagen, recepties, evenementen', setup: 'Presentatie & versnijding inbegrepen', rec: true }
       ],
       recEyebrow: 'Herhaling', recTitle: 'Zin in regelmaat? Ga wekelijks.',
       recBody: 'Een wekelijks abonnement voor uw in aanmerking komende formules. U houdt de controle: wijzig, pauzeer of annuleer van week tot week, zonder verbintenis.',
@@ -275,6 +275,10 @@
     return z;
   }
   const wrap = (k, n) => ((k % n) + n) % n;
+  // This page is served from /landing/office/. Absolutize any bare relative
+  // asset/link URL (fallback OR DB-driven) against the /landing root so images
+  // and cross-page links resolve correctly from the sub-folder.
+  const A = (u) => (!u || /^(https?:|\/|#|mailto:|tel:|data:)/.test(u)) ? u : '/landing/' + u;
 
   // ---- Icons ----
   const Arrow = (p) => (
@@ -361,25 +365,25 @@
     titles: { 1: { fr: 'Explorer', nl: 'Ontdekken' }, 2: { fr: 'Services', nl: 'Diensten' }, 3: { fr: 'La Maison', nl: 'Het huis' } },
     cols: {
       '1': [
-        { url: 'index.html#boutiques', label_fr: 'Nos boutiques', label_nl: 'Onze winkels' },
-        { url: 'index.html#produits', label_fr: 'Produits', label_nl: 'Producten' },
-        { url: 'index.html#experiences', label_fr: 'Expériences', label_nl: 'Ervaringen' }
+        { url: '/landing/index.html#boutiques', label_fr: 'Nos boutiques', label_nl: 'Onze winkels' },
+        { url: '/landing/index.html#produits', label_fr: 'Produits', label_nl: 'Producten' },
+        { url: '/landing/index.html#experiences', label_fr: 'Expériences', label_nl: 'Ervaringen' }
       ],
       '2': [
-        { url: 'index.html#experiences', label_fr: 'Click & Collect', label_nl: 'Click & Collect' },
-        { url: 'livraison-bureau.html', label_fr: 'Livraison bureau', label_nl: 'Levering op kantoor' },
-        { url: 'index.html#produits', label_fr: 'Magasin en ligne', label_nl: 'Webshop' }
+        { url: '/landing/index.html#experiences', label_fr: 'Click & Collect', label_nl: 'Click & Collect' },
+        { url: '/landing/office/livraison-bureau.html', label_fr: 'Livraison bureau', label_nl: 'Levering op kantoor' },
+        { url: '/landing/index.html#produits', label_fr: 'Magasin en ligne', label_nl: 'Webshop' }
       ],
       '3': [
-        { url: 'franchise-lead.html', label_fr: 'Franchise', label_nl: 'Franchise' },
-        { url: 'galette-des-rois.html', label_fr: 'Galette des rois', label_nl: 'Driekoningentaart' }
+        { url: '/landing/franchise-lead.html', label_fr: 'Franchise', label_nl: 'Franchise' },
+        { url: '/landing/galette-des-rois.html', label_fr: 'Galette des rois', label_nl: 'Driekoningentaart' }
       ]
     },
     copyright: { fr: "© 2026 L'Atelier By — Tous droits réservés.", nl: "© 2026 L'Atelier By — Alle rechten voorbehouden." },
     legal: [
-      { url: 'mentions-legales.html#mentions', fr: 'Mentions légales', nl: 'Wettelijke vermeldingen' },
-      { url: 'mentions-legales.html#confidentialite', fr: 'Confidentialité', nl: 'Privacy' },
-      { url: 'mentions-legales.html#conditions', fr: 'Conditions', nl: 'Voorwaarden' }
+      { url: '/landing/mentions-legales.html#mentions', fr: 'Mentions légales', nl: 'Wettelijke vermeldingen' },
+      { url: '/landing/mentions-legales.html#confidentialite', fr: 'Confidentialité', nl: 'Privacy' },
+      { url: '/landing/mentions-legales.html#conditions', fr: 'Conditions', nl: 'Voorwaarden' }
     ]
   };
 
@@ -432,9 +436,9 @@
       cols: cols,
       copyright: { fr: pk(fr, 'ft.copyright', F.copyright.fr), nl: pk(nl, 'ft.copyright', F.copyright.nl) },
       legal: [
-        { url: 'mentions-legales.html#mentions', fr: pk(fr, 'ft.legal1', F.legal[0].fr), nl: pk(nl, 'ft.legal1', F.legal[0].nl) },
-        { url: 'mentions-legales.html#confidentialite', fr: pk(fr, 'ft.legal2', F.legal[1].fr), nl: pk(nl, 'ft.legal2', F.legal[1].nl) },
-        { url: 'mentions-legales.html#conditions', fr: pk(fr, 'ft.legal3', F.legal[2].fr), nl: pk(nl, 'ft.legal3', F.legal[2].nl) }
+        { url: '/landing/mentions-legales.html#mentions', fr: pk(fr, 'ft.legal1', F.legal[0].fr), nl: pk(nl, 'ft.legal1', F.legal[0].nl) },
+        { url: '/landing/mentions-legales.html#confidentialite', fr: pk(fr, 'ft.legal2', F.legal[1].fr), nl: pk(nl, 'ft.legal2', F.legal[1].nl) },
+        { url: '/landing/mentions-legales.html#conditions', fr: pk(fr, 'ft.legal3', F.legal[2].fr), nl: pk(nl, 'ft.legal3', F.legal[2].nl) }
       ]
     };
   }
@@ -646,7 +650,7 @@
         <header className="lb-header" data-screen-label="Header">
           <div className="lb-header__inner">
             <a href="#top" className="lb-brand">
-              <img src="img/brand/logo.png" alt="L'Atelier By" />
+              <img src="/landing/img/brand/logo.png" alt="L'Atelier By" />
             </a>
             <nav className="lb-nav">
               <a href="#zone" className={activeNav === 'zone' ? 'is-active' : ''}>{L.navZone}</a>
@@ -669,7 +673,7 @@
 
           {/* ============ HERO ============ */}
           <section className="lb-hero" data-screen-label="Hero">
-            <div className="lb-hero__art"><img src="img/sandwiches-platter.png" alt="" /></div>
+            <div className="lb-hero__art"><img src="/landing/img/sandwiches-platter.png" alt="" /></div>
             <div className="lb-wrap lb-hero__inner">
               <div className="lb-hero__body">
                 <p className="lb-eyebrow lb-eyebrow--inline"><span></span> {L.heroEyebrow}</p>
@@ -697,7 +701,7 @@
                 {ucCarousel.map((c, i) => (
                   <div key={i} className="lb-card lb-uc-card" onClick={c.onClick}
                     style={{ transform: c.transform, opacity: c.opacity, zIndex: c.z, cursor: c.cursor, borderColor: c.border, boxShadow: c.shadow }}>
-                    <div className="lb-uc-card__icon"><img src={c.offer.icon} alt="" /></div>
+                    <div className="lb-uc-card__icon"><img src={A(c.offer.icon)} alt="" /></div>
                     <h3 className="lb-card-title">{c.offer.name}</h3>
                     <p className="lb-card-desc">{c.offer.description}</p>
                   </div>
@@ -751,7 +755,7 @@
                     style={{ transform: c.transform, opacity: c.opacity, zIndex: c.z, cursor: c.cursor, borderColor: c.border, boxShadow: c.shadow }}>
                     <div className="lb-offer-card__top">
                       {c.offer.badge && (<span className="lb-offer-card__badge">{c.offer.badge}</span>)}
-                      <img src={c.offer.icon} alt="" />
+                      <img src={A(c.offer.icon)} alt="" />
                     </div>
                     <div className="lb-offer-card__body">
                       <h3>{c.offer.name}</h3>
@@ -837,7 +841,7 @@
                   <div key={i} className="lb-card lb-prod-card" onClick={c.onClick}
                     style={{ transform: c.transform, opacity: c.opacity, zIndex: c.z, cursor: c.cursor, borderColor: c.border, boxShadow: c.shadow }}>
                     <div className="lb-prod-card__media">
-                      <img src={c.offer.img} alt={c.offer.title} />
+                      <img src={A(c.offer.img)} alt={c.offer.title} />
                       <span className="lb-prod-card__badge">{L.prodBadge}</span>
                     </div>
                     <div className="lb-prod-card__body">
@@ -1070,7 +1074,7 @@
           <div className="lb-wrap">
             <div className="lb-footer__cols">
               <div>
-                <img src="img/brand/logo.png" alt="L'Atelier By" className="lb-footer__logo" />
+                <img src="/landing/img/brand/logo.png" alt="L'Atelier By" className="lb-footer__logo" />
                 <p className="lb-footer__tag">{ft.tag[lang]}</p>
               </div>
               {[1, 2, 3].map((col) => {
@@ -1080,7 +1084,7 @@
                   <div key={col}>
                     <h4>{ft.titles[col][lang]}</h4>
                     {links.map((lnk, i) => (
-                      <a key={i} href={lnk.url}>{lang === 'nl' ? lnk.label_nl : lnk.label_fr}</a>
+                      <a key={i} href={A(lnk.url)}>{lang === 'nl' ? lnk.label_nl : lnk.label_fr}</a>
                     ))}
                   </div>
                 );
@@ -1090,7 +1094,7 @@
               <span>{ft.copyright[lang]}</span>
               <span className="lb-footer__legal">
                 {ft.legal.map((lg, i) => (
-                  <React.Fragment key={i}>{i > 0 ? ' · ' : ''}<a href={lg.url}>{lang === 'nl' ? lg.nl : lg.fr}</a></React.Fragment>
+                  <React.Fragment key={i}>{i > 0 ? ' · ' : ''}<a href={A(lg.url)}>{lang === 'nl' ? lg.nl : lg.fr}</a></React.Fragment>
                 ))}
               </span>
             </div>
