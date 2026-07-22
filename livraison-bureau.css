@@ -52,6 +52,7 @@
 @media (prefers-reduced-motion: reduce) {
   .lb [data-reveal] { opacity: 1; transform: none; transition: none; }
   .lb .lb-hero__art { animation: none; }
+  .lb .lb-cta-attn { animation: none; }
 }
 
 .lb-wrap {
@@ -129,6 +130,19 @@
 }
 .lb a.lb-btn--ink:hover { background: var(--lp-ruby); color: var(--lp-paper); }
 .lb-btn--sm { font-size: 14px; font-weight: 500; padding: 13px 22px; }
+
+/* Header CTA — subtle periodic "attention" nudge to catch the eye.
+   Idle most of the cycle, then a quick light vibration + micro-zoom. */
+.lb a.lb-cta-attn { animation: lbCtaAttn 4.5s ease-in-out infinite; will-change: transform; }
+.lb a.lb-cta-attn:hover, .lb a.lb-cta-attn:focus-visible { animation: none; }
+@keyframes lbCtaAttn {
+  0%, 70%, 100% { transform: translateX(0) scale(1); }
+  74% { transform: translateX(-1.5px) scale(1.04); }
+  78% { transform: translateX(1.5px)  scale(1.04); }
+  82% { transform: translateX(-1.4px) scale(1.03); }
+  86% { transform: translateX(1px)    scale(1.02); }
+  90% { transform: translateX(0)      scale(1); }
+}
 
 /* Header ------------------------------------------------------------ */
 .lb-header {

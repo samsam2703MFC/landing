@@ -593,7 +593,7 @@
                 <button type="button" aria-label="Français" className={lang === 'fr' ? 'is-active' : ''} onClick={() => setLang('fr')}>FR</button>
                 <button type="button" aria-label="Nederlands" className={lang === 'nl' ? 'is-active' : ''} onClick={() => setLang('nl')}>NL</button>
               </div>
-              <a href="#contact" className="lb-btn lb-btn--ink lb-btn--sm">{L.ctaHeader}</a>
+              <a href="#contact" className="lb-btn lb-btn--ink lb-btn--sm lb-cta-attn">{L.ctaHeader}</a>
             </div>
           </div>
         </header>
