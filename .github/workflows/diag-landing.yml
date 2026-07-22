@@ -7,7 +7,7 @@ jobs:
   diag:
     runs-on: ubuntu-latest
     steps:
-      - name: Inspect jsx version + cache headers
+      - name: Show existing .htaccess and leftovers
         uses: appleboy/ssh-action@v1
         with:
           host: 185.180.206.46
@@ -16,35 +16,19 @@ jobs:
           script: |
             D=/var/www/latelierby-landing
 
-            echo "=== git state in $D ==="
-            cd "$D" && git log --oneline -1 && git status --porcelain=v1 | head
+            echo "=== .htaccess in $D (if any) ==="
+            if [ -f "$D/.htaccess" ]; then cat "$D/.htaccess"; else echo "(none)"; fi
 
             echo ""
-            echo "=== livraison-bureau.jsx on disk ==="
-            ls -la "$D/livraison-bureau.jsx"
-            echo -n "line count: "; wc -l < "$D/livraison-bureau.jsx"
-            if grep -q "La boulangerie qui vient" "$D/livraison-bureau.jsx"; then
-              echo ">>> JSX is the NEW full page"
-            else
-              echo ">>> JSX is OLD/prototype"
-            fi
-            echo "--- first 3 lines of the on-disk jsx ---"
-            head -3 "$D/livraison-bureau.jsx"
+            echo "=== Root .htaccess /var/www/latelierby-landing vs any parent ==="
+            ls -la "$D/.htaccess" 2>/dev/null || true
 
             echo ""
-            echo "=== What localhost serves for the JSX (first 3 lines) ==="
-            curl -s http://localhost/landing/livraison-bureau.jsx | head -3
+            echo "=== mod_headers / mod_expires enabled? ==="
+            apache2ctl -M 2>/dev/null | grep -iE "headers|expires|rewrite" || true
 
             echo ""
-            echo "=== Does the SERVED jsx contain the new hero string? ==="
-            curl -s http://localhost/landing/livraison-bureau.jsx | grep -c "La boulangerie qui vient" || echo 0
-
-            echo ""
-            echo "=== Response headers for html + jsx (caching) ==="
-            curl -sI http://localhost/landing/livraison-bureau.html | grep -iE "HTTP/|cache-control|etag|last-modified|expires"
-            echo "---"
-            curl -sI http://localhost/landing/livraison-bureau.jsx | grep -iE "HTTP/|cache-control|etag|last-modified|expires"
-
-            echo ""
-            echo "=== First 40 lines of the SERVED html ==="
-            curl -s http://localhost/landing/livraison-bureau.html | head -40
+            echo "=== Leftover untracked files (old prototype?) ==="
+            ls -la "$D/livraison-bureau.js" "$D/webshop-landing-b2b.js" 2>/dev/null || true
+            echo "--- head of livraison-bureau.js (leftover) ---"
+            head -2 "$D/livraison-bureau.js" 2>/dev/null || echo "(none)"
