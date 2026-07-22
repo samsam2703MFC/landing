@@ -617,68 +617,6 @@
             </div>
           </section>
 
-          {/* ============ ZONE PIVOT ============ */}
-          <section id="zone" className="lb-section lb-section--surface" data-screen-label="Zone selector" data-reveal>
-            <div className="lb-wrap">
-              <div className="lb-zone__head">
-                <p className="lb-eyebrow">{L.zoneEyebrow}</p>
-                <h2 className="lb-h2">{L.zoneTitle}</h2>
-                <p className="lb-lede">{L.zoneLede}</p>
-              </div>
-
-              <div className="lb-zone__card">
-                <label className="lb-label">{L.zoneSelectLabel}</label>
-                <div className="lb-select-wrap">
-                  <select className="lb-select" value={zoneId} onChange={onZoneSelect}>
-                    <option value="">{L.zoneChoose}</option>
-                    {zoneGroups.map((g, gi) => (
-                      <optgroup key={gi} label={g.label}>
-                        {g.zones.map((zz) => (<option key={zz.idStr} value={zz.idStr}>{zz.zone_name}</option>))}
-                      </optgroup>
-                    ))}
-                    <option value="0">{L.zoneOutOption}</option>
-                  </select>
-                  <span className="lb-select-caret"><Caret /></span>
-                </div>
-
-                {zoneNone && (<p className="lb-zone__generic">{L.zoneGeneric}</p>)}
-
-                {z && (
-                  <div className="lb-zone__reveal">
-                    <div>
-                      <span className="lb-chip-live">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
-                        {L.zoneLivePar} {shop && !shop.is_system ? shop.name : ''} · {shop && !shop.is_system ? shop.city : ''}
-                      </span>
-                    </div>
-                    <div className="lb-params">
-                      <div className="lb-param"><p className="lb-param__k">{L.lblDays}</p><p className="lb-param__v">{daysStr}</p></div>
-                      <div className="lb-param"><p className="lb-param__k">{L.lblCutoff}</p><p className="lb-param__v lb-param__v--ruby">{cutoffStr}</p></div>
-                      <div className="lb-param"><p className="lb-param__k">{L.lblSlots}</p><p className="lb-param__v">{slotsStr}</p></div>
-                      <div className="lb-param"><p className="lb-param__k">{L.lblMin}</p><p className="lb-param__v">{minStr}</p></div>
-                    </div>
-                    {z.note && (
-                      <p className="lb-zone__note">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>
-                        <span>{z.note[lang]}</span>
-                      </p>
-                    )}
-                    <a href="#contact" className="lb-btn lb-btn--primary lb-btn--sm lb-zone__cta">{L.zoneCta}<Arrow size={15} /></a>
-                  </div>
-                )}
-
-                {zoneOut && (
-                  <div className="lb-zone__reveal">
-                    <p className="lb-zone__out-body"><b style={{ fontWeight: 600 }}>{L.zoneOutTitle}</b> {L.zoneOutBody}</p>
-                    <label className="lb-label">{L.zoneOutLabel} <span style={{ color: 'var(--lp-ruby)' }}>*</span></label>
-                    <input type="text" className="lb-input" value={f.postal_code || ''} onInput={onPostalInput} onChange={onPostalInput} placeholder={L.zoneOutPh} />
-                    <a href="#contact" className="lb-btn lb-btn--primary lb-btn--sm" style={{ marginTop: '18px' }}>{L.zoneOutCta}<Arrow size={15} /></a>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
-
           {/* ============ USE CASES ============ */}
           <section className="lb-section" data-screen-label="Use cases" data-reveal>
             <div className="lb-wrap">
@@ -896,6 +834,68 @@
                     </div>
                   </details>
                 ))}
+              </div>
+            </div>
+          </section>
+
+          {/* ============ ZONE PIVOT (grouped with the contact form) ============ */}
+          <section id="zone" className="lb-section lb-section--surface" data-screen-label="Zone selector" data-reveal>
+            <div className="lb-wrap">
+              <div className="lb-zone__head">
+                <p className="lb-eyebrow">{L.zoneEyebrow}</p>
+                <h2 className="lb-h2">{L.zoneTitle}</h2>
+                <p className="lb-lede">{L.zoneLede}</p>
+              </div>
+
+              <div className="lb-zone__card">
+                <label className="lb-label">{L.zoneSelectLabel}</label>
+                <div className="lb-select-wrap">
+                  <select className="lb-select" value={zoneId} onChange={onZoneSelect}>
+                    <option value="">{L.zoneChoose}</option>
+                    {zoneGroups.map((g, gi) => (
+                      <optgroup key={gi} label={g.label}>
+                        {g.zones.map((zz) => (<option key={zz.idStr} value={zz.idStr}>{zz.zone_name}</option>))}
+                      </optgroup>
+                    ))}
+                    <option value="0">{L.zoneOutOption}</option>
+                  </select>
+                  <span className="lb-select-caret"><Caret /></span>
+                </div>
+
+                {zoneNone && (<p className="lb-zone__generic">{L.zoneGeneric}</p>)}
+
+                {z && (
+                  <div className="lb-zone__reveal">
+                    <div>
+                      <span className="lb-chip-live">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+                        {L.zoneLivePar} {shop && !shop.is_system ? shop.name : ''} · {shop && !shop.is_system ? shop.city : ''}
+                      </span>
+                    </div>
+                    <div className="lb-params">
+                      <div className="lb-param"><p className="lb-param__k">{L.lblDays}</p><p className="lb-param__v">{daysStr}</p></div>
+                      <div className="lb-param"><p className="lb-param__k">{L.lblCutoff}</p><p className="lb-param__v lb-param__v--ruby">{cutoffStr}</p></div>
+                      <div className="lb-param"><p className="lb-param__k">{L.lblSlots}</p><p className="lb-param__v">{slotsStr}</p></div>
+                      <div className="lb-param"><p className="lb-param__k">{L.lblMin}</p><p className="lb-param__v">{minStr}</p></div>
+                    </div>
+                    {z.note && (
+                      <p className="lb-zone__note">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>
+                        <span>{z.note[lang]}</span>
+                      </p>
+                    )}
+                    <a href="#contact" className="lb-btn lb-btn--primary lb-btn--sm lb-zone__cta">{L.zoneCta}<Arrow size={15} /></a>
+                  </div>
+                )}
+
+                {zoneOut && (
+                  <div className="lb-zone__reveal">
+                    <p className="lb-zone__out-body"><b style={{ fontWeight: 600 }}>{L.zoneOutTitle}</b> {L.zoneOutBody}</p>
+                    <label className="lb-label">{L.zoneOutLabel} <span style={{ color: 'var(--lp-ruby)' }}>*</span></label>
+                    <input type="text" className="lb-input" value={f.postal_code || ''} onInput={onPostalInput} onChange={onPostalInput} placeholder={L.zoneOutPh} />
+                    <a href="#contact" className="lb-btn lb-btn--primary lb-btn--sm" style={{ marginTop: '18px' }}>{L.zoneOutCta}<Arrow size={15} /></a>
+                  </div>
+                )}
               </div>
             </div>
           </section>
