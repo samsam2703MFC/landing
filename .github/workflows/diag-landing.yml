@@ -7,43 +7,44 @@ jobs:
   diag:
     runs-on: ubuntu-latest
     steps:
-      - name: Inspect what serves /landing
+      - name: Inspect jsx version + cache headers
         uses: appleboy/ssh-action@v1
         with:
           host: 185.180.206.46
           username: root
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            echo "=== Apache vhost dump (who serves the IP / port 80) ==="
-            apache2ctl -S 2>&1 || httpd -S 2>&1 || true
+            D=/var/www/latelierby-landing
+
+            echo "=== git state in $D ==="
+            cd "$D" && git log --oneline -1 && git status --porcelain=v1 | head
 
             echo ""
-            echo "=== All livraison-bureau.html on disk + which version ==="
-            find /var/www -maxdepth 5 -name 'livraison-bureau.html' 2>/dev/null | while read f; do
-              echo "--- $f"
-              ls -la "$f"
-              if grep -q "La boulangerie qui vient" "$f" 2>/dev/null; then
-                echo "    >>> FULL PAGE (new)"
-              else
-                echo "    >>> prototype/other"
-              fi
-            done
+            echo "=== livraison-bureau.jsx on disk ==="
+            ls -la "$D/livraison-bureau.jsx"
+            echo -n "line count: "; wc -l < "$D/livraison-bureau.jsx"
+            if grep -q "La boulangerie qui vient" "$D/livraison-bureau.jsx"; then
+              echo ">>> JSX is the NEW full page"
+            else
+              echo ">>> JSX is OLD/prototype"
+            fi
+            echo "--- first 3 lines of the on-disk jsx ---"
+            head -3 "$D/livraison-bureau.jsx"
 
             echo ""
-            echo "=== What localhost actually serves ==="
-            curl -s http://localhost/landing/livraison-bureau.html \
-              | grep -oE "La boulangerie qui vient|Choisissez votre zone de livraison|livraison-bureau.jsx" | head -5
+            echo "=== What localhost serves for the JSX (first 3 lines) ==="
+            curl -s http://localhost/landing/livraison-bureau.jsx | head -3
 
             echo ""
-            echo "=== 'landing' references in Apache config (Alias / DocumentRoot) ==="
-            grep -rniE "landing|DocumentRoot" /etc/apache2/sites-enabled/ /etc/apache2/apache2.conf 2>/dev/null || true
+            echo "=== Does the SERVED jsx contain the new hero string? ==="
+            curl -s http://localhost/landing/livraison-bureau.jsx | grep -c "La boulangerie qui vient" || echo 0
 
             echo ""
-            echo "=== sites-enabled ==="
-            ls -la /etc/apache2/sites-enabled/ 2>/dev/null || true
+            echo "=== Response headers for html + jsx (caching) ==="
+            curl -sI http://localhost/landing/livraison-bureau.html | grep -iE "HTTP/|cache-control|etag|last-modified|expires"
+            echo "---"
+            curl -sI http://localhost/landing/livraison-bureau.jsx | grep -iE "HTTP/|cache-control|etag|last-modified|expires"
 
             echo ""
-            echo "=== /var/www top level ==="
-            ls -la /var/www/ 2>/dev/null || true
-            echo "--- /var/www/html/landing (if any) ---"
-            ls -la /var/www/html/landing/ 2>/dev/null | head -20 || echo "no /var/www/html/landing"
+            echo "=== First 40 lines of the SERVED html ==="
+            curl -s http://localhost/landing/livraison-bureau.html | head -40
