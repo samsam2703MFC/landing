@@ -3,6 +3,7 @@ name: Deploy to server
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -15,5 +16,24 @@ jobs:
           username: root
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            cd /var/www/latelierby-landing
-            git pull origin main
+            set -e
+            PROJECT=/var/www/latelierby-landing
+            cd "$PROJECT"
+
+            # Git refuses to operate on a root-owned tree it doesn't "trust".
+            git config --global --add safe.directory "$PROJECT"
+
+            # Deterministic deploy: force the working tree to match origin/main.
+            # A plain `git pull` aborts (and leaves stale files live) whenever the
+            # server copy has diverged — local edits, a half-finished merge, or a
+            # tracked file that now conflicts. fetch + reset --hard can't get stuck.
+            # It only touches TRACKED files, so DB-uploaded images and other
+            # untracked assets in the tree are left untouched.
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "=== Deployed commit ==="
+            git log --oneline -1
+
+            echo "=== Smoke test ==="
+            curl -s -o /dev/null -w "landing HTTP %{http_code}\n" http://localhost/landing/livraison-bureau.html
