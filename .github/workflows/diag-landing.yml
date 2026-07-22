@@ -1,0 +1,49 @@
+name: Diagnose landing path
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect what serves /landing
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 185.180.206.46
+          username: root
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            echo "=== Apache vhost dump (who serves the IP / port 80) ==="
+            apache2ctl -S 2>&1 || httpd -S 2>&1 || true
+
+            echo ""
+            echo "=== All livraison-bureau.html on disk + which version ==="
+            find /var/www -maxdepth 5 -name 'livraison-bureau.html' 2>/dev/null | while read f; do
+              echo "--- $f"
+              ls -la "$f"
+              if grep -q "La boulangerie qui vient" "$f" 2>/dev/null; then
+                echo "    >>> FULL PAGE (new)"
+              else
+                echo "    >>> prototype/other"
+              fi
+            done
+
+            echo ""
+            echo "=== What localhost actually serves ==="
+            curl -s http://localhost/landing/livraison-bureau.html \
+              | grep -oE "La boulangerie qui vient|Choisissez votre zone de livraison|livraison-bureau.jsx" | head -5
+
+            echo ""
+            echo "=== 'landing' references in Apache config (Alias / DocumentRoot) ==="
+            grep -rniE "landing|DocumentRoot" /etc/apache2/sites-enabled/ /etc/apache2/apache2.conf 2>/dev/null || true
+
+            echo ""
+            echo "=== sites-enabled ==="
+            ls -la /etc/apache2/sites-enabled/ 2>/dev/null || true
+
+            echo ""
+            echo "=== /var/www top level ==="
+            ls -la /var/www/ 2>/dev/null || true
+            echo "--- /var/www/html/landing (if any) ---"
+            ls -la /var/www/html/landing/ 2>/dev/null | head -20 || echo "no /var/www/html/landing"
