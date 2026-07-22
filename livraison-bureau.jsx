@@ -567,7 +567,8 @@
               postal_code: f.postal_code,
               lang: (typeof document !== 'undefined' && document.documentElement.lang === 'nl') ? 'nl' : 'fr',
             }),
-          }).catch(() => {});
+          }).then(r => r.json()).then(j => console.info('[office-lead]', j))
+            .catch(err => console.warn('[office-lead] échec réseau', err));
         } catch (_) { /* le message de confirmation reste affiché quoi qu'il arrive */ }
       }
     };

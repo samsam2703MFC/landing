@@ -72,6 +72,30 @@ $colExists = function (string $table, string $col) use ($pdo): bool {
     return (bool) $st->fetchColumn();
 };
 
+// ── Journal de diagnostic : chaque tentative est tracée (payload + issue).
+//    SELECT * FROM lp_office_lead_log ORDER BY id DESC;  pour débugger.
+$pdo->exec("CREATE TABLE IF NOT EXISTS lp_office_lead_log (
+    id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    email      VARCHAR(255) NULL,
+    zip        VARCHAR(12)  NULL,
+    shop_id    INT          NULL,
+    outcome    VARCHAR(30)  NOT NULL,          -- created | duplicate | insert_failed
+    client_id  INT          NULL,
+    error_msg  VARCHAR(600) NULL,
+    payload    TEXT         NULL,
+    created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+$logIt = function (string $outcome, $clientId = null, $error = null) use ($pdo, &$email, &$zip, &$shopId, $body) {
+    try {
+        $st = $pdo->prepare("INSERT INTO lp_office_lead_log (email, zip, shop_id, outcome, client_id, error_msg, payload)
+                              VALUES (?,?,?,?,?,?,?)");
+        $st->execute([(string) $email ?: null, $zip ?: null, $shopId ?: 0, $outcome,
+                      $clientId, $error !== null ? mb_substr((string) $error, 0, 600) : null,
+                      mb_substr(json_encode($body, JSON_UNESCAPED_UNICODE), 0, 2000)]);
+    } catch (PDOException $e) { /* le log ne doit jamais casser le flux */ }
+};
+
 // ── 1) Shop déduit du code postal (le franchisé dont la chalandise couvre le CP) ──
 $shopId = 0; $shopName = null;
 try {
@@ -93,6 +117,7 @@ try {
     $st = $pdo->prepare("SELECT id, id_main_shop FROM client WHERE email IS NOT NULL AND LOWER(TRIM(email))=? LIMIT 1");
     $st->execute([strtolower($email)]);
     if ($ex = $st->fetch()) {
+        $logIt('duplicate', (int) $ex['id']);
         echo json_encode(['ok' => true, 'duplicate' => true,
             'attached' => ((int) $ex['id_main_shop'] !== 0), 'shop' => $shopName]);
         exit;
@@ -118,8 +143,15 @@ try {
     $st  = $pdo->prepare($sql);
     $st->execute($vals);
     $cid = (int) $pdo->lastInsertId();
+    $logIt('created', $cid);
 } catch (PDOException $e) {
-    http_response_code(500); echo json_encode(['error' => 'insert_failed']); exit;
+    // L'erreur SQL exacte est journalisée ET renvoyée : la table client (ERP)
+    // peut exiger des colonnes que ce formulaire ne connaît pas — le message
+    // 1364 « Field 'x' doesn't have a default value » nomme la colonne.
+    $logIt('insert_failed', null, $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['error' => 'insert_failed', 'detail' => mb_substr($e->getMessage(), 0, 300)]);
+    exit;
 }
 
 echo json_encode([
