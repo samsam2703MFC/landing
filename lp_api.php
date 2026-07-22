@@ -71,6 +71,7 @@ $handlers = [
     'services' => 'lp_get_services',
     'sections' => 'lp_get_sections',
     'od'       => 'lp_get_od',
+    'od_zones' => 'lp_get_od_zones',
     'all'      => 'lp_get_all',
 ];
 
@@ -422,6 +423,101 @@ function lp_get_od(PDO $pdo): array {
         'testimonials' => $testimonials, 'faqs' => $faqs, 'form_fields' => $fields,
         'footer' => $footer, 'footer_i18n' => $footer_i18n,
     ];
+}
+
+/**
+ * Zones de livraison RÉELLES (livraison-bureau) — pilotées par l'ERP.
+ *
+ * Hiérarchie :
+ *   ws_franchisor_catchment (zone de chalandise)  =  le GROUPE du menu déroulant
+ *     └── ws_tours (tournées)                       =  les OPTIONS sélectionnables
+ *           └── ws_tour_availability                =  jours / heure limite / créneau
+ *
+ * Le lien tournée ↔ chalandise se fait par shop_id (chaque boutique a sa
+ * chalandise et ses tournées). Une boutique doit être active + landing_enabled.
+ * Renvoie { shops:[...], zones:[...] } dans la forme attendue par le JSX ;
+ * en cas d'absence de table / d'erreur, renvoie des tableaux vides et la page
+ * garde son contenu de secours.
+ */
+function lp_get_od_zones(PDO $pdo): array {
+    $q = function (string $sql) use ($pdo): array {
+        try { return $pdo->query($sql)->fetchAll(); }
+        catch (PDOException $e) { return []; }
+    };
+
+    // Tournées rattachées à une boutique affichée sur la landing.
+    // Le groupe = la chalandise (catchment) de la même boutique.
+    $tours = $q(
+        "SELECT t.id AS tour_id, t.shop_id, TRIM(t.name) AS tour_name, t.zone_secondary,
+                s.name AS shop_name, s.city AS shop_city, s.email AS shop_email,
+                (SELECT c.name FROM ws_franchisor_catchment c
+                   WHERE c.shop_id = t.shop_id AND c.active = 1
+                   ORDER BY c.id ASC LIMIT 1) AS catchment_name
+         FROM ws_tours t
+         JOIN shops s ON s.id = t.shop_id AND s.active = 1 AND s.landing_enabled = 1
+         WHERE t.active = 1
+         ORDER BY s.sort_order ASC, t.id ASC"
+    );
+    if (!$tours) return ['shops' => [], 'zones' => []];
+
+    // Disponibilités (jours / heure limite / créneau) indexées par tournée.
+    $avail = [];
+    foreach ($q("SELECT tour_id, delivery_day, delivery_start, delivery_end, cutoff_time
+                 FROM ws_tour_availability WHERE active = 1
+                 ORDER BY tour_id ASC, delivery_day ASC") as $r) {
+        $avail[(int) $r['tour_id']][] = $r;
+    }
+
+    $dayCode = [1 => 'lun', 2 => 'mar', 3 => 'mer', 4 => 'jeu', 5 => 'ven', 6 => 'sam', 7 => 'dim'];
+    $hm = function ($t) { return ($t !== null && $t !== '') ? substr((string) $t, 0, 5) : ''; };
+
+    $shopsMap = [];
+    $zones = [];
+    foreach ($tours as $t) {
+        $tid  = (int) $t['tour_id'];
+        $sid  = (int) $t['shop_id'];
+        $rows = $avail[$tid] ?? [];
+
+        $days = $slots = [];
+        $cutoff = '';
+        foreach ($rows as $a) {
+            $d = (int) $a['delivery_day'];
+            if (isset($dayCode[$d]) && !in_array($dayCode[$d], $days, true)) $days[] = $dayCode[$d];
+            $slot = $hm($a['delivery_start']) . ' – ' . $hm($a['delivery_end']);
+            if (trim($slot, ' –') !== '' && !in_array($slot, $slots, true)) $slots[] = $slot;
+            if ($cutoff === '' && $hm($a['cutoff_time']) !== '') $cutoff = $hm($a['cutoff_time']);
+        }
+
+        $group = $t['catchment_name'] ?: ($t['shop_city'] ?: 'Autres zones');
+        $note  = ($t['zone_secondary'] !== null && trim((string) $t['zone_secondary']) !== '')
+               ? ('Communes desservies : ' . $t['zone_secondary']) : '';
+
+        $zones[] = [
+            'id'          => $tid,
+            'shop_id'     => $sid,
+            'group'       => $group,                                   // libellé de chalandise
+            'region'      => '',
+            'zone_name'   => $t['tour_name'] !== '' ? $t['tour_name'] : ('Tournée ' . $tid),
+            'city'        => $t['shop_city'],
+            'cutoff_time' => $cutoff,
+            'days'        => $days,
+            'slots'       => $slots,
+            'min'         => null,                                     // pas de source fiable en base
+            'note_fr'     => $note,
+            'note_nl'     => $note,
+            'priority'    => $tid,
+            'is_active'   => true,
+        ];
+
+        if (!isset($shopsMap[$sid])) {
+            $shopsMap[$sid] = [
+                'id' => $sid, 'name' => $t['shop_name'], 'city' => $t['shop_city'],
+                'email' => $t['shop_email'], 'is_system' => false,
+            ];
+        }
+    }
+
+    return ['shops' => array_values($shopsMap), 'zones' => $zones];
 }
 
 function lp_get_all(PDO $pdo): array {

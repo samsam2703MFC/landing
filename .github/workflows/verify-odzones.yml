@@ -1,0 +1,21 @@
+name: Verify od_zones endpoint
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl the od_zones route
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 185.180.206.46
+          username: root
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            echo "=== HTTP status ==="
+            curl -s -o /dev/null -w "%{http_code}\n" "http://localhost/landing/lp_api.php?r=od_zones"
+            echo "=== Body ==="
+            curl -s "http://localhost/landing/lp_api.php?r=od_zones" | head -c 4000
+            echo ""

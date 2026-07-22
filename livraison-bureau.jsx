@@ -336,6 +336,10 @@
   // the rest of the site — fetches the DB and patches over it. If the API or
   // the lp_od_* tables are absent, the fallback keeps the page fully working.
   const API_URL = '/landing/lp_api.php?r=od';
+  // Real delivery zones/tournées, straight from the ERP (ws_franchisor_catchment
+  // → ws_tours → ws_tour_availability). Overlaid on top of whatever the editorial
+  // pack provides, so the selector always reflects the live catchment/tour data.
+  const ZONES_URL = '/landing/lp_api.php?r=od_zones';
 
   const DEFAULT_FORM_DEFS = [
     { key: 'first_name', type: 'text', full: false, required: true },
@@ -468,12 +472,30 @@
     const [prodIndex, setProdIndex] = useState(0);
 
     // Fetch the DB content once and patch over the fallback (site convention).
+    // Two sources, resolved together so there's no race on setPack:
+    //   - `od`       : editorial content (hero, formules, faq…) from lp_od_*
+    //   - `od_zones` : the REAL delivery zones/tournées from the ERP (ws_*)
+    // od_zones is authoritative for the zone selector and is overlaid last.
     useEffect(() => {
       let alive = true;
-      fetch(API_URL, { headers: { Accept: 'application/json' } })
-        .then(r => r.ok ? r.json() : null)
-        .then(od => { if (!alive || !od) return; const p = buildPackFromOD(od); if (p) setPack(p); })
-        .catch(() => { /* garde le fallback */ });
+      const grab = (url) => fetch(url, { headers: { Accept: 'application/json' } })
+        .then(r => r.ok ? r.json() : null).catch(() => null);
+      Promise.all([grab(API_URL), grab(ZONES_URL)]).then(([od, oz]) => {
+        if (!alive) return;
+        let base = fallbackPack();
+        if (od) { const p = buildPackFromOD(od); if (p) base = p; }
+        if (oz && Array.isArray(oz.zones) && oz.zones.length) {
+          const shopsMap = Object.assign({ 0: SHOPS[0] }, base.shopsMap);
+          (oz.shops || []).forEach(s => { shopsMap[s.id] = s; });
+          const zones = oz.zones.map(z => ({
+            ...z,
+            is_active: true,
+            note: (z.note_fr || z.note_nl) ? { fr: z.note_fr, nl: z.note_nl } : null
+          }));
+          base = { ...base, zones, shopsMap };
+        }
+        setPack(base);
+      });
       return () => { alive = false; };
     }, []);
 
@@ -535,14 +557,32 @@
     const closeModal = () => setSubmitted(false);
 
     // ---- Derived data ----
+    // Group the selector. Real ERP zones carry a `group` label (the catchment /
+    // zone de chalandise) → group by that, in first-seen order. Demo/fallback
+    // zones only have a `region` code → keep the region grouping.
     const active = pack.zones.filter(x => x.is_active);
-    const regionOrder = ['bw', 'bf', 'nm', 'eb'];
-    const byRegion = {};
-    active.forEach(x => { (byRegion[x.region] = byRegion[x.region] || []).push(x); });
-    const zoneGroups = regionOrder.filter(r => byRegion[r]).map(r => ({
-      label: L.regions[r],
-      zones: byRegion[r].sort((a, b) => a.priority - b.priority).map(x => ({ idStr: String(x.id), zone_name: x.zone_name }))
-    }));
+    let zoneGroups;
+    if (active.some(x => x.group)) {
+      const order = [];
+      const byGroup = {};
+      active.forEach(x => {
+        const g = x.group || '—';
+        if (!byGroup[g]) { byGroup[g] = []; order.push(g); }
+        byGroup[g].push(x);
+      });
+      zoneGroups = order.map(g => ({
+        label: g,
+        zones: byGroup[g].sort((a, b) => a.priority - b.priority).map(x => ({ idStr: String(x.id), zone_name: x.zone_name }))
+      }));
+    } else {
+      const regionOrder = ['bw', 'bf', 'nm', 'eb'];
+      const byRegion = {};
+      active.forEach(x => { (byRegion[x.region] = byRegion[x.region] || []).push(x); });
+      zoneGroups = regionOrder.filter(r => byRegion[r]).map(r => ({
+        label: L.regions[r],
+        zones: byRegion[r].sort((a, b) => a.priority - b.priority).map(x => ({ idStr: String(x.id), zone_name: x.zone_name }))
+      }));
+    }
 
     const daysStr = z ? z.days.map(d => L.days[d]).join(' · ') : '';
     const cutoffStr = z ? (z.cutoff_time + L.cutoffSuffix) : '';
@@ -875,8 +915,8 @@
                     <div className="lb-params">
                       <div className="lb-param"><p className="lb-param__k">{L.lblDays}</p><p className="lb-param__v">{daysStr}</p></div>
                       <div className="lb-param"><p className="lb-param__k">{L.lblCutoff}</p><p className="lb-param__v lb-param__v--ruby">{cutoffStr}</p></div>
-                      <div className="lb-param"><p className="lb-param__k">{L.lblSlots}</p><p className="lb-param__v">{slotsStr}</p></div>
-                      <div className="lb-param"><p className="lb-param__k">{L.lblMin}</p><p className="lb-param__v">{minStr}</p></div>
+                      {slotsStr && (<div className="lb-param"><p className="lb-param__k">{L.lblSlots}</p><p className="lb-param__v">{slotsStr}</p></div>)}
+                      {(z.min != null && Number(z.min) > 0) && (<div className="lb-param"><p className="lb-param__k">{L.lblMin}</p><p className="lb-param__v">{minStr}</p></div>)}
                     </div>
                     {z.note && (
                       <p className="lb-zone__note">
