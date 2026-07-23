@@ -1,0 +1,35 @@
+name: Verify landing final state
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Full landing sanity
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 185.180.206.46
+          username: root
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            D=/var/www/latelierby-landing
+            cd "$D"
+            echo "=== deployed landing commit ==="; git log --oneline -1
+            echo "=== git status (root landing pages should NOT be modified anymore) ==="
+            git status --porcelain=v1 | grep -iE "livraison-bureau|evenement" || echo "  (root pages clean — no external overwrite)"
+            echo ""
+            echo "=== root livraison-bureau.html: redirect (good) or full page (bad)? ==="
+            grep -oiE "http-equiv=\"refresh\"|<div id=\"root\">" "$D/livraison-bureau.html" | head -1
+            echo ""
+            echo "=== HTTP + content ==="
+            for u in "/livraison-bureau.html" "/office/livraison-bureau.html" "/office/livraison-bureau.jsx" \
+                     "/b2b/evenements-b2b.html" "/b2b/webshop-landing-b2b.js" \
+                     "/assets/abricot/office-delivery.png" "/fonts/Gotham_Medium.otf"; do
+              printf "  %-40s %s\n" "$u" "$(curl -s -o /dev/null -w '%{http_code}' "http://localhost/landing$u")"
+            done
+            echo "--- old office URL redirects to /office/ ? ---"
+            curl -s "http://localhost/landing/livraison-bureau.html" | grep -oE "/landing/office/livraison-bureau.html" | head -1
+            echo "--- b2b page loads its bundle ? ---"
+            curl -s "http://localhost/landing/b2b/evenements-b2b.html" | grep -oE "webshop-landing-b2b.js\?v=[0-9]*" | head -1
